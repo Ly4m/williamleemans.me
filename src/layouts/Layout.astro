@@ -1,16 +1,58 @@
 ---
 import '../styles/global.css'
 import '@fontsource/space-grotesk';
+
+type Props = {
+	title?: string;
+	description?: string;
+	ogImage?: string;
+	noindex?: boolean;
+	lang?: string;
+	structuredData?: string;
+};
+
+const {
+	title = 'William Leemans',
+	description = "Entrepreneur & architecte logiciel. J'aide à concevoir des produits robustes, utiles et soignés.",
+	ogImage = '/og/default.jpg',
+	noindex = false,
+	lang = 'fr',
+	structuredData
+} = Astro.props;
+
+const site = Astro.site?.toString() ?? 'https://williamleemans.me';
+const canonical = new URL(Astro.url.pathname, site).toString();
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
+
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+
+		<!-- Robots -->
+		<meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
+
+		<!-- Open Graph -->
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="William Leemans" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={ogImage} />
+
+		<!-- Twitter -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImage} />
+
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-		<title>William Leemans</title>
 	</head>
 	<body class="m-[8px] py-[5vh] px-[10vw] bg-primary-100 antialiased">
 		<slot />
