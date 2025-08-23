@@ -4,33 +4,82 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-    --font-space: 'Space Grotesk', 'sans-serif';
-    --font-sans: 'Inter', sans-serif;
+  --font-space: "Space Grotesk", "sans-serif";
+  --font-sans: "Inter", sans-serif;
 
-    --color-primary-100: #FAFAFA;
-    --color-charcoal: #1B1B1B;
-    --color-ash: #555;
+  --color-primary-100: #fafafa;
+  --color-charcoal: #252525;
+  --color-faded: #6b6b6b;
 
-    --text-base: 16px;
+
+  --text-base: 16px;
 }
 
 body {
-    line-height: 1.6;
-    animation: fadeIn 1s ease-out;
+  line-height: 1.6;
+  animation: fadeIn 1s ease-out;
 }
-h1, h2, h3 {
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    animation: blurIn 1s cubic-bezier(0.23, 1, 0.32, 1);
-    /* Glassmorphism/backdrop effect for headers */
-    backdrop-filter: blur(8px) saturate(105%);
+h1,
+h2,
+h3 {
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  animation: blurIn 1s cubic-bezier(0.23, 1, 0.32, 1);
+  backdrop-filter: blur(8px) saturate(105%);
 }
+
+article {
+  a {
+    font-weight: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(125, 125, 125, 0.3);
+    transition: border 0.3s ease-in-out;
+
+    &:hover {
+      border-bottom: 1px solid var(--color-charcoal);
+    }
+  }
+}
+
 /* Animations */
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes blurIn {
-    from { filter: blur(12px); opacity: 0.5; }
-    to { filter: blur(0); opacity: 1; }
+  from {
+    filter: blur(12px);
+    opacity: 0.5;
+  }
+  to {
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+@layer utilities {
+  .dot-leader {
+    --dot: 2px;
+    --gap: 12px;
+    background: radial-gradient(
+        circle,
+        currentColor calc(var(--dot) / 2),
+        transparent calc(var(--dot) / 2)
+      )
+      0 50% / var(--gap) var(--dot) repeat-x;
+    height: var(--dot);
+    align-self: center;
+  }
+
+  .group:hover .dot-leader {
+    color: var(--color-charcoal);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-astro-transition] { transition: none !important; animation: none !important; }
 }

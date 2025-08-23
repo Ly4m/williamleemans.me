@@ -1,0 +1,48 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+
+const posts = (await getCollection("blog")).sort(
+  (a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) =>
+    b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const fmt = (date: Date) => {
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  return `${year} · ${month}`;
+}
+---
+
+<Layout title="William Leemans — Architecte logiciel" ogImage="/og/home.jpg">
+  <header class="py-12">
+    <h1 class="font-space text-charcoal text-2xl tracking-tight md:text-3xl">
+      The blog
+    </h1>
+  </header>
+  <main class="text-ash">
+    <ul class="max-w-md">
+      {
+        posts.map((post: CollectionEntry) => (
+          <li>
+            <a
+              href={`/blog/${post.id}`}
+              class="group flex items-center justify-between gap-1"
+            >
+              <time class="text-faded group-hover:text-charcoal text-sm tabular-nums transition-colors group-hover:transition-none motion-reduce:transition-none">
+                {fmt(post.data.pubDate)}
+              </time>
+              <span aria-hidden="true" class="text-faded dot-leader group-hover:dot-leader-hover grow transition-colors group-hover:transition-none leading-none motion-reduce:transition-none"
+              />
+              <span class="group-hover:text-charcoal">
+                {post.data.title}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </main>
+</Layout>

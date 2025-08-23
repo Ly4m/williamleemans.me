@@ -1,0 +1,73 @@
+---
+interface NavItem {
+  label: string;
+  href: string;
+}
+
+const { items = [] }: { items: NavItem[] } = Astro.props;
+const current = Astro.url.pathname;
+---
+
+<!-- Mobile toggle (checkbox hack = no JS) -->
+<input id="nav-toggle" type="checkbox" class="peer hidden" />
+
+<!-- Top bar (mobile) -->
+<header
+  class="fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between px-4 md:hidden"
+>
+  <a href="/" class="font-medium font-space tracking-tight">W&nbsp;L</a>
+  <label for="nav-toggle" class="cursor-pointer" aria-label="Ouvrir le menu">
+    <div class="mb-1 h-[2px] w-6"></div>
+    <div class="mb-1 h-[2px] w-6"></div>
+    <div class="h-[2px] w-6"></div>
+  </label>
+</header>
+
+<!-- Sidebar -->
+<aside
+  class="text-charcoal fixed top-0 left-0 z-40 h-screen w-64 -translate-x-full transform transition-transform duration-300 peer-checked:translate-x-0 md:fixed md:h-screen md:translate-x-0"
+  aria-label="Navigation latérale"
+>
+  <div class="hidden h-16 items-center px-6 md:flex">
+    <a href="/" class="font-medium tracking-tight">W&nbsp;L</a>
+  </div>
+
+  <nav class="space-y-2 px-6 py-6">
+    {
+      items.map(({ label, href }) => {
+        const active =
+          current === href || (href !== "/" && current.startsWith(href));
+        return (
+          <a
+            href={href}
+            class={[
+              "group block px-3 py-2 text-sm tracking-wide uppercase transition",
+              "border-l-2",
+              active
+                ? "border-black font-medium"
+                : "border-transparent opacity-70 hover:opacity-100",
+            ].join(" ")}
+          >
+            <span class="inline-block translate-x-0 transition group-hover:translate-x-1">
+              {label}
+            </span>
+          </a>
+        );
+      })
+    }
+  </nav>
+
+  <div class="absolute right-6 bottom-6 left-6 text-xs opacity-60">
+    <a href="https://github.com/..." class="hover:opacity-100">GitHub</a>
+    <span class="mx-2">·</span>
+    <a href="https://www.linkedin.com/in/..." class="hover:opacity-100"
+      >LinkedIn</a
+    >
+  </div>
+</aside>
+
+<!-- Click mask (mobile) -->
+<label
+  for="nav-toggle"
+  class="peer-checked:fixed peer-checked:inset-0 peer-checked:bg-black/40 md:hidden"
+></label>

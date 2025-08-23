@@ -1,60 +1,87 @@
 ---
-import '../styles/global.css'
-import '@fontsource/space-grotesk';
+import "../styles/global.css";
+import "@fontsource/space-grotesk";
+import SideNav from "../components/SideNav.astro";
+import { ClientRouter } from "astro:transitions";
 
 type Props = {
-	title?: string;
-	description?: string;
-	ogImage?: string;
-	noindex?: boolean;
-	lang?: string;
-	structuredData?: string;
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  noindex?: boolean;
+  lang?: string;
+  structuredData?: string;
 };
 
 const {
-	title = 'William Leemans',
-	description = "Entrepreneur & architecte logiciel. J'aide à concevoir des produits robustes, utiles et soignés.",
-	ogImage = '/og/default.jpg',
-	noindex = false,
-	lang = 'fr',
-	structuredData
+  title = "William Leemans",
+  description = "Hi, I’m William Leemans! Entrepreneur, software architect, and Jetdev CTO. I craft clean solutions, mentor developers, and love building useful products.",
+  ogImage = "/og/default.jpg",
+  noindex = false,
+  lang = "en",
+  structuredData,
 } = Astro.props;
 
-const site = Astro.site?.toString() ?? 'https://williamleemans.me';
+const nav = [
+  { label: "Home", href: "/" },
+  { label: "Blog", href: "/blog" }, // blog/notes
+];
+
+const site = Astro.site?.toString() ?? "https://williamleemans.me";
 const canonical = new URL(Astro.url.pathname, site).toString();
 ---
 
 <!doctype html>
-<html lang={lang}>
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+<html
+  lang={lang}
+  class="h-full"
+  transition:name="root"
+  transition:animate="initial"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
 
-		<title>{title}</title>
-		<meta name="description" content={description} />
-		<link rel="canonical" href={canonical} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
 
-		<!-- Robots -->
-		<meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
+    <!-- Robots -->
+    <meta
+      name="robots"
+      content={noindex ? "noindex, nofollow" : "index, follow"}
+    />
 
-		<!-- Open Graph -->
-		<meta property="og:type" content="website" />
-		<meta property="og:site_name" content="William Leemans" />
-		<meta property="og:title" content={title} />
-		<meta property="og:description" content={description} />
-		<meta property="og:url" content={canonical} />
-		<meta property="og:image" content={ogImage} />
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="William Leemans" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
 
-		<!-- Twitter -->
-		<meta name="twitter:card" content="summary_large_image" />
-		<meta name="twitter:title" content={title} />
-		<meta name="twitter:description" content={description} />
-		<meta name="twitter:image" content={ogImage} />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:site" content="@WillLeemans" />
+    <meta name="twitter:creator" content="@WillLeemans" />
 
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-	</head>
-	<body class="m-[8px] py-[5vh] px-[10vw] bg-primary-100 antialiased">
-		<slot />
-	</body>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <ClientRouter />
+  </head>
+  <body class="bg-primary-100 h-full antialiased min-h-screen">
+    <SideNav items={nav} />
+
+    <!-- Content area -->
+    <main class="md:ml-64">
+      <!-- spacer for mobile top bar -->
+      <div class="h-14 md:h-0"></div>
+      <section class="max-w-3xl px-6 py-10 md:px-10 container">
+        <slot />
+      </section>
+    </main>
+  </body>
 </html>

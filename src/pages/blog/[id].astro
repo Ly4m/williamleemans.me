@@ -1,0 +1,35 @@
+---
+import { getCollection, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((post: CollectionEntry<"blog">) => ({
+    params: { id: post.id },
+    props: { post }
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const fmt = (date: Date) => {
+  return date.toLocaleDateString();
+}
+---
+
+<Layout title={"William Leemans — " + post.data.title} ogImage="/og/home.jpg">
+  <header class="py-12">
+    <h1 class="font-space text-charcoal text-2xl tracking-tight md:text-3xl">
+      {post.data.title}
+    </h1>
+    <p class="text-faded">
+      {post.data.readingTime} min - {fmt(post.data.pubDate)}
+    </p>
+  </header>
+  <main class="text-charcoal">
+    <article class="prose">
+      <Content />
+    </article>
+  </main>
+</Layout>
