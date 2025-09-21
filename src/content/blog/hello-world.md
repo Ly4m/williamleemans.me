@@ -13,7 +13,7 @@ So lo and behold: **My own personal website!**
 
 I love tinkering with new tech, so I'm building it with **[Astro](https://astro.build/)**
 for its clean developer experience (plus, the CLI robot won me over 🤖). 
-I’m also exploring design more deeply, so I’m crafting the look and feel as I go.
+I’m also exploring design more deeply, so I’m building the look and feel as I go.
 
 **Here’s what you can expect to find around here:**
 
