@@ -3,7 +3,7 @@ slug: "new-machine-day"
 title: "New Machine Day"
 lang: "en"
 description: "Why I switched from a 16″ to a 14″ MacBook Pro, rebuilt my dev setup from scratch, and added a cozy Gruvbox vibe for autumn."
-pubDate: "2025-09-21"
+pubDate: "2025-09-23"
 readingTime: 4
 ---
 
