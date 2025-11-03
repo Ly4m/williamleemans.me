@@ -9,12 +9,14 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/netlify": "^6.5.6",
-    "@astrojs/sitemap": "^3.4.2",
-    "@fontsource/space-grotesk": "^5.2.6",
+    "@astrojs/netlify": "^6.6.0",
+    "@astrojs/sitemap": "^3.6.0",
     "@fontsource/ibm-plex-mono": "^5.2.6",
+    "@fontsource/space-grotesk": "^5.2.6",
     "@tailwindcss/vite": "^4.1.11",
-    "astro": "^5.12.8",
+    "astro": "^5.15.3",
+    "playwright": "^1.56.1",
+    "rehype-mermaid": "^3.0.0",
     "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
