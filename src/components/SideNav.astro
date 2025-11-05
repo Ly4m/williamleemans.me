@@ -1,4 +1,5 @@
 ---
+import AnimatedLogo from "./AnimatedLogo.astro";
 interface NavItem {
   label: string;
   href: string;
@@ -13,7 +14,7 @@ const current = Astro.url.pathname;
 <header
   class="fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between px-4 md:hidden"
 >
-  <a href="/" class="font-medium font-space tracking-tight">W&nbsp;L</a>
+  <AnimatedLogo />
 
   <!-- Mobile navigation icons -->
   <nav class="flex items-center gap-3">
@@ -71,10 +72,10 @@ const current = Astro.url.pathname;
 <!-- Desktop sidebar navigation -->
 <aside
   class="text-charcoal fixed top-0 left-0 z-40 hidden h-screen w-64 md:block"
-  aria-label="Navigation latérale"
+  aria-label="Side Navigation"
 >
   <div class="flex h-16 items-center px-6">
-    <a href="/" class="font-medium tracking-tight">W&nbsp;L</a>
+    <AnimatedLogo />
   </div>
 
   <nav class="space-y-2 px-6 py-6">

@@ -1,0 +1,59 @@
+---
+
+---
+
+<a href="/" class="logo">
+  <span class="logo-initials">W</span>
+  <span class="logo-full">illiam</span>
+  <span class="logo-initials">&nbspL</span>
+  <span class="logo-full">eemans</span>
+</a>
+
+<style>
+.logo {
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  }
+
+.logo-initials {
+  position: relative;
+  z-index: 2;
+  }
+
+.logo-full {
+  display: inline-block;
+  overflow: hidden;
+  max-width: 0;
+  opacity: 0;
+  transition: max-width 0.3s ease, opacity 0.3s ease;
+  animation: logo-expand 12s ease-in-out infinite;
+  position: relative;
+  color: var(--color-faded);
+  z-index: 1;
+  }
+
+@keyframes logo-expand {
+  0%, 25%, 70%, 100% {
+  max-width: 0;
+  opacity: 0;
+  }
+  35%, 65% {
+  max-width: 18ch; /* fit “illiam Leemans” */
+  opacity: 1;
+  }
+  }
+
+/* Optional: expand on hover */
+.logo:hover .logo-full {
+  max-width: 18ch;
+  opacity: 1;
+  }
+
+</style>
