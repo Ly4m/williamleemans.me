@@ -8,9 +8,11 @@ import netlify from "@astrojs/netlify";
 import sitemap from "@astrojs/sitemap";
 import rehypeMermaid from "rehype-mermaid";
 
+import svelte from "@astrojs/svelte";
+
 export default defineConfig({
   site: "https://williamleemans.me",
-  integrations: [sitemap()],
+  integrations: [sitemap(), svelte()],
   markdown: {
     syntaxHighlight: {
       type: "shiki",
