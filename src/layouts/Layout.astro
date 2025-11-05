@@ -4,6 +4,7 @@ import "@fontsource/space-grotesk";
 import "@fontsource/ibm-plex-mono";
 import SideNav from "../components/SideNav.astro";
 import { ClientRouter } from "astro:transitions";
+import EmberBackground from "../components/EmberBackground.svelte";
 
 type Props = {
   title?: string;
@@ -72,9 +73,11 @@ const canonical = new URL(Astro.url.pathname, site).toString();
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+
     <ClientRouter />
   </head>
   <body class="bg-primary-100 h-full antialiased min-h-screen">
+    <EmberBackground client:load />
     <SideNav items={nav} />
 
     <!-- Content area -->

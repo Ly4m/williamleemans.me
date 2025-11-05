@@ -18,7 +18,7 @@ export default defineConfig({
       type: "shiki",
       excludeLangs: ["math", "mermaid"],
     },
-    rehypePlugins: [rehypeMermaid],
+    rehypePlugins: [[rehypeMermaid, { strategy: "img-svg" }]],
   },
   vite: {
     plugins: [tailwindcss()],
