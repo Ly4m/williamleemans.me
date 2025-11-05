@@ -77,20 +77,8 @@ It moves your commits onto another branch, like cutting and pasting them on top 
 For example, you can update your branch with the latest changes from main without adding a merge commit.
 
 Here’s what the history looks like before rebasing:
-```mermaid
----
-config:
-  theme: 'neutral'
----
-    gitGraph
-       commit id: "A"
-       commit id: "B"
-       branch new-feature
-       commit id: "C"
-       commit id: "D"
-       checkout main
-       commit id: "E"
-```
+
+![rebase-1](images/3/rebase-1.svg)
 
 ```bash
 git rebase main
@@ -98,19 +86,7 @@ git rebase main
 
 Git moves your commits so they sit on top of main, keeping the history clean and linear:
 
-```mermaid
----
-config:
-  theme: 'neutral'
----
-    gitGraph
-       commit id: "A"
-       commit id: "B"
-       commit id: "E"
-       branch new-feature
-       commit id: "C"
-       commit id: "D"
-```
+![rebase-2](images/3/rebase-2.svg)
 
 But this is just the tip of the iceberg, you can do a lot more with rebase.
 
@@ -119,21 +95,7 @@ But this is just the tip of the iceberg, you can do a lot more with rebase.
 Imagine I’ve just finished my UI scaffolding feature, and I’m ready to merge it into main.
 But, my feature is split into two commits, and I have a commit about docs that needs to be reworded.
 
-```mermaid
----
-config:
-  theme: 'neutral'
----
-gitGraph
-    commit id: "A"
-    commit id: "B"
-    branch ui-scaffolding
-    commit id: "feat: ui part 1 (C)"
-    commit id: "add doc (D)"
-    commit id: "feat: ui part 2 (E)"
-    checkout main
-    commit id: "F"
-```
+![interactive-1](images/3/interactive-1.svg)
 
 There are three things I want to do:
 1. Squash the two feature commits (C & E) into one
@@ -175,19 +137,7 @@ reword D # add doc
 
 When saving the file, Git will automatically apply the changes to the history.
 
-```mermaid
----
-config:
-  theme: 'neutral'
----
-gitGraph
-    commit id: "A"
-    commit id: "B"
-    commit id: "F"
-    branch ui-scaffolding
-    commit id: "feat: scaffolds UI"
-    commit id: "docs: adds UI screenshots"
-```
+![interactive-2](images/3/interactive-2.svg)
 
 And there it is, the history is clean, and the branch is up to date with main!
 
@@ -208,18 +158,7 @@ git push --force
 
 Let's say you already have multiple commits on your branch and want to fix one of them.
 
-```mermaid
----
-config:
-  theme: 'neutral'
----
-gitGraph
-    commit id: "A"
-    commit id: "B"
-    branch new-feature
-    commit id: "feat: scaffolds UI (C)"
-    commit id: "docs: adds UI screenshots (D)"
-```
+![fixup-1](images/3/fixup-1.svg)
 
 If you want to fix something in commit D, you could simply use the --amend option we saw earlier.
 
@@ -242,18 +181,7 @@ pick D # docs: adds UI screenshots"
 
 Now your history is clean, and the fix is properly included in commit C:
 
-```mermaid
----
-config:
-  theme: 'neutral'
----
-gitGraph
-    commit id: "A"
-    commit id: "B"
-    branch new-feature
-    commit id: "feat: scaffolds UI with the fix (C)"
-    commit id: "docs: adds UI screenshots (D)"
-```
+![fixup-2](images/3/fixup-2.svg)
     
 ---
 

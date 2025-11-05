@@ -6,7 +6,6 @@ import tailwindcss from "@tailwindcss/vite";
 import netlify from "@astrojs/netlify";
 
 import sitemap from "@astrojs/sitemap";
-import rehypeMermaid from "rehype-mermaid";
 
 import svelte from "@astrojs/svelte";
 
@@ -16,9 +15,7 @@ export default defineConfig({
   markdown: {
     syntaxHighlight: {
       type: "shiki",
-      excludeLangs: ["math", "mermaid"],
     },
-    rehypePlugins: [[rehypeMermaid, { strategy: "img-svg" }]],
   },
   vite: {
     plugins: [tailwindcss()],

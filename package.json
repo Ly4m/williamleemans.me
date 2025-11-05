@@ -16,8 +16,6 @@
     "@fontsource/space-grotesk": "^5.2.6",
     "@tailwindcss/vite": "^4.1.11",
     "astro": "^5.15.3",
-    "playwright": "^1.56.1",
-    "rehype-mermaid": "^3.0.0",
     "simplex-noise": "^4.0.3",
     "svelte": "^5.43.3",
     "tailwindcss": "^4.1.11",
