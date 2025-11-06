@@ -1,59 +1,68 @@
----
-
----
-
 <a href="/" class="logo">
   <span class="logo-initials">W</span>
   <span class="logo-full">illiam</span>
-  <span class="logo-initials">&nbspL</span>
+  <span class="logo-initials">&nbsp;L</span>
   <span class="logo-full">eemans</span>
 </a>
 
 <style>
-.logo {
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  display: inline-block;
-  white-space: nowrap;
-  overflow: hidden;
-  cursor: pointer;
-  position: relative;
-  display: flex;
-  align-items: center;
+  .logo {
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
   }
 
-.logo-initials {
-  position: relative;
-  z-index: 2;
+  .logo-initials {
+    position: relative;
   }
 
-.logo-full {
-  display: inline-block;
-  overflow: hidden;
-  max-width: 0;
-  opacity: 0;
-  transition: max-width 0.3s ease, opacity 0.3s ease;
-  animation: logo-expand 12s ease-in-out infinite;
-  position: relative;
-  color: var(--color-faded);
-  z-index: 1;
+  .logo-full {
+    display: inline-block;
+    overflow: hidden;
+    max-width: 0;
+    opacity: 0;
+    filter: blur(4px);
+    color: var(--color-faded, #888);
+    animation: name-expand 20s ease-in-out infinite;
   }
 
-@keyframes logo-expand {
-  0%, 25%, 70%, 100% {
-  max-width: 0;
-  opacity: 0;
+  .logo-full:first-of-type {
+    animation-delay: 0.1s;
   }
-  35%, 65% {
-  max-width: 18ch; /* fit “illiam Leemans” */
-  opacity: 1;
-  }
+  .logo-full:last-of-type {
+    animation-delay: 0.15s;
   }
 
-/* Optional: expand on hover */
-.logo:hover .logo-full {
-  max-width: 18ch;
-  opacity: 1;
+  .logo:hover .logo-full {
+    max-width: 18ch;
+    opacity: 1;
+    filter: blur(0);
+    color: var(--color-faded);
+    animation-play-state: paused;
   }
 
+  @keyframes name-expand {
+    0%, 20% {
+      max-width: 0;
+      opacity: 0;
+      filter: blur(4px);
+    }
+
+    25%, 55% {
+      max-width: 18ch;
+      opacity: 1;
+      filter: blur(0);
+    }
+
+    60%, 100% {
+      max-width: 0;
+      opacity: 0;
+      filter: blur(3px);
+    }
+  }
 </style>
