@@ -6,8 +6,33 @@ interface NavItem {
   icon?: string; // Optional icon for mobile display
 }
 
+interface SocialLink {
+  label: string;
+  href: string;
+  icon: string;
+}
+
+
 const { items = [] }: { items?: NavItem[] } = Astro.props;
 const current = Astro.url.pathname;
+
+const isActive = (href: string, current: string) => {
+  if (href === "/") return current === "/";
+  return current === href || current.startsWith(href + "/");
+}
+
+const socialLinks: SocialLink[] = [
+  {
+    label: "GitHub",
+    href: "https://github.com/Ly4m",
+    icon: "icon-[tabler--brand-github]"
+  },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/wleemans",
+    icon: "icon-[tabler--brand-linkedin]"
+  }
+];
 ---
 
 <!-- Mobile header with icons -->
@@ -20,8 +45,7 @@ const current = Astro.url.pathname;
   <nav class="flex items-center gap-3">
     {
       items.map(({ label, href, icon }) => {
-        const active =
-          current === href || (href !== "/" && current.startsWith(href));
+        const active = isActive(href, current);
         return (
           <a
             href={href}
@@ -47,24 +71,22 @@ const current = Astro.url.pathname;
 
     <!-- Social links for mobile -->
     <div class="ml-2 flex gap-2 border-l border-gray-200 pl-3">
-      <a
-        href="https://github.com/Ly4m"
-        rel="noopener noreferrer"
-        target="_blank"
-        class="flex h-8 w-8 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 hover:text-black"
-        title="GitHub"
-      >
-        <i class="icon-[tabler--brand-github] text-lg" aria-hidden="true"></i>
-      </a>
-      <a
-        href="https://www.linkedin.com/in/wleemans"
-        rel="noopener noreferrer"
-        target="_blank"
-        class="flex h-8 w-8 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 hover:text-black"
-        title="LinkedIn"
-      >
-        <i class="icon-[tabler--brand-linkedin] text-lg" aria-hidden="true"></i>
-      </a>
+      {
+        socialLinks.map(s => {
+          return (
+            <a
+              href={s.href}
+              rel="noopener noreferrer"
+              target="_blank"
+              class="flex h-8 w-8 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 hover:text-black"
+              title={s.label}
+            >
+              <i class={["text-lg", s.icon].join(" ")}
+                 aria-hidden="true"></i>
+            </a>
+          )
+        })
+      }
     </div>
   </nav>
 </header>
@@ -103,11 +125,12 @@ const current = Astro.url.pathname;
     }
   </nav>
 
-  <div class="absolute right-6 bottom-6 left-6 text-xs opacity-60">
-    <a target="_blank" href="https://github.com/Ly4m" rel="noopener noreferrer" class="hover:opacity-100">GitHub</a>
+  <div class="absolute bottom-6 left-6 text-xs opacity-60">
+    { socialLinks.map(s => {
+      return (
+        <a target="_blank" href={s.href} rel="noopener noreferrer" class="hover:opacity-100">{s.label}</a><span>&nbsp</span>
+      )
+    }) }
     <span class="mx-2">·</span>
-    <a target="_blank" href="https://www.linkedin.com/in/wleemans" rel="noopener noreferrer" class="hover:opacity-100"
-    >LinkedIn</a
-    >
   </div>
 </aside>
