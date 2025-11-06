@@ -41,6 +41,10 @@ article {
   }
 }
 
+.prose {
+  max-width: 68ch;
+}
+
 /* Animations */
 @keyframes fadeIn {
   from {

@@ -37,7 +37,7 @@ const canonical = new URL(Astro.url.pathname, site).toString();
 <!doctype html>
 <html
   lang={lang}
-  class="h-full"
+  class="h-full scroll-smooth"
   transition:name="root"
   transition:animate="initial"
 >
@@ -81,7 +81,7 @@ const canonical = new URL(Astro.url.pathname, site).toString();
     <SideNav items={nav} />
 
     <!-- Content area -->
-    <main class="md:ml-36">
+    <main class="md:ml-38">
       <!-- spacer for mobile top bar -->
       <div class="h-14 md:h-0"></div>
       <section class="max-w-4xl px-6 py-10 md:px-10 container">
