@@ -34,21 +34,10 @@ class EmberParticle {
 Then we make it move with an update function, a bit like in a video game.
 
 ```ts
-update(
-  noise2D
-:
-(x: number, y: number) => number,
-  time
-:
-number,
-  width
-:
-number,
-  height
-:
-number,
-)
-{
+update(noise2D:(x: number, y: number) => number,
+  time:number,
+  width:number,
+  height:number) {
   this.vx = noise2D(this.x * 0.01, this.y * 0.01 + time * 0.0005) * 0.2;
   this.vy = this.baseVy;
 

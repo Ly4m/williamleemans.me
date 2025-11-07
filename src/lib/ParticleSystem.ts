@@ -25,7 +25,7 @@ class EmberParticle {
     this.y = Math.random() * height;
 
     this.vx = 0;
-    this.baseVy = -0.5 - Math.random() * 0.3;
+    this.baseVy = (-0.5 - Math.random()) * 0.2;
     this.vy = this.baseVy;
 
     this.radius = 1 + Math.random() * 1.5;
@@ -44,7 +44,7 @@ class EmberParticle {
     this.x += this.vx;
     this.y += this.vy;
 
-    const flickerSpeed = 0.025;
+    const flickerSpeed = 0.015;
     const flicker = 0.75 + 0.5 * Math.sin(this.life * flickerSpeed + this.flickerPhase);
 
     this.radius = this.baseRadius * flicker;
@@ -82,7 +82,7 @@ export class EmberParticleSystem {
   private tick: number;
   private animationFrameId: number | null = null;
 
-  constructor(canvas: HTMLCanvasElement, particleCount = 300) {
+  constructor(canvas: HTMLCanvasElement, particleCount = 200) {
     this.canvas = canvas;
 
     const ctx = canvas.getContext('2d');

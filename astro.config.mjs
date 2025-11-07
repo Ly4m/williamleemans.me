@@ -13,8 +13,11 @@ export default defineConfig({
   site: "https://williamleemans.me",
   integrations: [sitemap(), svelte()],
   markdown: {
-    syntaxHighlight: {
-      type: "shiki",
+    shikiConfig: {
+      themes: {
+        light: 'nord',
+        dark: 'github-dark',
+      },
     },
   },
   vite: {

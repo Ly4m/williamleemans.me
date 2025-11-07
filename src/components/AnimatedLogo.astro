@@ -1,7 +1,7 @@
 <a href="/" class="logo">
   <span class="logo-initials">W</span>
   <span class="logo-full">illiam</span>
-  <span class="logo-initials">&nbsp;L</span>
+  <span class="logo-initials">&nbspL</span>
   <span class="logo-full">eemans</span>
 </a>
 
@@ -13,8 +13,12 @@
     overflow: hidden;
     cursor: pointer;
     position: relative;
-    display: inline-flex;
     align-items: center;
+    display: inline-flex;
+  }
+
+  .logo-part {
+    display: flex;
   }
 
   .logo-initials {
@@ -35,11 +39,11 @@
     animation-delay: 0.1s;
   }
   .logo-full:last-of-type {
-    animation-delay: 0.15s;
+    animation-delay: 0.35s;
   }
 
   .logo:hover .logo-full {
-    max-width: 18ch;
+    max-width: 16ch;
     opacity: 1;
     filter: blur(0);
     color: var(--color-faded);
