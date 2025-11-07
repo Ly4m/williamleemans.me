@@ -25,7 +25,6 @@ h3 {
   font-weight: 700;
   letter-spacing: 0.03em;
   animation: blurIn 1s cubic-bezier(0.23, 1, 0.32, 1);
-  backdrop-filter: blur(8px) saturate(105%);
 }
 
 article {
