@@ -22,15 +22,18 @@ class EmberParticle {
 
   reset(width: number, height: number) {
     this.x = Math.random() * width;
-    this.y = height + Math.random() * 100;
+    this.y = Math.random() * height;
+
     this.vx = 0;
     this.baseVy = -0.5 - Math.random() * 0.3;
     this.vy = this.baseVy;
-    this.radius = 1 + Math.random() * 2.5;
+
+    this.radius = 1 + Math.random() * 1.5;
     this.baseRadius = this.radius;
+
     this.ttl = 500 + Math.random() * 2200;
-    this.life = Math.random() * this.ttl;
-    this.alpha = 1;
+    this.life = 0;
+    this.alpha = 0;
     this.flickerPhase = Math.random() * TAU;
   }
 
