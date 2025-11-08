@@ -36,7 +36,7 @@ const socialLinks: SocialLink[] = [
 
 <!-- Mobile header with icons -->
 <header
-  class="fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between px-4 md:hidden bg-primary-100"
+  class="bg-primary-100 fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between px-4 md:hidden"
 >
   <AnimatedLogo />
 
@@ -119,7 +119,7 @@ const socialLinks: SocialLink[] = [
     }
   </nav>
 
-  <div class="flex gap-2pr-3 absolute bottom-6">
+  <div class="gap-2pr-3 absolute bottom-6 flex">
     {
       socialLinks.map((s) => {
         return (
