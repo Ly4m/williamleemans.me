@@ -1,0 +1,29 @@
+---
+
+type Props = {
+  type?: string;
+  siteName?: string;
+  title: string;
+  description: string;
+  canonical: string;
+  ogImage: string;
+};
+
+const {
+  type = "website",
+  siteName = "William Leemans",
+  title,
+  description,
+  canonical,
+  ogImage,
+ } = Astro.props;
+
+
+---
+
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />

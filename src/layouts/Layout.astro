@@ -5,6 +5,8 @@ import "@fontsource/ibm-plex-mono";
 import SideNav from "../components/SideNav.astro";
 import { ClientRouter } from "astro:transitions";
 import EmberBackground from "../components/EmberBackground.svelte";
+import TwitterMeta from "../components/meta/TwitterMeta.astro";
+import OpenGraphMeta from "../components/meta/OpenGraphMeta.astro";
 
 type Props = {
   title?: string;
@@ -55,21 +57,9 @@ const canonical = new URL(Astro.url.pathname, site).toString();
       content={noindex ? "noindex, nofollow" : "index, follow"}
     />
 
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="William Leemans" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={ogImage} />
+    <OpenGraphMeta title={title} description={description} canonical={canonical} ogImage={ogImage} />
 
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImage} />
-    <meta name="twitter:site" content="@WillLeemans" />
-    <meta name="twitter:creator" content="@WillLeemans" />
+    <TwitterMeta title={title} description={description} image={ogImage} />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
