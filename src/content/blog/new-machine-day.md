@@ -29,7 +29,6 @@ Some people see setting up a new machine as a chore. I see it as an opportunity:
 
 Of course, I don’t start completely from scratch each time. Over the years, I’ve built a small repository that serves as my setup checklist, so I can go from zero to fully operational in under an hour.
 
-
 ### System tweaks
 
 macOS isn’t the most customizable OS, but a few small changes make a big difference.
@@ -42,10 +41,11 @@ I’ve tried going full terminal, but I still rely on some desktop apps, especia
 For Git, I use the terminal for things like fixups and interactive rebases, but GitKraken is faster for many tasks and integrates nicely with GitHub and GitLab.
 
 Other must-haves:
-* Raycast instead of Spotlight, for its speed and plugin ecosystem.
-* Rectangle to manage windows (I find Yabai and Aerospace powerful but a bit too hacky).
-* Ghostty as my terminal emulator of choice.
-* Obsidian for note-taking.
+
+- Raycast instead of Spotlight, for its speed and plugin ecosystem.
+- Rectangle to manage windows (I find Yabai and Aerospace powerful but a bit too hacky).
+- Ghostty as my terminal emulator of choice.
+- Obsidian for note-taking.
 
 ### Terminal utilities & Dotfiles
 

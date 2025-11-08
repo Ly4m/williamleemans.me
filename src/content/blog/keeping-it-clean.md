@@ -11,6 +11,7 @@ The first thing I do when I join a new project is check the Git history.
 A quick look already tells me a lot about the team.
 
 There are two things I always look for:
+
 1. How the commit messages are written
 2. How the history is structured
 
@@ -24,7 +25,9 @@ Which commit message would be more useful to you?
 ```
 fix(ui): prevent modal from getting stuck open
 ```
+
 or
+
 ```
 ui bug fix
 ```
@@ -53,18 +56,18 @@ That’s exactly what --amend is for.
 
 Imagine you just noticed a typo in the README.md file that you changed in your last commit.
 
-Instead of creating a new commit with the fix, you can integrate your changes into the last commit like so: 
+Instead of creating a new commit with the fix, you can integrate your changes into the last commit like so:
 
 ```bash
 git add README.md # or whatever files you changed
-git commit --amend 
+git commit --amend
 ```
 
 I often use it to aggregate my changes in a single WIP commit.
 
 And to reword the last commit message:
 
-```bash 
+```bash
 git commit --amend -m "docs: fix typos in README"
 ```
 
@@ -98,6 +101,7 @@ But, my feature is split into two commits, and I have a commit about docs that n
 ![interactive-1](images/3/interactive-1.svg)
 
 There are three things I want to do:
+
 1. Squash the two feature commits (C & E) into one
 2. Rename the "add doc" (D) commit with a proper message
 3. Rebase the branch on top of main
@@ -105,6 +109,7 @@ There are three things I want to do:
 **Step 1: Start the interactive rebase**
 
 I use the rebase command with the -i (or --interactive) option to start the rebase in interactive mode.
+
 ```bash
 git rebase -i main
 ```
@@ -118,6 +123,7 @@ pick C # feat: ui part 1
 pick D # add doc
 pick E # feat: ui part 2
 ```
+
 The first word ('pick', 'squash', etc.) tells Git what to do with that commit, and the order of the lines decides the order of the commits.
 
 **Step 3: Edit the todo list**
@@ -142,16 +148,17 @@ When saving the file, Git will automatically apply the changes to the history.
 And there it is, the history is clean, and the branch is up to date with main!
 
 > At any point, if you realize you made a mistake, you can abort the rebase and come back to the original state with:
+>
 > ```bash
 > git rebase --abort
 > ```
 
 **Step 4: Push the new history to the remote**
 
-
 As rebasing creates new commits, you may need to add the force option to your push command.
+
 ```bash
-git push --force 
+git push --force
 ```
 
 ### Fixup: quickly fix a specific commit
@@ -167,8 +174,8 @@ But if you need to fix something in commit C, it would take more work, you’d h
 Luckily, there’s a better way. You can use the --fixup option to create a new commit that targets directly the one you want to fix.
 
 ```bash
-git commit --fixup C 
-git rebase -i --autosquash main 
+git commit --fixup C
+git rebase -i --autosquash main
 ```
 
 When you run an interactive rebase with --autosquash, Git automatically moves all fixup commits next to the commits they modify and squashes them for you.
@@ -182,8 +189,7 @@ pick D # docs: adds UI screenshots"
 Now your history is clean, and the fix is properly included in commit C:
 
 ![fixup-2](images/3/fixup-2.svg)
-    
+
 ---
 
 There’s always more to learn about Git, but with these few commands, you’re already most of the way there.
-

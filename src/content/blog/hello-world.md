@@ -6,13 +6,14 @@ description: "Hello World! My first post about building this site, experimenting
 pubDate: "2025-08-11"
 readingTime: 1
 ---
-After years of sharing ideas here and there, I wanted my own place, no platforms, no algorithms. 
+
+After years of sharing ideas here and there, I wanted my own place, no platforms, no algorithms.
 Just a little corner of the web, in the spirit of the [IndieWeb](https://indieweb.org/).
 
 So lo and behold: **My own personal website!**
 
 I love tinkering with new tech, so I'm building it with **[Astro](https://astro.build/)**
-for its clean developer experience (plus, the CLI robot won me over 🤖). 
+for its clean developer experience (plus, the CLI robot won me over 🤖).
 I’m also exploring design more deeply, so I’m building the look and feel as I go.
 
 **Here’s what you can expect to find around here:**
@@ -22,7 +23,6 @@ I’m also exploring design more deeply, so I’m building the look and feel as 
 - Devlogs diving into my side projects and experiments. If I’m building or finding something cool, you’ll hear about it.
 - I am likely to also write some posts in French in this blog.
 
-This blog will grow with me, so things will evolve. 
-Got suggestions or just want to say hi? 
+This blog will grow with me, so things will evolve.
+Got suggestions or just want to say hi?
 [Email me](mailto:hi@williamleemans.me) or connect on [LinkedIn](https://www.linkedin.com/in/wleemans).
-

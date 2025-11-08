@@ -12,26 +12,25 @@ interface SocialLink {
   icon: string;
 }
 
-
 const { items = [] }: { items?: NavItem[] } = Astro.props;
 const current = Astro.url.pathname;
 
 const isActive = (href: string, current: string) => {
   if (href === "/") return current === "/";
   return current === href || current.startsWith(href + "/");
-}
+};
 
 const socialLinks: SocialLink[] = [
   {
     label: "GitHub",
     href: "https://github.com/Ly4m",
-    icon: "icon-[tabler--brand-github]"
+    icon: "icon-[tabler--brand-github]",
   },
   {
     label: "LinkedIn",
     href: "https://www.linkedin.com/in/wleemans",
-    icon: "icon-[tabler--brand-linkedin]"
-  }
+    icon: "icon-[tabler--brand-linkedin]",
+  },
 ];
 ---
 
@@ -53,12 +52,12 @@ const socialLinks: SocialLink[] = [
               "flex h-8 w-8 items-center justify-center rounded-md text-sm transition",
               active
                 ? "bg-black text-white"
-                : "text-gray-600 hover:bg-gray-100 hover:text-black"
+                : "text-gray-600 hover:bg-gray-100 hover:text-black",
             ].join(" ")}
             title={label}
           >
             {icon ? (
-              <i class={`iconify ${icon} text-lg`}></i>
+              <i class={`iconify ${icon} text-lg`} />
             ) : (
               <span class="text-xs font-medium uppercase">
                 {label.charAt(0)}
@@ -72,7 +71,7 @@ const socialLinks: SocialLink[] = [
     <!-- Social links for mobile -->
     <div class="ml-2 flex gap-2 border-l border-gray-200 pl-3">
       {
-        socialLinks.map(s => {
+        socialLinks.map((s) => {
           return (
             <a
               href={s.href}
@@ -81,10 +80,9 @@ const socialLinks: SocialLink[] = [
               class="flex h-8 w-8 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 hover:text-black"
               title={s.label}
             >
-              <i class={["text-lg", s.icon].join(" ")}
-                 aria-hidden="true"></i>
+              <i class={["text-lg", s.icon].join(" ")} aria-hidden="true" />
             </a>
-          )
+          );
         })
       }
     </div>
@@ -93,11 +91,10 @@ const socialLinks: SocialLink[] = [
 
 <!-- Desktop sidebar navigation -->
 <aside
-  class="text-charcoal z-40 hidden h-screen w-24 md:block pt-16 sticky top-0"
+  class="text-charcoal sticky top-0 z-40 hidden h-screen w-24 pt-16 md:block"
   aria-label="Side Navigation"
 >
-
-  <nav class="space-y-2 pl-6 py-6">
+  <nav class="space-y-2 py-6 pl-6">
     {
       items.map(({ label, href }) => {
         const active =
@@ -110,7 +107,7 @@ const socialLinks: SocialLink[] = [
               "border-l-2",
               active
                 ? "border-black font-medium"
-                : "border-transparent opacity-70 hover:opacity-100"
+                : "border-transparent opacity-70 hover:opacity-100",
             ].join(" ")}
           >
             <span class="inline-block translate-x-0 transition group-hover:translate-x-1">
@@ -123,11 +120,23 @@ const socialLinks: SocialLink[] = [
   </nav>
 
   <div class="absolute bottom-6 left-6 text-xs opacity-60">
-    { socialLinks.map(s => {
-      return (
-        <a target="_blank" href={s.href} rel="noopener noreferrer" class="hover:opacity-100">{s.label}</a><span>&nbsp</span>
-      )
-    }) }
+    {
+      socialLinks.map((s) => {
+        return (
+          <>
+            <a
+              target="_blank"
+              href={s.href}
+              rel="noopener noreferrer"
+              class="hover:opacity-100"
+            >
+              {s.label}
+            </a>
+            <span>&nbsp</span>
+          </>
+        );
+      })
+    }
     <span class="mx-2">·</span>
   </div>
 </aside>

@@ -57,7 +57,12 @@ const canonical = new URL(Astro.url.pathname, site).toString();
       content={noindex ? "noindex, nofollow" : "index, follow"}
     />
 
-    <OpenGraphMeta title={title} description={description} canonical={canonical} ogImage={ogImage} />
+    <OpenGraphMeta
+      title={title}
+      description={description}
+      canonical={canonical}
+      ogImage={ogImage}
+    />
 
     <TwitterMeta title={title} description={description} image={ogImage} />
 
@@ -66,18 +71,16 @@ const canonical = new URL(Astro.url.pathname, site).toString();
 
     <ClientRouter />
   </head>
-  <body class="bg-primary-100 h-full antialiased min-h-screen">
+  <body class="bg-primary-100 h-full min-h-screen antialiased">
     <EmberBackground client:load />
 
-
     <!-- Content area -->
-    <main class="flex ">
-
+    <main class="flex justify-center">
       <SideNav items={nav} />
 
       <!-- spacer for mobile top bar -->
       <div class="h-14 md:h-0"></div>
-      <section class="max-w-4xl px-6 py-10 md:px-10 container">
+      <section class="container max-w-4xl px-6 py-10 md:px-10">
         <slot />
       </section>
     </main>

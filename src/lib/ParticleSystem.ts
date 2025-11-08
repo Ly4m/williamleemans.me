@@ -1,4 +1,4 @@
-import { createNoise2D } from 'simplex-noise';
+import { createNoise2D } from "simplex-noise";
 
 const TAU = Math.PI * 2;
 
@@ -37,7 +37,12 @@ class EmberParticle {
     this.flickerPhase = Math.random() * TAU;
   }
 
-  update(noise2D: (x: number, y: number) => number, time: number, width: number, height: number) {
+  update(
+    noise2D: (x: number, y: number) => number,
+    time: number,
+    width: number,
+    height: number,
+  ) {
     this.vx = noise2D(this.x * 0.01, this.y * 0.01 + time * 0.0005) * 0.2;
     this.vy = this.baseVy;
 
@@ -45,7 +50,8 @@ class EmberParticle {
     this.y += this.vy;
 
     const flickerSpeed = 0.015;
-    const flicker = 0.75 + 0.5 * Math.sin(this.life * flickerSpeed + this.flickerPhase);
+    const flicker =
+      0.75 + 0.5 * Math.sin(this.life * flickerSpeed + this.flickerPhase);
 
     this.radius = this.baseRadius * flicker;
     this.alpha = (1 - this.life / this.ttl) * flicker;
@@ -58,9 +64,16 @@ class EmberParticle {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+    const gradient = ctx.createRadialGradient(
+      this.x,
+      this.y,
+      0,
+      this.x,
+      this.y,
+      this.radius,
+    );
     gradient.addColorStop(0, `rgba(0, 0, 00, ${this.alpha})`);
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
 
     ctx.fillStyle = gradient;
     ctx.shadowColor = `rgba(255, 140, 30, ${this.alpha})`;
@@ -74,9 +87,9 @@ class EmberParticle {
 
 export class EmberParticleSystem {
   private canvas: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
-  private particles: EmberParticle[];
-  private noise2D: (x: number, y: number) => number;
+  private readonly ctx: CanvasRenderingContext2D;
+  private readonly particles: EmberParticle[];
+  private readonly noise2D: (x: number, y: number) => number;
   private width: number;
   private height: number;
   private tick: number;
@@ -85,8 +98,8 @@ export class EmberParticleSystem {
   constructor(canvas: HTMLCanvasElement, particleCount = 200) {
     this.canvas = canvas;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('Canvas context not found');
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Canvas context not found");
     this.ctx = ctx;
 
     this.noise2D = createNoise2D();
@@ -102,7 +115,7 @@ export class EmberParticleSystem {
       this.particles.push(new EmberParticle(this.width, this.height));
     }
 
-    window.addEventListener('resize', () => this.resize());
+    window.addEventListener("resize", () => this.resize());
   }
 
   resize() {
@@ -110,7 +123,7 @@ export class EmberParticleSystem {
     this.height = window.innerHeight;
     this.canvas.width = this.width;
     this.canvas.height = this.height;
-    this.particles.forEach(p => p.reset(this.width, this.height));
+    this.particles.forEach((p) => p.reset(this.width, this.height));
   }
 
   clear() {
@@ -134,7 +147,7 @@ export class EmberParticleSystem {
     this.updateAndDraw();
   }
 
-  stop()  {
+  stop() {
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;

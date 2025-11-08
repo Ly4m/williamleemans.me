@@ -11,7 +11,6 @@
   --color-charcoal: #252525;
   --color-faded: #6b6b6b;
 
-
   --text-base: 16px;
 }
 
@@ -84,5 +83,8 @@ article {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-astro-transition] { transition: none !important; animation: none !important; }
+  [data-astro-transition] {
+    transition: none !important;
+    animation: none !important;
+  }
 }

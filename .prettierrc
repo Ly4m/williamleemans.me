@@ -3,10 +3,7 @@
   "overrides": [
     {
       "files": "*.astro",
-      "options": {
-        "parser": "astro",
-        "printWidth": 3OO
-      }
+      "options": { "parser": "astro" }
     }
   ]
 }
