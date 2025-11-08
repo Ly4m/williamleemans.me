@@ -36,7 +36,7 @@ const socialLinks: SocialLink[] = [
 
 <!-- Mobile header with icons -->
 <header
-  class="fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between px-4 md:hidden"
+  class="fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between px-4 md:hidden bg-primary-100"
 >
   <AnimatedLogo />
 
@@ -91,7 +91,7 @@ const socialLinks: SocialLink[] = [
 
 <!-- Desktop sidebar navigation -->
 <aside
-  class="text-charcoal sticky top-0 z-40 hidden h-screen w-24 pt-16 md:block"
+  class="text-charcoal sticky top-0 z-40 hidden h-screen w-24 pt-24 md:block lg:block"
   aria-label="Side Navigation"
 >
   <nav class="space-y-2 py-6 pl-6">
@@ -119,24 +119,21 @@ const socialLinks: SocialLink[] = [
     }
   </nav>
 
-  <div class="absolute bottom-6 left-6 text-xs opacity-60">
+  <div class="flex gap-2pr-3 absolute bottom-6">
     {
       socialLinks.map((s) => {
         return (
-          <>
-            <a
-              target="_blank"
-              href={s.href}
-              rel="noopener noreferrer"
-              class="hover:opacity-100"
-            >
-              {s.label}
-            </a>
-            <span>&nbsp</span>
-          </>
+          <a
+            href={s.href}
+            rel="noopener noreferrer"
+            target="_blank"
+            class="flex h-8 w-8 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 hover:text-black"
+            title={s.label}
+          >
+            <i class={["text-lg", s.icon].join(" ")} aria-hidden="true" />
+          </a>
         );
       })
     }
-    <span class="mx-2">·</span>
   </div>
 </aside>
