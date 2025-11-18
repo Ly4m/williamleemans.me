@@ -1,19 +1,30 @@
 ---
-slug: "particle-animation"
-title: "Particle Animation"
-lang: "en"
-description: "How I built a simple particle animation with the Canvas API for my website background"
+slug: "animation-de-particules"
+title: "Animation de particules"
+lang: "fr"
+description: "Comment j’ai créé une animation de particules simple avec l’API Canvas pour le fond de mon site."
 pubDate: "2025-11-6"
 readingTime: 1
 ---
 
-Last week, while finishing my previous post, I realized that even though I like the minimalism of this black and white design, it was missing a bit of life.
+La semaine dernière, en terminant mon article précédent, je me suis rendu compte que même si j’aimais bien le design minimaliste en noir et blanc, il manquait un peu de vie.
 
-Maybe it was the pellet stove burning next to me. Or the floating particles in the Upside Down from Stranger Things on my TV (which I’m rewatching before the final season).
-But I suddenly wanted to add some motion.
+C’était peut-être le poêle à pellet qui crépitait à côté de moi. Ou les particules flottantes de l'« Upside Down » de *Stranger Things* a la tv, que je me refais avant la dernière saison.  
+Mais, j’ai eu envie d’ajouter un peu de mouvement et de me créer une petite ambiance.
 
-I almost reached for PixiJS, a 2D rendering engine, but decided to see how far I could get with the humble Canvas API. 
-I'm all for using the platform and keeping my website as light and simple as possible.
+## Rester simple et comprendre ce qu’on fait
+
+Mon premier réflexe a été de penser à PixiJS. Un moteur de rendu, assez léger, et parfait pour des animations 2D.  
+Mais dans ma démarche d'apprentissage autour de ce site web, je préfère commencer par la base, comprendre ce que je fais, et ne sortir un framework que si j’en ai réellement besoin.
+
+Donc j'ai décidé de voir jusqu’où je pouvais aller avec la simple API Canvas.  
+Je préfère utiliser les outils natifs et garder mon site aussi léger que possible.
+
+## Modélisation
+
+J'ai commencé par modéliser les particules comme des objets simples.
+
+Une particule, ce n’est rien d’autre qu’un point avec une position, une vitesse, une taille, une durée de vie et de quoi en faire fluctuer l'apparence.
 
 ```ts
 class EmberParticle {
@@ -31,7 +42,10 @@ class EmberParticle {
 }
 ```
 
-Then we make it move with an update function, a bit like in a video game.
+## Faire bouger la particule
+
+J’ai écrit une méthode update qui agit un peu comme un `tick` dans un jeu vidéo. (j'aime le jeu vidéo)
+À chaque frame, on met à jour la vitesse, la position, la taille, la transparence, etc.
 
 ```ts
 update(noise2D:(x: number, y: number) => number,
@@ -59,13 +73,18 @@ update(noise2D:(x: number, y: number) => number,
 }
 ```
 
-For the noise2D function I use the 'createNoise2D' from the simplex-noise library.
-It's a bit overkill, but it generates smooth, continuous noise rather than random jumps,
-so the particles gently drift instead of twitching around.
 
-> Simplex noise is a smooth, pseudo-random function, often used for natural movement, like smoke or wind.
+### Le secret derrière la fonction noise2D
 
-Finally, we render everything with a simple draw function:
+Pour adoucir les mouvements, j’utilise `createNoise2D` de la librairie simplex-noise.
+C’est un peu overkill, mais ça génère un bruit continu et fluide, et non des valeurs aléatoires qui sautent partout, ce qui donne un mouvement doux, qui dérive comme une fumée.
+
+> Le simplex noise, c’est une fonction pseudo-aléatoire lissée, souvent utilisée pour simuler des mouvements naturels comme le vent ou la fumée.
+
+## Dessiner la particule
+
+Pour le rendu, j'ai fait quelque chose de très simple : un cercle avec un peu de blur.
+Il a fallu pas mal jouer avec les paramètres pour avoir quelque chose qui me plait. Mais au final pas besoin de plus.
 
 ```ts
 draw(ctx:CanvasRenderingContext2D) {
@@ -90,11 +109,15 @@ draw(ctx:CanvasRenderingContext2D) {
 }
 ```
 
-It’s kind of agent-like; every particle moves on its own, following simple rules, a bit like the cells in Conway’s Game
-of Life.
+### Des petits agents
 
-Now I just wrapped that in a ParticleSystem class that populates the canvas and runs a loop to update and draw the
-particles.
+
+Chaque particule se comporte un peu comme un petit agent indépendant, elle suit ses propres règles, avec son mouvement et sa durée de vie, un peu comme les cellules du [Game of Life de Conway](https://fr.wikipedia.org/wiki/Jeu_de_la_vie).
+
+
+## Le système complet
+
+Une fois qu'on a nos particules, il ne reste plus qu'à créer une classe ParticleSystem qui remplit le canvas et orchestre le tout.
 
 ```ts
 updateAndDraw()
@@ -117,11 +140,11 @@ updateAndDraw()
 }
 ```
 
-requestAnimationFrame is managed by the browser and calls a function before the next frame. 
-It automatically syncs to the display’s refresh rate and pauses when the tab is not in focus.
+La fonction `requestAnimationFrame` est gérée par le navigateur et s'occupe de tout :
+Elle appelle une fonction juste avant l’affichage de la frame suivante, se cale automatiquement sur le taux de rafraîchissement de l’écran et se met en pause quand l’onglet n’est plus actif.
 
-All of this is run when I mount a Svelte component each time the user navigates, and to prevent a memory leak it's
-important to stop it using the cancelAnimationFrame when the component unmounts.
+Comme je lance ça dans un composant Svelte, il est essentiel d’arrêter proprement la boucle pour éviter des fuites de mémoire.
+D’où un petit stop() :
 
 ```ts
 stop()
@@ -133,5 +156,12 @@ stop()
 }
 ```
 
-In the end, it didn’t require any fancy library and was easier than I thought.
-It’s always fun to tweak the parameters and see how the animation reacts. I plan to keep improving it and maybe create a few variations.
+C'est `cancelAnimationFrame` que l'on va utiliser cette fois.
+
+## Au final
+
+Au final, pas besoin de lib compliquée, et c’était plus simple que prévu.
+L’API Canvas fait parfaitement le job et mon code reste léger.
+
+C'était assez amusant de jouer avec les paramètres et de voir la scène évoluer en temps réel.
+Je compte l’améliorer petit à petit et peut-être en faire quelques variations pour d'autres pages du site.

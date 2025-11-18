@@ -1,28 +1,30 @@
 ---
 slug: "hello-world"
 title: "Hello World"
-lang: "en"
-description: "Hello World! My first post about building this site, experimenting with Astro & design, and what I’ll share here."
+lang: "fr"
+description: "Mon premier post : la création de ce site, un peu de design, et beaucoup d’envie de partager."
 pubDate: "2025-08-11"
 readingTime: 1
 ---
 
-After years of sharing ideas here and there, I wanted my own place, no platforms, no algorithms.
-Just a little corner of the web, in the spirit of the [IndieWeb](https://indieweb.org/).
+Après plusieurs années à partager mes idées ici et là, j'ai eu envie de me créer mon propre espace,
+sans plateforme ni algorithme,s ans plateforme, juste un espace à moi dans l'esprit du mouvement [IndieWeb](https://indieweb.org/)
 
-So lo and behold: **My own personal website!**
+Et donc voilà ! **Mon propre site perso !**
+    
+J'adore tester des nouvelles technos, ici, je suis parti sur **[Astro](https://astro.build/)**, 
+le framework propose une super developer experience (en plus du robot de la CLI 🤖) et semble adapté à mon besoin.
 
-I love tinkering with new tech, so I'm building it with **[Astro](https://astro.build/)**
-for its clean developer experience (plus, the CLI robot won me over 🤖).
-I’m also exploring design more deeply, so I’m building the look and feel as I go.
+J'en profite aussi pour m'essayer au design en faisant toute la D.A. from scratch.
 
-**Here’s what you can expect to find around here:**
+Voici ce que vous pourrez trouver sur ce blog :
 
-- Thoughts and reflections on software engineering, especially architecture and developer experience.
-- Notes and stories from my journey as CTO at Jetdev. I’ll share what I’m learning, challenges I’m facing, and what’s shaping my perspective.
-- Devlogs diving into my side projects and experiments. If I’m building or finding something cool, you’ll hear about it.
-- I am likely to also write some posts in French in this blog.
+- Mes réflexions sur le développement logiciel, spécialement sur l'architecture et la developer experience.
+- Des notes et histoires sur mon parcours en tant que CTO de Jetdev. J'aimerais partager ce que j'apprends et les challenges auxquels je fais face.
+- Des devlogs autour de mes side projects et experimentations. 
 
-This blog will grow with me, so things will evolve.
-Got suggestions or just want to say hi?
-[Email me](mailto:hi@williamleemans.me) or connect on [LinkedIn](https://www.linkedin.com/in/wleemans).
+Ce blog va evoluer avec moi, tout est encore en construction.
+
+Une idée, une remarque ou juste envie d’échanger ?
+
+Écris-moi à [hi@williamleemans.me](mailto:hi@williamleemans.me) ou passe me dire bonjour sur [LinkedIn](https://www.linkedin.com/in/wleemans).

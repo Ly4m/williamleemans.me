@@ -1,0 +1,104 @@
+---
+import Welcome from "../../components/Welcome.astro";
+import Layout from "../../layouts/Layout.astro";
+
+const staggerRules = Array.from(
+  { length: 100 },
+  (_, i) =>
+    `.wave-enter-content > *:nth-child(${i + 1}) { --stagger: ${i + 1}; }`,
+).join("\n");
+---
+
+<Layout
+  title="William Leemans — Software Engineer in Lille"
+  ogImage="/og/home.jpg"
+>
+  <main class="py-8 md:py-12">
+    <header class="mb-6 md:mb-8">
+      <h1 class="font-space text-charcoal text-2xl tracking-tight md:text-3xl">
+        William Leemans
+      </h1>
+    </header>
+
+    <section class="text-charcoal prose wave-enter-content">
+      <p>
+        Hello there! I'm William, a Belgian entrepreneur and software architect.
+      </p>
+      <p>
+        I’m co-founder and CTO of <a
+        target="_blank"
+        rel="noopener noreferrer"
+        class="orange"
+        href="https://www.jetdev.fr">Jetdev</a
+      >, where I spend my time designing systems, mentoring developers, and
+        turning ideas into real products. I’ve been lucky to work with folks at
+        Kiabi, Exotec, Decathlon, and Electro Depot, and I’ve also helped bring
+        our own products <a
+        rel="noopener noreferrer"
+        target="_blank"
+        class="pink"
+        href="https://www.scanzee.app/">Scanzee</a
+      >
+        and Distract to life.
+      </p>
+      <p>
+        I love learning new things, then talking about them, sometimes in
+        workshops, sometimes in talks, and sometimes just rambling on the
+        internet.
+      </p>
+      <p>
+        When I’m not coding, you’ll usually find me button-mashing through a video
+        game, nose-deep in a graphic novel, or trying new recipes with my wife. I
+        also dabble in music and enjoy board games with friends.
+      </p>
+      <nav aria-label="Social links">
+        <span class="mr-1">Wanna say hi? You can find me on </span>
+        <a
+          target="_blank"
+          href="https://github.com/Ly4m"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1"
+        >
+        <span class="icon-[tabler--brand-github] text-lg" aria-hidden="true"
+        ></span>
+          GitHub
+        </a>
+        <span>or</span>
+        <a
+          target="_blank"
+          href="https://www.linkedin.com/in/wleemans"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1"
+        >
+        <span class="icon-[tabler--brand-linkedin] text-lg" aria-hidden="true"
+        ></span>
+          LinkedIn
+        </a>
+      </nav>
+    </section>
+  </main>
+</Layout>
+
+<style is:global set:html={staggerRules}></style>
+
+<style>
+  a {
+    font-weight: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(125, 125, 125, 0.3);
+    transition: border 0.3s ease-in-out;
+
+    &:hover {
+      border-bottom: 1px solid var(--color-charcoal);
+    }
+
+    &.orange:hover {
+      border-bottom: 1px solid #ff772c;
+    }
+
+    &.pink:hover {
+      border-bottom: 1px solid #e82483;
+    }
+  }
+</style>
+

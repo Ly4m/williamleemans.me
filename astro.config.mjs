@@ -12,11 +12,15 @@ import svelte from "@astrojs/svelte";
 export default defineConfig({
   site: "https://williamleemans.me",
   integrations: [sitemap(), svelte()],
+  i18n: {
+    locales: ["fr", "en"],
+    defaultLocale: "fr",
+  },
   markdown: {
     shikiConfig: {
       themes: {
-        light: 'nord',
-        dark: 'github-dark',
+        light: "nord",
+        dark: "github-dark",
       },
     },
   },

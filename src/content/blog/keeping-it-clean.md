@@ -1,85 +1,90 @@
 ---
-slug: "keeping-it-clean"
-title: "Keeping the git history clean"
-lang: "en"
-description: "How to keep your Git history clean, write meaningful commits, and use rebase effectively."
+slug: "garder-un-historique-git-propre"
+title: "Garder un historique Git propre"
+lang: "fr"
+description: "Comment garder un historique Git propre, écrire de bons commits et utiliser rebase efficacement."
 pubDate: "2025-10-15"
 readingTime: 4
 ---
 
-The first thing I do when I join a new project is check the Git history.
-A quick look already tells me a lot about the team.
+La première chose que je fais quand j’arrive sur un nouveau projet, c’est de regarder l’historique Git.  
+Un simple coup d’œil en dit déjà long sur l’équipe.
 
-There are two things I always look for:
+Je me concentre toujours sur deux éléments :
 
-1. How the commit messages are written
-2. How the history is structured
+1. comment les messages de commit sont écrits
+2. comment l’historique est structuré
 
-## Writing good commit messages
+## Écrire des bons messages de commit
 
-Imagine you’re using git blame to understand why a line of code was written the way it was.
-Or maybe you want to generate release notes or find where a bug was introduced.
+Imaginez que vous utilisez `git blame` pour comprendre pourquoi une ligne de code a été écrite. Ou que vous essayez de générer des release notes, ou d’identifier quand un bug a été ajouté dans le code.
 
-Which commit message would be more useful to you?
+Quel message vous semble le plus utile ?
 
 ```
 fix(ui): prevent modal from getting stuck open
 ```
 
-or
+ou
 
 ```
 ui bug fix
 ```
 
-The key is to pick a convention for the project and stick to it.
-In 99% of cases, I recommend using [Conventional Commits](https://www.conventionalcommits.org/fr/v1.0.0/).
-It’s widely used, well-documented, and supported by plenty of tools.
+La clé, c’est de choisir une convention et de s’y tenir.  
+Dans 99 % des cas, je recommande d’utiliser les [Conventional Commits](https://www.conventionalcommits.org/fr/v1.0.0/).  
 
-For personal projects, I also like using [gitmoji](https://gitmoji.dev/) as it makes it easy to identify the type of change.
+C’est largement utilisé, bien documenté, et de nombreux outils le supportent.
 
-If you use a ticketing tool like Jira, Linear, or GitHub Issues, a good practice that I advocate for is to always include
-the ticket ID in the commit description. Future you will thank you.
+Pour mes projets perso, j’aime aussi utiliser [gitmoji](https://gitmoji.dev/), qui rend le type de changement facilement identifiable.
 
-Once your commits are meaningful, the next step is to organize them into a clean, linear history.
+Si vous utilisez un outil de ticketing comme Jira, Linear ou GitHub Issues, une bonne pratique que j’encourage fortement est d’inclure l’ID du ticket dans la description du commit. Votre futur vous vous remerciera.
 
-## Keeping the Git history clean
+Une fois que vos commits sont clairs, l’étape suivante est de les organiser dans un historique propre et linéaire.
 
-I like the analogy of a garden. If you leave the branches unattended, it quickly becomes a tangled, overgrown mess.
+## Garder un historique Git propre
 
-Luckily, Git gives us plenty of ways to clean things up. Here are the ones I use all the time:
+J’aime l'analogie du jardin.  
+Si vous laissez les branches pousser sans vous en occuper, tout devient vite un amas emmêlé et difficile à comprendre.
 
-### Amend: fix, reword, or add more changes to the last commit
+Heureusement, Git nous donne plein d’outils pour entretenir tout ça.  
 
-You need to fix the latest commit, reword its message, or add more changes to it?
-That’s exactly what --amend is for.
+Voici ceux que j’utilise au quotidien :
 
-Imagine you just noticed a typo in the README.md file that you changed in your last commit.
+### Amend : corriger, reformuler ou compléter le dernier commit
 
-Instead of creating a new commit with the fix, you can integrate your changes into the last commit like so:
+Besoin de corriger votre dernier commit, d’en modifier le message ou d’y ajouter des changements ?  
+C’est exactement ce que permet l'option `--amend`.
+
+Vous venez de faire un commit, vous poussez votre branche… et vous remarquez une faute dans la doc ou une ligne oubliée.
+
+Au lieu de créer un nouveau commit juste pour ça, vous pouvez intégrer la correction au précédent :
 
 ```bash
-git add README.md # or whatever files you changed
+git add README.md # ou les autres fichiers modifiés
 git commit --amend
 ```
 
-I often use it to aggregate my changes in a single WIP commit.
+Git écrase le commit précédent et le remplace par une version corrigée.
+C’est comme si l’erreur n’avait jamais existé dans l’historique.
 
-And to reword the last commit message:
+Je l’utilise souvent pour agréger mes changements dans un seul commit WIP.
+
+Et pour modifier uniquement le message :
 
 ```bash
 git commit --amend -m "docs: fix typos in README"
 ```
 
-### Rebase: Cut and paste a branch
+### Rebase : couper et coller une branche
 
-Rebase can look scary at first, but it’s one of Git’s most powerful tools and my favorite.
+Rebase peut faire peur au début, mais c’est l’un des outils les plus puissants de Git et mon préféré.
 
-It moves your commits onto another branch, like cutting and pasting them on top of a new base.
+Il déplace vos commits au-dessus d’un point donné, comme un couper-coller sur une nouvelle base.
 
-For example, you can update your branch with the latest changes from main without adding a merge commit.
+Par exemple, vous pouvez mettre à jour votre branche avec les derniers changements de main sans créer de commit de merge.
 
-Here’s what the history looks like before rebasing:
+Voici l’historique avant le rebase :
 
 ![rebase-1](images/3/rebase-1.svg)
 
@@ -87,26 +92,26 @@ Here’s what the history looks like before rebasing:
 git rebase main
 ```
 
-Git moves your commits so they sit on top of main, keeping the history clean and linear:
+Git déplace vos commits au-dessus de main, gardant l’historique propre et linéaire :
 
 ![rebase-2](images/3/rebase-2.svg)
 
-But this is just the tip of the iceberg, you can do a lot more with rebase.
+Mais ce n’est que le début. On peut aller beaucoup plus loin avec rebase.
 
-#### Interactive rebase
+#### Rebase interactif
 
-Imagine I’ve just finished my UI scaffolding feature, and I’m ready to merge it into main.
-But, my feature is split into two commits, and I have a commit about docs that needs to be reworded.
+Imaginons que je viens de terminer une feature de scaffolding UI, et qu’elle est prête à être mergée dans main.
+Sauf qu’elle est divisée en deux commits, et qu’un commit lié à la documentation a besoin d’être renommé.
 
 ![interactive-1](images/3/interactive-1.svg)
 
-There are three things I want to do:
+Je veux faire trois choses :
 
-1. Squash the two feature commits (C & E) into one
-2. Rename the "add doc" (D) commit with a proper message
-3. Rebase the branch on top of main
+1. fusionner les deux commits de la feature (C & E)
+2. renommer le commit “add doc” (D)
+3. rebaser la branche sur main
 
-**Step 1: Start the interactive rebase**
+**Étape 1 : démarrer le rebase interactif**
 
 I use the rebase command with the -i (or --interactive) option to start the rebase in interactive mode.
 
@@ -114,9 +119,9 @@ I use the rebase command with the -i (or --interactive) option to start the reba
 git rebase -i main
 ```
 
-**Step 2: View the rebase todo list**
+**Étape 2 : afficher la todo list**
 
-The rebase will open a todo list in your editor with a list of commits, like so :
+Git ouvre alors une todo list dans votre éditeur :
 
 ```bash
 pick C # feat: ui part 1
@@ -124,11 +129,11 @@ pick D # add doc
 pick E # feat: ui part 2
 ```
 
-The first word ('pick', 'squash', etc.) tells Git what to do with that commit, and the order of the lines decides the order of the commits.
+Le premier mot (pick, squash, etc.) indique à Git quoi faire, et l’ordre des lignes définit l’ordre final des commits.
 
-**Step 3: Edit the todo list**
+**Étape 3 : modifier la liste**
 
-For our example, here is what I would do :
+Pour cet exemple, voici ce que je ferais :
 
 ```bash
 pick C # feat: ui part 1
@@ -136,49 +141,53 @@ squash E # feat: ui part 2
 reword D # add doc
 ```
 
-1. I 'pick' the first commit, which I want to keep
-2. I move the "ui part 2" (E) commit in the second position
-3. I use 'squash' to merge it into the first one
-4. I use 'reword' on the third commit, to change the message
+1. Je garde le premier commit avec "pick"
+2. Je place “ui part 2” juste en dessous
+3. Je le “squash” pour le fusionner avec le premier
+4. J'utilise “reword” sur le commit de documentation
 
-When saving the file, Git will automatically apply the changes to the history.
+
+Une fois le fichier sauvegardé, Git applique les modifications sur l’historique.
 
 ![interactive-2](images/3/interactive-2.svg)
 
-And there it is, the history is clean, and the branch is up to date with main!
+Et voilà, un historique propre et une branche à jour avec main!
 
-> At any point, if you realize you made a mistake, you can abort the rebase and come back to the original state with:
+> À tout moment, si vous réalisez que vous vous êtes trompé, vous pouvez annuler le rebase :
 >
 > ```bash
 > git rebase --abort
 > ```
 
-**Step 4: Push the new history to the remote**
+**Étape 4 : pousser le nouvel historique**
 
-As rebasing creates new commits, you may need to add the force option to your push command.
+Comme rebase réécrit l’historique, vous devrez sans doute forcer le push :
 
 ```bash
 git push --force
 ```
 
-### Fixup: quickly fix a specific commit
+> Attention : git push --force peut écraser le travail des autres.
+> Utilises plutôt --force-with-lease pour éviter les mauvaises surprises.
 
-Let's say you already have multiple commits on your branch and want to fix one of them.
+### Fixup : corriger rapidement un commit spécifique
+
+Disons que vous avez plusieurs commits sur votre branche et que vous devez en corriger un en particulier.
 
 ![fixup-1](images/3/fixup-1.svg)
 
-If you want to fix something in commit D, you could simply use the --amend option we saw earlier.
+Pour corriger le commit D, vous pourriez utiliser --amend.
 
-But if you need to fix something in commit C, it would take more work, you’d have to create a new commit, start an interactive rebase, and edit the todo list manually.
+Mais pour le commit C, c’est plus compliqué : il faudrait créer un nouveau commit, lancer un rebase interactif, éditer la todo… bref, un peu lourd.
 
-Luckily, there’s a better way. You can use the --fixup option to create a new commit that targets directly the one you want to fix.
+Heureusement, il existe mieux : --fixup, qui crée un commit ciblant directement celui à corriger.
 
 ```bash
 git commit --fixup C
 git rebase -i --autosquash main
 ```
 
-When you run an interactive rebase with --autosquash, Git automatically moves all fixup commits next to the commits they modify and squashes them for you.
+Avec --autosquash, Git déplace automatiquement les commits “fixup” à côté de leurs commits cibles, puis les fusionne.
 
 ```bash
 pick C # feat: scaffolds UI
@@ -186,10 +195,10 @@ pick E # fixup
 pick D # docs: adds UI screenshots"
 ```
 
-Now your history is clean, and the fix is properly included in commit C:
+Résultat : un historique propre, et la correction bien intégrée dans le commit C :
 
 ![fixup-2](images/3/fixup-2.svg)
 
 ---
 
-There’s always more to learn about Git, but with these few commands, you’re already most of the way there.
+On peut toujours aller plus loin avec Git, mais avec ces quelques commandes, vous avez déjà 90 % de ce dont vous avez besoin au quotidien.
