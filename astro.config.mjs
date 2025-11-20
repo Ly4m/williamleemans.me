@@ -19,7 +19,7 @@ export default defineConfig({
   markdown: {
     shikiConfig: {
       themes: {
-        light: "nord",
+        light: "vitesse-light",
         dark: "github-dark",
       },
     },
