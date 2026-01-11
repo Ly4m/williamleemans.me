@@ -1,9 +1,10 @@
 ---
 import AnimatedLogo from "./AnimatedLogo.astro";
+
 interface NavItem {
   label: string;
   href: string;
-  icon?: string; // Optional icon for mobile display
+  icon?: string;
 }
 
 interface SocialLink {
@@ -34,14 +35,36 @@ const socialLinks: SocialLink[] = [
 ];
 ---
 
-<!-- Mobile header with icons -->
 <header
   class="bg-primary-100 fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between px-4 md:hidden"
 >
+  
   <AnimatedLogo />
 
-  <!-- Mobile navigation icons -->
-  <nav class="flex items-center gap-3">
+  <button
+    id="mobile-menu-toggle"
+    class="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-md text-gray-600 hover:bg-gray-100 hover:text-black"
+    aria-label="Toggle menu"
+    aria-expanded="false"
+  >
+    <span
+      class="hamburger-line h-0.5 w-5 bg-current transition-all duration-300"
+    ></span>
+    <span
+      class="hamburger-line h-0.5 w-5 bg-current transition-all duration-300"
+    ></span>
+    <span
+      class="hamburger-line h-0.5 w-5 bg-current transition-all duration-300"
+    ></span>
+  </button>
+</header>
+
+<div
+  id="mobile-menu"
+  class="bg-primary-100 fixed inset-0 z-40 flex translate-x-full flex-col items-center justify-center transition-transform duration-300 md:hidden"
+  aria-hidden="true"
+>
+  <nav class="flex flex-col items-center gap-8">
     {
       items.map(({ label, href, icon }) => {
         const active = isActive(href, current);
@@ -49,47 +72,35 @@ const socialLinks: SocialLink[] = [
           <a
             href={href}
             class={[
-              "flex h-8 w-8 items-center justify-center rounded-md text-sm transition",
-              active
-                ? "bg-black text-white"
-                : "text-gray-600 hover:bg-gray-100 hover:text-black",
+              "mobile-menu-link flex flex-col items-center gap-2 text-2xl font-medium tracking-wide uppercase transition-all duration-200",
+              active ? "text-black" : "text-gray-600 hover:text-black",
             ].join(" ")}
-            title={label}
           >
-            {icon ? (
-              <i class={`iconify ${icon} text-lg`} />
-            ) : (
-              <span class="text-xs font-medium uppercase">
-                {label.charAt(0)}
-              </span>
-            )}
+            {icon && <i class={`${icon} text-3xl`} />}
+            <span>{label}</span>
           </a>
         );
       })
     }
-
-    <!-- Social links for mobile -->
-    <div class="ml-2 flex gap-2 border-l border-gray-200 pl-3">
-      {
-        socialLinks.map((s) => {
-          return (
-            <a
-              href={s.href}
-              rel="noopener noreferrer"
-              target="_blank"
-              class="flex h-8 w-8 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 hover:text-black"
-              title={s.label}
-            >
-              <i class={["text-lg", s.icon].join(" ")} aria-hidden="true" />
-            </a>
-          );
-        })
-      }
-    </div>
   </nav>
-</header>
 
-<!-- Desktop sidebar navigation -->
+  <div class="absolute bottom-12 flex gap-4">
+    {
+      socialLinks.map((s) => (
+        <a
+          href={s.href}
+          rel="noopener noreferrer"
+          target="_blank"
+          class="flex h-12 w-12 items-center justify-center rounded-md text-gray-600 transition hover:bg-gray-100 hover:text-black"
+          title={s.label}
+        >
+          <i class={["text-2xl", s.icon].join(" ")} aria-hidden="true" />
+        </a>
+      ))
+    }
+  </div>
+</div>
+
 <aside
   class="text-charcoal sticky top-0 z-40 hidden h-screen w-24 pt-24 md:block lg:block"
   aria-label="Side Navigation"
@@ -97,8 +108,7 @@ const socialLinks: SocialLink[] = [
   <nav class="space-y-2 py-6 pl-6">
     {
       items.map(({ label, href }) => {
-        const active =
-          current === href || (href !== "/" && current.startsWith(href));
+        const active = isActive(href, current);
         return (
           <a
             href={href}
@@ -119,21 +129,98 @@ const socialLinks: SocialLink[] = [
     }
   </nav>
 
-  <div class="gap-2pr-3 absolute bottom-6 flex">
+  <div class="absolute bottom-6 flex gap-2 pl-6">
     {
-      socialLinks.map((s) => {
-        return (
-          <a
-            href={s.href}
-            rel="noopener noreferrer"
-            target="_blank"
-            class="flex h-8 w-8 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 hover:text-black"
-            title={s.label}
-          >
-            <i class={["text-lg", s.icon].join(" ")} aria-hidden="true" />
-          </a>
-        );
-      })
+      socialLinks.map((s) => (
+        <a
+          href={s.href}
+          rel="noopener noreferrer"
+          target="_blank"
+          class="flex h-8 w-8 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 hover:text-black"
+          title={s.label}
+        >
+          <i class={["text-lg", s.icon].join(" ")} aria-hidden="true" />
+        </a>
+      ))
     }
   </div>
 </aside>
+
+<style>
+  .menu-open #mobile-menu-toggle .hamburger-line:nth-child(1) {
+    transform: rotate(45deg) translate(6px, 6px);
+  }
+
+  .menu-open #mobile-menu-toggle .hamburger-line:nth-child(2) {
+    opacity: 0;
+  }
+
+  .menu-open #mobile-menu-toggle .hamburger-line:nth-child(3) {
+    transform: rotate(-45deg) translate(6px, -6px);
+  }
+</style>
+
+<script>
+  function initMobileMenu() {
+    const toggle = document.getElementById("mobile-menu-toggle");
+    const menu = document.getElementById("mobile-menu");
+    const menuLinks = document.querySelectorAll(".mobile-menu-link");
+
+    if (!toggle || !menu) return;
+
+    function closeMenu() {
+      menu.classList.add("translate-x-full");
+      menu.setAttribute("aria-hidden", "true");
+      toggle.setAttribute("aria-expanded", "false");
+      document.body.classList.remove("menu-open");
+      document.body.style.overflow = "";
+    }
+
+    function openMenu() {
+      menu.classList.remove("translate-x-full");
+      menu.setAttribute("aria-hidden", "false");
+      toggle.setAttribute("aria-expanded", "true");
+      document.body.classList.add("menu-open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function toggleMenu() {
+      const isOpen = menu.getAttribute("aria-hidden") === "false";
+      isOpen ? closeMenu() : openMenu();
+    }
+
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === "Escape" && menu.getAttribute("aria-hidden") === "false") {
+        closeMenu();
+      }
+    }
+
+    toggle.removeEventListener("click", toggleMenu);
+    toggle.addEventListener("click", toggleMenu);
+
+    menuLinks.forEach((link) => {
+      link.removeEventListener("click", closeMenu);
+      link.addEventListener("click", closeMenu);
+    });
+
+    document.removeEventListener("keydown", handleEscape);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      toggle.removeEventListener("click", toggleMenu);
+      menuLinks.forEach((link) => link.removeEventListener("click", closeMenu));
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }
+
+  let cleanup = initMobileMenu();
+
+  document.addEventListener("astro:page-load", () => {
+    if (cleanup) cleanup();
+    cleanup = initMobileMenu();
+  });
+
+  document.addEventListener("astro:before-preparation", () => {
+    if (cleanup) cleanup();
+  });
+</script>
