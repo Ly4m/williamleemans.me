@@ -95,7 +95,7 @@ export class EmberParticleSystem {
   private tick: number;
   private animationFrameId: number | null = null;
 
-  constructor(canvas: HTMLCanvasElement, particleCount = 200) {
+  constructor(canvas: HTMLCanvasElement, particleCount = 100) {
     this.canvas = canvas;
 
     const ctx = canvas.getContext("2d");
