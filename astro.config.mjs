@@ -10,7 +10,7 @@ import sitemap from "@astrojs/sitemap";
 import svelte from "@astrojs/svelte";
 
 export default defineConfig({
-  site: "https://williamleemans.me",
+  site: "https://lmns.fr",
   integrations: [sitemap(), svelte()],
   i18n: {
     locales: ["fr", "en"],
