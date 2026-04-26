@@ -85,8 +85,19 @@ const canonical = new URL(Astro.url.pathname, site).toString();
     <meta name="generator" content={Astro.generator} />
 
     <ClientRouter />
+
+    <script is:inline>
+      function applyTheme() {
+        const stored = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const dark = stored === 'dark' || (!stored && prefersDark);
+        document.documentElement.classList.toggle('dark', dark);
+      }
+      applyTheme();
+      document.addEventListener('astro:after-swap', applyTheme);
+    </script>
   </head>
-  <body class="bg-primary-100 h-full min-h-screen antialiased">
+  <body class="bg-primary-100 dark:bg-[#1a1a1a] dark:text-primary-100 h-full min-h-screen antialiased">
     <EmberBackground client:load />
 
     <!-- Content area -->

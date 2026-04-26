@@ -26,11 +26,11 @@ const staggerRules = Array.from(
 
 <Layout title={"William Leemans — " + post.data.title} ogImage="/og/home.jpg">
   <header class="py-8 md:py-12">
-    <h1 class="font-space text-charcoal text-2xl tracking-tight md:text-3xl">
+    <h1 class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl">
       {post.data.title}
     </h1>
   </header>
-  <main class="text-charcoal mb-40">
+  <main class="text-charcoal dark:text-primary-100 mb-40">
     <p class="mb-8">
       Ce qu'il se passe dans ma vie en ce moment, inspiré par <a
       target="_blank"
@@ -38,7 +38,7 @@ const staggerRules = Array.from(
       href="https://nownownow.com/about">nownownow.com</a
     >
     </p>
-    <article class="prose wave-enter-content">
+    <article class="prose dark:prose-invert wave-enter-content">
       <Content />
     </article>
   </main>

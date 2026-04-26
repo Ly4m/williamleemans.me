@@ -63,7 +63,12 @@ class EmberParticle {
     }
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
+  draw(ctx: CanvasRenderingContext2D, dark: boolean) {
+    const [r, g, b] = dark ? [212, 175, 55] : [0, 0, 0];
+    const glowColor = dark
+      ? `rgba(212, 175, 55, ${this.alpha})`
+      : `rgba(255, 140, 30, ${this.alpha})`;
+
     const gradient = ctx.createRadialGradient(
       this.x,
       this.y,
@@ -72,11 +77,11 @@ class EmberParticle {
       this.y,
       this.radius,
     );
-    gradient.addColorStop(0, `rgba(0, 0, 00, ${this.alpha})`);
-    gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+    gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${this.alpha})`);
+    gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
 
     ctx.fillStyle = gradient;
-    ctx.shadowColor = `rgba(255, 140, 30, ${this.alpha})`;
+    ctx.shadowColor = glowColor;
     ctx.shadowBlur = this.radius * 2;
 
     ctx.beginPath();
@@ -94,6 +99,8 @@ export class EmberParticleSystem {
   private height: number;
   private tick: number;
   private animationFrameId: number | null = null;
+  private dark: boolean = false;
+  private observer: MutationObserver | null = null;
 
   constructor(canvas: HTMLCanvasElement, particleCount = 100) {
     this.canvas = canvas;
@@ -114,6 +121,12 @@ export class EmberParticleSystem {
     for (let i = 0; i < particleCount; i++) {
       this.particles.push(new EmberParticle(this.width, this.height));
     }
+
+    this.dark = document.documentElement.classList.contains("dark");
+    this.observer = new MutationObserver(() => {
+      this.dark = document.documentElement.classList.contains("dark");
+    });
+    this.observer.observe(document.documentElement, { attributeFilter: ["class"] });
 
     window.addEventListener("resize", () => this.resize());
   }
@@ -137,7 +150,7 @@ export class EmberParticleSystem {
 
     for (const particle of this.particles) {
       particle.update(this.noise2D, this.tick, this.width, this.height);
-      particle.draw(this.ctx);
+      particle.draw(this.ctx, this.dark);
     }
 
     this.animationFrameId = requestAnimationFrame(() => this.updateAndDraw());
@@ -152,5 +165,6 @@ export class EmberParticleSystem {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
     }
+    this.observer?.disconnect();
   }
 }

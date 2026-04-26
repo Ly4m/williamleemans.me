@@ -19,7 +19,7 @@ const fmt = (date: Date) => {
 <Layout title="William Leemans" ogImage="/og/home.jpg">
   <div class="max-w-2xl">
     <header class="py-12">
-      <h1 class="font-space text-charcoal text-2xl tracking-tight md:text-3xl">
+      <h1 class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl">
         Le blog
       </h1>
     </header>
@@ -32,14 +32,14 @@ const fmt = (date: Date) => {
                 href={`/blog/${post.id}`}
                 class="group flex items-center justify-between gap-1"
               >
-                <time class="text-faded group-hover:text-charcoal text-sm tabular-nums transition-colors group-hover:transition-none motion-reduce:transition-none">
+                <time class="text-faded group-hover:text-charcoal dark:group-hover:text-primary-100 text-sm tabular-nums transition-colors group-hover:transition-none motion-reduce:transition-none">
                   {fmt(post.data.pubDate)}
                 </time>
                 <span
                   aria-hidden="true"
                   class="text-faded dot-leader group-hover:dot-leader-hover grow leading-none transition-colors group-hover:transition-none motion-reduce:transition-none"
                 />
-                <span class="group-hover:text-charcoal text-faded">
+                <span class="group-hover:text-charcoal dark:group-hover:text-primary-100 text-faded">
                   {post.data.title}
                 </span>
               </a>

@@ -26,15 +26,15 @@ const staggerRules = Array.from(
 
 <Layout title={"William Leemans — " + post.data.title} ogImage="/og/home.jpg">
   <header class="py-12">
-    <h1 class="font-space text-charcoal text-2xl tracking-tight md:text-3xl">
+    <h1 class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl">
       {post.data.title}
     </h1>
     <p class="text-faded">
       {post.data.readingTime} min - {fmt(post.data.pubDate)}
     </p>
   </header>
-  <main class="text-charcoal mb-40">
-    <article class="prose wave-enter-content">
+  <main class="text-charcoal dark:text-primary-100 mb-40">
+    <article class="prose dark:prose-invert wave-enter-content">
       <Content />
     </article>
   </main>

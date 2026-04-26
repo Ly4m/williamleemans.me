@@ -15,12 +15,12 @@ const staggerRules = Array.from(
 >
   <main class="py-8 md:py-12">
     <header class="mb-6 md:mb-8">
-      <h1 class="font-space text-charcoal text-2xl tracking-tight md:text-3xl">
+      <h1 class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl">
         William Leemans
       </h1>
     </header>
 
-    <section class="text-charcoal prose wave-enter-content">
+    <section class="text-charcoal dark:text-primary-100 prose dark:prose-invert wave-enter-content">
       <p>
         Hello there! I'm William, a Belgian entrepreneur and software architect.
       </p>
@@ -91,7 +91,13 @@ const staggerRules = Array.from(
     &:hover {
       border-bottom: 1px solid var(--color-charcoal);
     }
+  }
 
+  :global(.dark) a:hover {
+    border-bottom-color: var(--color-primary-100);
+  }
+
+  a {
     &.orange:hover {
       border-bottom: 1px solid #ff772c;
     }
