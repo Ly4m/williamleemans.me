@@ -1,12 +1,6 @@
 ---
-import Welcome from "../components/Welcome.astro";
 import Layout from "../layouts/Layout.astro";
 
-const staggerRules = Array.from(
-  { length: 100 },
-  (_, i) =>
-    `.wave-enter-content > *:nth-child(${i + 1}) { --stagger: ${i + 1}; }`,
-).join("\n");
 ---
 
 <Layout
@@ -82,8 +76,6 @@ const staggerRules = Array.from(
     </section>
   </main>
 </Layout>
-
-<style is:global set:html={staggerRules}></style>
 
 <style>
   a {

@@ -12,10 +12,6 @@ import svelte from "@astrojs/svelte";
 export default defineConfig({
   site: "https://lmns.fr",
   integrations: [sitemap(), svelte()],
-  i18n: {
-    locales: ["fr", "en"],
-    defaultLocale: "fr",
-  },
   markdown: {
     shikiConfig: {
       themes: {

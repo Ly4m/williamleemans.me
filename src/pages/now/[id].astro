@@ -17,11 +17,6 @@ const fmt = (date: Date) => {
   return date.toLocaleDateString();
 };
 
-const staggerRules = Array.from(
-  { length: 100 },
-  (_, i) =>
-    `.wave-enter-content > *:nth-child(${i + 1}) { --stagger: ${i + 1}; }`,
-).join("\n");
 ---
 
 <Layout title={"William Leemans — " + post.data.title} ogImage="/og/home.jpg">
@@ -43,5 +38,3 @@ const staggerRules = Array.from(
     </article>
   </main>
 </Layout>
-
-<style is:global set:html={staggerRules}></style>

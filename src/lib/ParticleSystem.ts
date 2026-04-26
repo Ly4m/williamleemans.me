@@ -65,25 +65,23 @@ class EmberParticle {
 
   draw(ctx: CanvasRenderingContext2D, dark: boolean) {
     const [r, g, b] = dark ? [212, 175, 55] : [0, 0, 0];
-    const glowColor = dark
-      ? `rgba(212, 175, 55, ${this.alpha})`
-      : `rgba(255, 140, 30, ${this.alpha})`;
+    const [gr, gg, gb] = dark ? [212, 175, 55] : [255, 140, 30];
+    const glowRadius = this.radius * 5;
 
-    const gradient = ctx.createRadialGradient(
-      this.x,
-      this.y,
-      0,
-      this.x,
-      this.y,
-      this.radius,
-    );
-    gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${this.alpha})`);
-    gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+    const glow = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, glowRadius);
+    glow.addColorStop(0, `rgba(${gr}, ${gg}, ${gb}, ${this.alpha * 0.3})`);
+    glow.addColorStop(1, `rgba(${gr}, ${gg}, ${gb}, 0)`);
 
-    ctx.fillStyle = gradient;
-    ctx.shadowColor = glowColor;
-    ctx.shadowBlur = this.radius * 2;
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, glowRadius, 0, TAU);
+    ctx.fill();
 
+    const core = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+    core.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${this.alpha})`);
+    core.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+
+    ctx.fillStyle = core;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, TAU);
     ctx.fill();
@@ -101,6 +99,7 @@ export class EmberParticleSystem {
   private animationFrameId: number | null = null;
   private dark: boolean = false;
   private observer: MutationObserver | null = null;
+  private resizeHandler: () => void;
 
   constructor(canvas: HTMLCanvasElement, particleCount = 100) {
     this.canvas = canvas;
@@ -128,7 +127,8 @@ export class EmberParticleSystem {
     });
     this.observer.observe(document.documentElement, { attributeFilter: ["class"] });
 
-    window.addEventListener("resize", () => this.resize());
+    this.resizeHandler = () => this.resize();
+    window.addEventListener("resize", this.resizeHandler);
   }
 
   resize() {
@@ -166,5 +166,6 @@ export class EmberParticleSystem {
       this.animationFrameId = null;
     }
     this.observer?.disconnect();
+    window.removeEventListener("resize", this.resizeHandler);
   }
 }

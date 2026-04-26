@@ -1,11 +1,10 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import { getCollection, render } from "astro:content";
-import type { CollectionEntry } from "astro:content";
 
 const nowEntries = await getCollection("now");
 const sortedEntries = nowEntries.sort(
-  (a, b) => a.data.pubDate.getTime() - b.data.pubDate.getTime()
+  (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
 );
 
 const latestEntry = sortedEntries[0];
@@ -13,11 +12,6 @@ const { Content } = latestEntry ? await render(latestEntry) : { Content: null };
 
 const previousEntries = sortedEntries.slice(1);
 
-const staggerRules = Array.from(
-  { length: 100 },
-  (_, i) =>
-    `.wave-enter-content > *:nth-child(${i + 1}) { --stagger: ${i + 1}; }`,
-).join("\n");
 ---
 
 <Layout title="William Leemans — Now" ogImage="/og/home.jpg">
@@ -62,8 +56,6 @@ const staggerRules = Array.from(
     </main>
   </div>
 </Layout>
-
-<style is:global set:html={staggerRules}></style>
 
 <style>
   h2 {
