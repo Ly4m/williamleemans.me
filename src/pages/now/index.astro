@@ -4,7 +4,7 @@ import { getCollection, render } from "astro:content";
 
 const nowEntries = await getCollection("now");
 const sortedEntries = nowEntries.sort(
-  (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
+  (a, b) => a.data.pubDate.getTime() - b.data.pubDate.getTime()
 );
 
 const latestEntry = sortedEntries[0];
