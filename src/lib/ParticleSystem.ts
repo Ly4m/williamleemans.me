@@ -14,6 +14,7 @@ class EmberParticle {
   ttl: number = 0;
   alpha: number = 0;
   flickerPhase: number;
+  colorTemp: number = 0; // 0 = cool ember (red-orange), 1 = hot ember (white-yellow)
 
   constructor(width: number, height: number) {
     this.flickerPhase = Math.random() * TAU;
@@ -35,6 +36,7 @@ class EmberParticle {
     this.life = 0;
     this.alpha = 0;
     this.flickerPhase = Math.random() * TAU;
+    this.colorTemp = Math.random();
   }
 
   update(
@@ -64,27 +66,56 @@ class EmberParticle {
   }
 
   draw(ctx: CanvasRenderingContext2D, dark: boolean) {
-    const [r, g, b] = dark ? [212, 175, 55] : [0, 0, 0];
-    const [gr, gg, gb] = dark ? [212, 175, 55] : [255, 140, 30];
-    const glowRadius = this.radius * 5;
+    if (dark) {
+      // Color temperature: cool = deep orange-red, hot = white-yellow
+      const t = this.colorTemp;
+      const coreWhite = Math.floor(160 + t * 95);   // 160–255
+      const coreGreen = Math.floor(80 + t * 140);   // 80–220
+      const glowGreen = Math.floor(60 + t * 80);    // 60–140
 
-    const glow = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, glowRadius);
-    glow.addColorStop(0, `rgba(${gr}, ${gg}, ${gb}, ${this.alpha * 0.3})`);
-    glow.addColorStop(1, `rgba(${gr}, ${gg}, ${gb}, 0)`);
+      const glowRadius = this.radius * 10;
+      const glow = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, glowRadius);
+      glow.addColorStop(0,   `rgba(255, ${glowGreen + 60}, 10, ${this.alpha * 0.55})`);
+      glow.addColorStop(0.3, `rgba(220, ${glowGreen}, 5, ${this.alpha * 0.25})`);
+      glow.addColorStop(0.7, `rgba(160, 30, 0, ${this.alpha * 0.08})`);
+      glow.addColorStop(1,   `rgba(120, 10, 0, 0)`);
 
-    ctx.fillStyle = glow;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, glowRadius, 0, TAU);
-    ctx.fill();
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, glowRadius, 0, TAU);
+      ctx.fill();
 
-    const core = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
-    core.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${this.alpha})`);
-    core.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+      // Hot core: white-yellow center → orange-amber edge
+      const core = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+      core.addColorStop(0,   `rgba(255, ${coreWhite}, ${Math.floor(t * 80)}, ${this.alpha})`);
+      core.addColorStop(0.5, `rgba(255, ${coreGreen}, 20, ${this.alpha * 0.85})`);
+      core.addColorStop(1,   `rgba(220, 60, 5, 0)`);
 
-    ctx.fillStyle = core;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, TAU);
-    ctx.fill();
+      ctx.fillStyle = core;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, TAU);
+      ctx.fill();
+    } else {
+      // Light mode: subtle dark-grey wisps
+      const glowRadius = this.radius * 7;
+      const glow = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, glowRadius);
+      glow.addColorStop(0, `rgba(40, 40, 40, ${this.alpha * 0.18})`);
+      glow.addColorStop(1, `rgba(40, 40, 40, 0)`);
+
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, glowRadius, 0, TAU);
+      ctx.fill();
+
+      const core = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+      core.addColorStop(0, `rgba(80, 80, 80, ${this.alpha * 0.45})`);
+      core.addColorStop(1, `rgba(80, 80, 80, 0)`);
+
+      ctx.fillStyle = core;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, TAU);
+      ctx.fill();
+    }
   }
 }
 
