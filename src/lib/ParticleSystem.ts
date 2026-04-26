@@ -73,11 +73,11 @@ class EmberParticle {
       const coreGreen = Math.floor(80 + t * 140);   // 80–220
       const glowGreen = Math.floor(60 + t * 80);    // 60–140
 
-      const glowRadius = this.radius * 10;
+      const glowRadius = this.radius * 8;
       const glow = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, glowRadius);
-      glow.addColorStop(0,   `rgba(255, ${glowGreen + 60}, 10, ${this.alpha * 0.55})`);
-      glow.addColorStop(0.3, `rgba(220, ${glowGreen}, 5, ${this.alpha * 0.25})`);
-      glow.addColorStop(0.7, `rgba(160, 30, 0, ${this.alpha * 0.08})`);
+      glow.addColorStop(0,   `rgba(255, ${glowGreen + 60}, 10, ${this.alpha * 0.38})`);
+      glow.addColorStop(0.3, `rgba(220, ${glowGreen}, 5, ${this.alpha * 0.18})`);
+      glow.addColorStop(0.7, `rgba(160, 30, 0, ${this.alpha * 0.06})`);
       glow.addColorStop(1,   `rgba(120, 10, 0, 0)`);
 
       ctx.fillStyle = glow;
@@ -87,8 +87,8 @@ class EmberParticle {
 
       // Hot core: white-yellow center → orange-amber edge
       const core = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
-      core.addColorStop(0,   `rgba(255, ${coreWhite}, ${Math.floor(t * 80)}, ${this.alpha})`);
-      core.addColorStop(0.5, `rgba(255, ${coreGreen}, 20, ${this.alpha * 0.85})`);
+      core.addColorStop(0,   `rgba(255, ${coreWhite}, ${Math.floor(t * 80)}, ${this.alpha * 0.8})`);
+      core.addColorStop(0.5, `rgba(255, ${coreGreen}, 20, ${this.alpha * 0.68})`);
       core.addColorStop(1,   `rgba(220, 60, 5, 0)`);
 
       ctx.fillStyle = core;
@@ -99,7 +99,7 @@ class EmberParticle {
       // Light mode: subtle dark-grey wisps
       const glowRadius = this.radius * 7;
       const glow = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, glowRadius);
-      glow.addColorStop(0, `rgba(40, 40, 40, ${this.alpha * 0.18})`);
+      glow.addColorStop(0, `rgba(40, 40, 40, ${this.alpha * 0.13})`);
       glow.addColorStop(1, `rgba(40, 40, 40, 0)`);
 
       ctx.fillStyle = glow;
@@ -108,7 +108,7 @@ class EmberParticle {
       ctx.fill();
 
       const core = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
-      core.addColorStop(0, `rgba(80, 80, 80, ${this.alpha * 0.45})`);
+      core.addColorStop(0, `rgba(80, 80, 80, ${this.alpha * 0.33})`);
       core.addColorStop(1, `rgba(80, 80, 80, 0)`);
 
       ctx.fillStyle = core;
@@ -132,7 +132,7 @@ export class EmberParticleSystem {
   private observer: MutationObserver | null = null;
   private resizeHandler: () => void;
 
-  constructor(canvas: HTMLCanvasElement, particleCount = 100) {
+  constructor(canvas: HTMLCanvasElement, particleCount = 75) {
     this.canvas = canvas;
 
     const ctx = canvas.getContext("2d");
