@@ -1,7 +1,8 @@
 ---
 import { getCollection, render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
-import Layout from "../../layouts/Layout.astro";
+import BlogLayout from "../../layouts/BlogLayout.astro";
+import BlogPostDecoration from "../../components/BlogPostDecoration.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
@@ -13,24 +14,33 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
-const fmt = (date: Date) => {
-  return date.toLocaleDateString();
+
+const fmtMeta = (date: Date) => date.toLocaleDateString();
+
+const fmtDate = (date: Date) => {
+  const y = date.getFullYear();
+  const m = (date.getMonth() + 1).toString().padStart(2, "0");
+  return `${y}·${m}`;
 };
 
+const readingTime = `T:${String(post.data.readingTime).padStart(2, "0")}`;
+const dateLabel   = fmtDate(post.data.pubDate);
 ---
 
-<Layout title={"William Leemans — " + post.data.title} ogImage="/og/home.jpg">
+<BlogLayout title={"William Leemans — " + post.data.title} ogImage="/og/home.jpg">
   <header class="py-12">
     <h1 class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl">
       {post.data.title}
     </h1>
     <p class="text-faded">
-      {post.data.readingTime} min - {fmt(post.data.pubDate)}
+      {post.data.readingTime} min — {fmtMeta(post.data.pubDate)}
     </p>
+    <BlogPostDecoration readingTime={readingTime} dateLabel={dateLabel} />
   </header>
+
   <main class="text-charcoal dark:text-primary-100 mb-40">
     <article class="prose dark:prose-invert wave-enter-content">
       <Content />
     </article>
   </main>
-</Layout>
+</BlogLayout>

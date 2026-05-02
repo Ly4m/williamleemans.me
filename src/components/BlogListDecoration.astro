@@ -1,0 +1,83 @@
+---
+type Props = {
+  postCount: string;
+  yearSpan: string;
+};
+
+const { postCount, yearSpan } = Astro.props;
+---
+
+<!--
+  Grid-aligned circuit decoration for the blog list page header.
+  All key x/y positions are multiples of 20px to rhyme with the dot grid.
+
+  y=40  ──|──────●══╮══●────────────────●───────────────|────────────|────
+           tick arc-L  arc-R          branch           tick          tick
+  y=20             apex              branch-top
+-->
+<div class="hidden md:block mt-5" aria-hidden="true">
+  <svg width="380" height="60" viewBox="0 0 380 60" fill="none" class="decoration">
+
+    <!-- Tick at x=20 -->
+    <path d="M 20 36 L 20 44" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
+
+    <!-- Left dashed segment: start → arc -->
+    <path d="M 0 40 L 60 40" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
+
+    <!-- Arc dome: x=60→x=100, center (80,40), radius 20, apex at (80,20) -->
+    <path d="M 60 40 A 20 20 0 0 0 100 40" stroke="currentColor" stroke-width="1" class="circuit-trace" />
+
+    <!-- Tick at x=140 -->
+    <path d="M 140 36 L 140 44" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
+
+    <!-- Middle dashed segment: arc → branch -->
+    <path d="M 100 40 L 180 40" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
+
+    <!-- Branch at x=180: up to y=20 -->
+    <path d="M 180 40 L 180 20" stroke="currentColor" stroke-width="1" class="circuit-trace" />
+
+    <!-- Right dashed segment: branch → end -->
+    <path d="M 180 40 L 380 40" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
+
+    <!-- Ticks at x=260 and x=340 -->
+    <path d="M 260 36 L 260 44" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
+    <path d="M 340 36 L 340 44" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
+
+    <!-- Arc junction dots -->
+    <circle cx="60"  cy="40" r="2"   fill="currentColor" class="circuit-dot" />
+    <circle cx="100" cy="40" r="2"   fill="currentColor" class="circuit-dot" />
+    <!-- Arc apex dot -->
+    <circle cx="80"  cy="20" r="1.5" fill="currentColor" class="circuit-dot" />
+    <!-- Branch junction dot -->
+    <circle cx="180" cy="40" r="2"   fill="currentColor" class="circuit-dot" />
+    <!-- Branch top dot -->
+    <circle cx="180" cy="20" r="1.5" fill="currentColor" class="circuit-dot" />
+
+    <!-- Labels: post count (left) and year span (right of branch) -->
+    <text x="0"   y="57" font-family="'IBM Plex Mono', monospace" font-size="8" letter-spacing="0.08em" fill="currentColor" class="circuit-label">{postCount}</text>
+    <text x="200" y="57" font-family="'IBM Plex Mono', monospace" font-size="8" letter-spacing="0.08em" fill="currentColor" class="circuit-label">{yearSpan}</text>
+  </svg>
+</div>
+
+<style>
+  .decoration {
+    color: rgba(107, 107, 107, 0.75);
+  }
+
+  :global(.dark) .decoration {
+    color: rgba(250, 250, 250, 0.35);
+  }
+
+  .circuit-dot,
+  .circuit-label {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .circuit-dot,
+    .circuit-label {
+      opacity: 1 !important;
+      animation: none !important;
+    }
+  }
+</style>

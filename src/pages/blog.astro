@@ -1,6 +1,6 @@
 ---
-import Layout from "../layouts/Layout.astro";
-
+import BlogLayout from "../layouts/BlogLayout.astro";
+import BlogListDecoration from "../components/BlogListDecoration.astro";
 import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 
@@ -14,17 +14,24 @@ const fmt = (date: Date) => {
   const month = (date.getMonth() + 1).toString().padStart(2, "0");
   return `${year} · ${month}`;
 };
+
+const postCount = `N:${String(posts.length).padStart(2, "0")}`;
+const newestYear = posts[0].data.pubDate.getFullYear();
+const oldestYear = posts[posts.length - 1].data.pubDate.getFullYear();
+const yearSpan = newestYear === oldestYear ? String(newestYear) : `${oldestYear}–${newestYear}`;
 ---
 
-<Layout title="William Leemans">
+<BlogLayout title="William Leemans">
   <div class="max-w-2xl">
     <header class="py-12">
       <h1 class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl">
         Le blog
       </h1>
+      <BlogListDecoration postCount={postCount} yearSpan={yearSpan} />
     </header>
+
     <main class="text-ash">
-      <ul class="">
+      <ul>
         {
           posts.map((post: CollectionEntry) => (
             <li>
@@ -49,4 +56,4 @@ const fmt = (date: Date) => {
       </ul>
     </main>
   </div>
-</Layout>
+</BlogLayout>

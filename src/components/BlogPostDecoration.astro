@@ -1,0 +1,79 @@
+---
+type Props = {
+  readingTime: string;
+  dateLabel: string;
+};
+
+const { readingTime, dateLabel } = Astro.props;
+---
+
+<!--
+  Grid-aligned circuit decoration for the blog post page header.
+  Smaller/subtler variant of the list decoration.
+
+  y=40  ──|──────●══╮══●──────●────────────────|────────────
+           tick arc-L  arc-R branch           tick
+  y=20             apex   branch-top
+-->
+<div class="hidden md:block mt-4" aria-hidden="true">
+  <svg width="260" height="60" viewBox="0 0 260 60" fill="none" class="decoration">
+
+    <!-- Tick at x=20 -->
+    <path d="M 20 36 L 20 44" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
+
+    <!-- Left dashed segment: start → arc -->
+    <path d="M 0 40 L 40 40" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
+
+    <!-- Arc dome: x=40→x=80, center (60,40), radius 20, apex at (60,20) -->
+    <path d="M 40 40 A 20 20 0 0 0 80 40" stroke="currentColor" stroke-width="1" class="circuit-trace" />
+
+    <!-- Middle dashed segment: arc → branch -->
+    <path d="M 80 40 L 120 40" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
+
+    <!-- Branch at x=120: up to y=20 -->
+    <path d="M 120 40 L 120 20" stroke="currentColor" stroke-width="1" class="circuit-trace" />
+
+    <!-- Right dashed segment: branch → end -->
+    <path d="M 120 40 L 260 40" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
+
+    <!-- Tick at x=200 -->
+    <path d="M 200 36 L 200 44" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
+
+    <!-- Arc junction dots -->
+    <circle cx="40"  cy="40" r="1.75" fill="currentColor" class="circuit-dot" />
+    <circle cx="80"  cy="40" r="1.75" fill="currentColor" class="circuit-dot" />
+    <!-- Apex dot -->
+    <circle cx="60"  cy="20" r="1.25" fill="currentColor" class="circuit-dot" />
+    <!-- Branch junction dot -->
+    <circle cx="120" cy="40" r="1.75" fill="currentColor" class="circuit-dot" />
+    <!-- Branch top dot -->
+    <circle cx="120" cy="20" r="1.25" fill="currentColor" class="circuit-dot" />
+
+    <!-- Labels: reading time (left) and post date (right of branch) -->
+    <text x="0"   y="57" font-family="'IBM Plex Mono', monospace" font-size="8" letter-spacing="0.08em" fill="currentColor" class="circuit-label">{readingTime}</text>
+    <text x="140" y="57" font-family="'IBM Plex Mono', monospace" font-size="8" letter-spacing="0.08em" fill="currentColor" class="circuit-label">{dateLabel}</text>
+  </svg>
+</div>
+
+<style>
+  .decoration {
+    color: rgba(107, 107, 107, 0.65);
+  }
+
+  :global(.dark) .decoration {
+    color: rgba(250, 250, 250, 0.28);
+  }
+
+  .circuit-dot,
+  .circuit-label {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .circuit-dot,
+    .circuit-label {
+      opacity: 1 !important;
+      animation: none !important;
+    }
+  }
+</style>
