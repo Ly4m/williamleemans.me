@@ -1,0 +1,74 @@
+---
+// No props — purely visual right-margin decoration for the home page.
+---
+
+<!--
+  Vertical dashed trace at x=40 with short horizontal branches pointing inward (left).
+  Positioned absolute on the right edge of a relative container.
+
+  x=40 ──────┤ tick(60)
+             ┤ tick(80)
+             ├─────── branch(100, 32px → x=8)
+             ┤ tick(120)
+             ├──── branch(160, 24px → x=16)
+             ┤ tick(200)
+             ├── branch(240, 16px → x=24)
+             ┤ tick(280)
+-->
+<div class="hidden lg:block flex-none self-stretch" aria-hidden="true">
+  <svg width="60" height="320" viewBox="0 0 60 320" fill="none" class="decoration">
+
+    <!-- Vertical dashed trace at x=40 -->
+    <path d="M 40 0 L 40 320" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
+
+    <!-- Ticks at y=60, 80, 120, 200, 280 -->
+    <path d="M 36 60 L 44 60"   stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
+    <path d="M 36 80 L 44 80"   stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
+    <path d="M 36 120 L 44 120" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
+    <path d="M 36 200 L 44 200" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
+    <path d="M 36 280 L 44 280" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
+
+    <!-- Horizontal branches pointing left -->
+    <!-- y=40: 16px branch → x=24 -->
+    <path d="M 40 40 L 24 40"   stroke="currentColor" stroke-width="1" class="circuit-trace" />
+    <!-- y=100: 32px branch → x=8 -->
+    <path d="M 40 100 L 8 100"  stroke="currentColor" stroke-width="1" class="circuit-trace" />
+    <!-- y=160: 24px branch → x=16 -->
+    <path d="M 40 160 L 16 160" stroke="currentColor" stroke-width="1" class="circuit-trace" />
+    <!-- y=240: 16px branch → x=24 -->
+    <path d="M 40 240 L 24 240" stroke="currentColor" stroke-width="1" class="circuit-trace" />
+
+    <!-- Junction dots at branch origins -->
+    <circle cx="40" cy="40"  r="1.75" fill="currentColor" class="circuit-dot" />
+    <circle cx="40" cy="100" r="1.75" fill="currentColor" class="circuit-dot" />
+    <circle cx="40" cy="160" r="1.75" fill="currentColor" class="circuit-dot" />
+    <circle cx="40" cy="240" r="1.75" fill="currentColor" class="circuit-dot" />
+
+    <!-- Endpoint dots at branch tips -->
+    <circle cx="24" cy="40"  r="1.25" fill="currentColor" class="circuit-dot" />
+    <circle cx="8"  cy="100" r="1.25" fill="currentColor" class="circuit-dot" />
+    <circle cx="16" cy="160" r="1.25" fill="currentColor" class="circuit-dot" />
+    <circle cx="24" cy="240" r="1.25" fill="currentColor" class="circuit-dot" />
+  </svg>
+</div>
+
+<style>
+  .decoration {
+    color: rgba(107, 107, 107, 0.65);
+  }
+
+  :global(.dark) .decoration {
+    color: rgba(250, 250, 250, 0.28);
+  }
+
+  .circuit-dot {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .circuit-dot {
+      opacity: 1 !important;
+      animation: none !important;
+    }
+  }
+</style>

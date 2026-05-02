@@ -1,9 +1,11 @@
 ---
-import Layout from "../layouts/Layout.astro";
-
+import BlogLayout from "../layouts/BlogLayout.astro";
+import HomeDecoration from "../components/HomeDecoration.astro";
+import HomeMarginDecoration from "../components/HomeMarginDecoration.astro";
+import HomeFooterDecoration from "../components/HomeFooterDecoration.astro";
 ---
 
-<Layout
+<BlogLayout
   title="William Leemans — Software Engineer in Lille"
   ogImage="/og/home.jpg"
 >
@@ -12,70 +14,76 @@ import Layout from "../layouts/Layout.astro";
       <h1 class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl">
         William Leemans
       </h1>
+      <HomeDecoration />
     </header>
 
-    <section class="text-charcoal dark:text-primary-100 prose dark:prose-invert wave-enter-content">
-      <p>
-        Salut ! Moi c'est William.
-      </p>
-      <p>
-        Italo-belge, entrepreneur et architecte logiciel passionné.
-      </p>
-      <p>
-        Je suis cofondateur et CTO de <a
-          target="_blank"
-          rel="noopener noreferrer"
-          class="orange"
-          href="https://www.jetdev.fr">Jetdev</a
-        >, où je passe mes journées à concevoir des systèmes, accompagner des
-        développeurs et clients.
-      </p>
-      <p>
-        J’ai pu collaborer avec des équipes chez Kiabi, Exotec, Decathlon ou
-        encore Electro Depot, et donner vie à nos propres produits
-        <a
-          rel="noopener noreferrer"
-          target="_blank"
-          class="pink"
-          href="https://www.scanzee.app/">Scanzee</a
-        >
-        et Distract.
-      </p>
-      <p>
-        J’adore apprendre de nouvelles choses, puis les partager, autour d’un café, d’une bière, d’un talk ou simplement sur internet.
-      </p>
-      <p>
-        Quand je ne code pas, on peut souvent me trouver en train d’affronter un boss manette en main,
-        le nez plongé dans une BD, ou en train de tester une nouvelle recette avec ma femme.
-        Je fais aussi un peu de musique et j’adore les soirées jeux de société entre amis.
-      </p>
-      <nav aria-label="Social links">
-        <span class="mr-1">Envie de dire bonjour ou de discuter tech ? Retrouve-moi sur </span>
-        <a
-          target="_blank"
-          href="https://github.com/Ly4m"
-          rel="noopener noreferrer"
-          class="inline-flex items-center gap-1"
-        >
-          <span class="icon-[tabler--brand-github] text-lg" aria-hidden="true"
-          ></span>
-          GitHub
-        </a>
-        <span>ou</span>
-        <a
-          target="_blank"
-          href="https://www.linkedin.com/in/wleemans"
-          rel="noopener noreferrer"
-          class="inline-flex items-center gap-1"
-        >
-          <span class="icon-[tabler--brand-linkedin] text-lg" aria-hidden="true"
-          ></span>
-          LinkedIn
-        </a>
-      </nav>
-    </section>
+    <div class="flex items-start gap-4">
+      <section class="text-charcoal dark:text-primary-100 prose dark:prose-invert wave-enter-content min-w-0">
+        <p>
+          Salut ! Moi c'est William.
+        </p>
+        <p>
+          Italo-belge, entrepreneur et architecte logiciel passionné.
+        </p>
+        <p>
+          Je suis cofondateur et CTO de <a
+            target="_blank"
+            rel="noopener noreferrer"
+            class="orange"
+            href="https://www.jetdev.fr">Jetdev</a
+          >, où je passe mes journées à concevoir des systèmes, accompagner des
+          développeurs et clients.
+        </p>
+        <p>
+          J'ai pu collaborer avec des équipes chez Kiabi, Exotec, Decathlon ou
+          encore Electro Depot, et donner vie à nos propres produits
+          <a
+            rel="noopener noreferrer"
+            target="_blank"
+            class="pink"
+            href="https://www.scanzee.app/">Scanzee</a
+          >
+          et Distract.
+        </p>
+        <p>
+          J'adore apprendre de nouvelles choses, puis les partager, autour d'un café, d'une bière, d'un talk ou simplement sur internet.
+        </p>
+        <p>
+          Quand je ne code pas, on peut souvent me trouver en train d'affronter un boss manette en main,
+          le nez plongé dans une BD, ou en train de tester une nouvelle recette avec ma femme.
+          Je fais aussi un peu de musique et j'adore les soirées jeux de société entre amis.
+        </p>
+        <nav aria-label="Social links">
+          <span class="mr-1">Envie de dire bonjour ou de discuter tech ? Retrouve-moi sur </span>
+          <a
+            target="_blank"
+            href="https://github.com/Ly4m"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1"
+          >
+            <span class="icon-[tabler--brand-github] text-lg" aria-hidden="true"
+            ></span>
+            GitHub
+          </a>
+          <span>ou</span>
+          <a
+            target="_blank"
+            href="https://www.linkedin.com/in/wleemans"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1"
+          >
+            <span class="icon-[tabler--brand-linkedin] text-lg" aria-hidden="true"
+            ></span>
+            LinkedIn
+          </a>
+        </nav>
+      </section>
+      <HomeMarginDecoration />
+    </div>
+
+    <HomeFooterDecoration />
   </main>
-</Layout>
+</BlogLayout>
 
 <style>
   a {
