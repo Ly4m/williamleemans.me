@@ -3,31 +3,38 @@
 ---
 
 <!--
-  Grid-aligned closing trace for the home page.
-  Single dashed trace with ticks and a short upward branch.
+  Full-width closing trace.
+  A single arc at the center echoes the header's motif — same geometry,
+  same orientation — as a quiet callback to the opening decoration.
+  Four ticks are placed symmetrically around the arc center (x=370).
 
-  y=4   ────────────────────────────────|─────────────────────
-                                     branch-top(200)
-  y=20  ──|─────────────────────────────────────────────────|──
-          tick(40)                       tick(160)         tick(260)
+  y=0   ────────────────────────────●────────────────────────────
+                                 apex(370)
+  y=20  ──|─────────|──────────╮─────────╰──────────|─────────|──
+         tick(60) tick(220)  arc(350→390)          tick(520) tick(680)
 -->
-<div class="hidden md:block mt-6" aria-hidden="true">
-  <svg width="300" height="30" viewBox="0 0 300 30" fill="none" class="decoration">
+<div class="hidden md:block mt-6 overflow-visible" aria-hidden="true">
+  <svg width="100%" viewBox="0 -6 760 36" fill="none" class="decoration" style="overflow: visible">
 
-    <!-- Dashed trace: 0 → 300 -->
-    <path d="M 0 20 L 300 20" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
+    <!-- Dashed trace: full width -->
+    <path d="M 0 20 L 350 20"  stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
+    <path d="M 390 20 L 760 20" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
 
-    <!-- Ticks at x=40, x=160, x=260 -->
-    <path d="M 40 16 L 40 24"   stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
-    <path d="M 160 16 L 160 24" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
-    <path d="M 260 16 L 260 24" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
+    <!-- Center arc — same r=20 semicircle as the header arcs, same upward orientation -->
+    <path d="M 350 20 A 20 20 0 0 0 390 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="circuit-trace" />
 
-    <!-- Short upward branch at x=200: y=20 → y=4 -->
-    <path d="M 200 20 L 200 4"  stroke="currentColor" stroke-width="1" class="circuit-trace" />
+    <!-- Ticks placed symmetrically around arc center (x=370) -->
+    <path d="M 60  16 L 60  24" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
+    <path d="M 220 16 L 220 24" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
+    <path d="M 520 16 L 520 24" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
+    <path d="M 680 16 L 680 24" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
 
-    <!-- Branch junction and tip dots -->
-    <circle cx="200" cy="20" r="1.75" fill="currentColor" class="circuit-dot" />
-    <circle cx="200" cy="4"  r="1.25" fill="currentColor" class="circuit-dot" />
+    <!-- Arc apex dot -->
+    <circle cx="370" cy="0"  r="1.5" fill="currentColor" class="circuit-dot" />
+
+    <!-- Arc endpoint junction dots -->
+    <circle cx="350" cy="20" r="2"   fill="currentColor" class="circuit-dot" />
+    <circle cx="390" cy="20" r="2"   fill="currentColor" class="circuit-dot" />
   </svg>
 </div>
 

@@ -28,6 +28,8 @@ const dateLabel   = fmtDate(post.data.pubDate);
 ---
 
 <BlogLayout title={"William Leemans — " + post.data.title} ogImage="/og/home.jpg">
+  <div id="reading-progress" aria-hidden="true"></div>
+
   <header class="py-12">
     <h1 class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl">
       {post.data.title}
@@ -44,3 +46,7 @@ const dateLabel   = fmtDate(post.data.pubDate);
     </article>
   </main>
 </BlogLayout>
+
+<script>
+  import '../../scripts/blog-post';
+</script>

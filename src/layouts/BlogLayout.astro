@@ -113,24 +113,25 @@ const canonical = new URL(Astro.url.pathname, site).toString();
 
     <script>
       function initCircuitAnimations() {
-        // Draw-in animation for all traces using their actual path length
-        const traces = document.querySelectorAll<SVGPathElement>('.circuit-trace');
-        let lastEnd = 0.05;
-        traces.forEach((path) => {
-          const length = path.getTotalLength();
-          // Duration scales with path length: ~0.4s for short, ~1s for long
-          const dur = Math.max(0.35, Math.min(length / 180, 1.0));
-          path.style.strokeDasharray = String(length);
-          path.style.strokeDashoffset = String(length);
-          path.style.animation = `circuit-draw ${dur.toFixed(2)}s cubic-bezier(0.4, 0, 0.2, 1) ${lastEnd.toFixed(2)}s forwards`;
-          lastEnd += dur * 0.6; // overlap slightly so they chain together
-        });
+        // Animate each SVG independently so all decorations start at the same time.
+        // Within each SVG, traces draw in DOM order with a small fixed stagger.
+        document.querySelectorAll('svg').forEach((svg) => {
+          const traces = svg.querySelectorAll<SVGPathElement>('.circuit-trace');
+          if (!traces.length) return;
 
-        // Fade in dots, rects, and labels after the traces have mostly drawn
-        const statics = document.querySelectorAll<Element>('.circuit-dot, .circuit-rect, .circuit-label');
-        statics.forEach((el, i) => {
-          (el as HTMLElement).style.opacity = '0';
-          (el as HTMLElement).style.animation = `circuit-appear 0.3s ease-out ${(lastEnd - 0.1 + i * 0.07).toFixed(2)}s forwards`;
+          traces.forEach((path, i) => {
+            const length = path.getTotalLength();
+            const dur = Math.max(0.4, Math.min(length / 180, 1.0));
+            const delay = 0.05 + i * 0.07;
+            path.style.strokeDasharray = String(length);
+            path.style.strokeDashoffset = String(length);
+            path.style.animation = `circuit-draw ${dur.toFixed(2)}s cubic-bezier(0.4, 0, 0.2, 1) ${delay.toFixed(2)}s forwards`;
+          });
+
+          svg.querySelectorAll<Element>('.circuit-dot, .circuit-rect, .circuit-label').forEach((el, i) => {
+            (el as HTMLElement).style.opacity = '0';
+            (el as HTMLElement).style.animation = `circuit-appear 0.3s ease-out ${(0.55 + i * 0.06).toFixed(2)}s forwards`;
+          });
         });
       }
 

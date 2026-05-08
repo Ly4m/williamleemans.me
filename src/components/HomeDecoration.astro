@@ -3,66 +3,72 @@
 ---
 
 <!--
-  Grid-aligned circuit decoration for the home page header.
-  Two parallel traces (upper y=20, lower y=40) connected by vias.
-  Arc apexes on the lower trace kiss the upper trace at y=20.
+  Full-width dual-trace header decoration.
+  Three arcs connect the lower trace to the upper, equally spaced.
+  Two vias bridge the traces between the arcs.
 
-  y=20  ──|──────────────────●────────────────────────────────●────|──
-           tick(20)         via(130)                          via(300) tick(340)
-  y=40  ──────●══╮══●──────────────────────●══╮══●──────────────────
-              arc1(60→100)               arc2(220→260)
+  y=20  ─|────────────●────────────●────────────●────────────|─
+          tick(20)  apex(180)    apex(380)    apex(580)   tick(740)
+  y=40  ──────────╮──────────╮──────────╮──────────────────────
+              arc1(160→200) arc2(360→400) arc3(560→600)
 -->
-<div class="hidden md:block mt-5" aria-hidden="true">
-  <svg width="380" height="50" viewBox="0 0 380 50" fill="none" class="decoration">
+<div class="hidden md:block mt-5 overflow-visible" aria-hidden="true">
+  <svg width="100%" viewBox="0 -4 760 54" fill="none" class="decoration" style="overflow: visible">
 
-    <!-- Upper trace (y=20): full width dashed -->
-    <path d="M 0 20 L 380 20" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
+    <!-- Upper trace -->
+    <path d="M 0 20 L 760 20" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
 
-    <!-- Ticks on upper trace at x=20, x=160, x=340 -->
+    <!-- Upper trace anchor ticks -->
     <path d="M 20 16 L 20 24"   stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
-    <path d="M 160 16 L 160 24" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
-    <path d="M 340 16 L 340 24" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
+    <path d="M 740 16 L 740 24" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
 
-    <!-- Lower trace (y=40): dashed segments between arcs -->
-    <path d="M 0 40 L 60 40"    stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
-    <path d="M 100 40 L 220 40" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
-    <path d="M 260 40 L 380 40" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
+    <!-- Lower trace: four segments around the three arcs -->
+    <path d="M 0 40 L 160 40"   stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
+    <path d="M 200 40 L 360 40" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
+    <path d="M 400 40 L 560 40" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
+    <path d="M 600 40 L 760 40" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
 
-    <!-- Arc 1: x=60→100, radius 20, apex at (80,20) — sweep 0 = upward dome -->
-    <path d="M 60 40 A 20 20 0 0 0 100 40" stroke="currentColor" stroke-width="1" class="circuit-trace" />
+    <!-- Arcs: each a semicircle (r=20) from lower trace, apex touching upper trace -->
+    <path d="M 160 40 A 20 20 0 0 0 200 40" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="circuit-trace" />
+    <path d="M 360 40 A 20 20 0 0 0 400 40" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="circuit-trace" />
+    <path d="M 560 40 A 20 20 0 0 0 600 40" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="circuit-trace" />
 
-    <!-- Arc 2: x=220→260, radius 20, apex at (240,20) -->
-    <path d="M 220 40 A 20 20 0 0 0 260 40" stroke="currentColor" stroke-width="1" class="circuit-trace" />
+    <!-- Vias at midpoints of the segments between arcs -->
+    <path d="M 280 20 L 280 40" stroke="currentColor" stroke-width="1" class="circuit-trace" />
+    <path d="M 480 20 L 480 40" stroke="currentColor" stroke-width="1" class="circuit-trace" />
 
-    <!-- Vias: vertical connections between traces at x=130 and x=300 -->
-    <path d="M 130 20 L 130 40" stroke="currentColor" stroke-width="1" class="circuit-trace" />
-    <path d="M 300 20 L 300 40" stroke="currentColor" stroke-width="1" class="circuit-trace" />
+    <!-- Arc apex dots (where arcs kiss the upper trace) -->
+    <circle cx="180" cy="20" r="1.5" fill="currentColor" class="circuit-dot" />
+    <circle cx="380" cy="20" r="1.5" fill="currentColor" class="circuit-dot" />
+    <circle cx="580" cy="20" r="1.5" fill="currentColor" class="circuit-dot" />
 
-    <!-- Arc 1 junction dots -->
-    <circle cx="60"  cy="40" r="2"   fill="currentColor" class="circuit-dot" />
-    <circle cx="100" cy="40" r="2"   fill="currentColor" class="circuit-dot" />
-    <circle cx="80"  cy="20" r="1.5" fill="currentColor" class="circuit-dot" />
-
-    <!-- Arc 2 junction dots -->
-    <circle cx="220" cy="40" r="2"   fill="currentColor" class="circuit-dot" />
-    <circle cx="260" cy="40" r="2"   fill="currentColor" class="circuit-dot" />
-    <circle cx="240" cy="20" r="1.5" fill="currentColor" class="circuit-dot" />
+    <!-- Arc endpoint junction dots -->
+    <circle cx="160" cy="40" r="2"   fill="currentColor" class="circuit-dot" />
+    <circle cx="200" cy="40" r="2"   fill="currentColor" class="circuit-dot" />
+    <circle cx="360" cy="40" r="2"   fill="currentColor" class="circuit-dot" />
+    <circle cx="400" cy="40" r="2"   fill="currentColor" class="circuit-dot" />
+    <circle cx="560" cy="40" r="2"   fill="currentColor" class="circuit-dot" />
+    <circle cx="600" cy="40" r="2"   fill="currentColor" class="circuit-dot" />
 
     <!-- Via junction dots -->
-    <circle cx="130" cy="20" r="1.5" fill="currentColor" class="circuit-dot" />
-    <circle cx="130" cy="40" r="1.5" fill="currentColor" class="circuit-dot" />
-    <circle cx="300" cy="20" r="1.5" fill="currentColor" class="circuit-dot" />
-    <circle cx="300" cy="40" r="1.5" fill="currentColor" class="circuit-dot" />
+    <circle cx="280" cy="20" r="1.5" fill="currentColor" class="circuit-dot" />
+    <circle cx="280" cy="40" r="1.5" fill="currentColor" class="circuit-dot" />
+    <circle cx="480" cy="20" r="1.5" fill="currentColor" class="circuit-dot" />
+    <circle cx="480" cy="40" r="1.5" fill="currentColor" class="circuit-dot" />
+
+    <!-- Tick endpoint dots -->
+    <circle cx="20"  cy="20" r="1.5" fill="currentColor" class="circuit-dot" />
+    <circle cx="740" cy="20" r="1.5" fill="currentColor" class="circuit-dot" />
   </svg>
 </div>
 
 <style>
   .decoration {
-    color: rgba(107, 107, 107, 0.75);
+    color: rgba(107, 107, 107, 0.65);
   }
 
   :global(.dark) .decoration {
-    color: rgba(250, 250, 250, 0.35);
+    color: rgba(250, 250, 250, 0.28);
   }
 
   .circuit-dot {
