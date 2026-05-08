@@ -1,17 +1,15 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { getCollection, render } from "astro:content";
+import NowEntry from "../../components/NowEntry.astro";
+import { getCollection } from "astro:content";
 
 const nowEntries = await getCollection("now");
 const sortedEntries = nowEntries.sort(
-  (a, b) => a.data.pubDate.getTime() - b.data.pubDate.getTime()
+  (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
 );
 
 const latestEntry = sortedEntries[0];
-const { Content } = latestEntry ? await render(latestEntry) : { Content: null };
-
 const previousEntries = sortedEntries.slice(1);
-
 ---
 
 <Layout title="William Leemans — Now" ogImage="/og/home.jpg">
@@ -30,11 +28,7 @@ const previousEntries = sortedEntries.slice(1);
       >
       </p>
 
-      {latestEntry && Content && (
-        <article class="prose dark:prose-invert wave-enter-content mb-12">
-          <Content />
-        </article>
-      )}
+      {latestEntry && <NowEntry entry={latestEntry} />}
 
       {previousEntries.length > 0 && (
         <section class="mt-12 mb-40">

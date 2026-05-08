@@ -1,6 +1,6 @@
 import { defineCollection, z } from "astro:content";
 
-import { glob, file } from "astro/loaders";
+import { glob } from "astro/loaders";
 
 const blog = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/blog" }),
@@ -13,6 +13,18 @@ const blog = defineCollection({
   }),
 });
 
+const bookSchema = z.object({
+  title: z.string(),
+  author: z.string(),
+  note: z.string().optional(),
+  status: z.enum(["lu", "en-cours"]),
+});
+
+const gameSchema = z.object({
+  title: z.string(),
+  note: z.string().optional(),
+  status: z.enum(["terminé", "en-cours"]),
+});
 
 const now = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/now" }),
@@ -20,9 +32,12 @@ const now = defineCollection({
     slug: z.string(),
     title: z.string(),
     pubDate: z.coerce.date(),
+    lang: z.string().optional(),
+    booksIntro: z.string().optional(),
+    books: z.array(bookSchema).optional(),
+    gamesIntro: z.string().optional(),
+    games: z.array(gameSchema).optional(),
   }),
 });
-
-
 
 export const collections = { blog, now };

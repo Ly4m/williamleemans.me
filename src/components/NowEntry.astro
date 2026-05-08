@@ -1,0 +1,79 @@
+---
+import { render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import MediaCard from "./MediaCard.astro";
+import { fetchBookCover, fetchGameCover } from "../lib/coverArt";
+
+interface Props {
+  entry: CollectionEntry<"now">;
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+
+const books = entry.data.books ?? [];
+const games = entry.data.games ?? [];
+const rawgKey = import.meta.env.RAWG_API_KEY ?? "";
+
+const [bookCovers, gameCovers] = await Promise.all([
+  Promise.all(books.map((b) => fetchBookCover(b.title, b.author))),
+  Promise.all(games.map((g) => fetchGameCover(g.title, rawgKey))),
+]);
+---
+
+<article class="prose dark:prose-invert wave-enter-content mb-12">
+  <Content />
+</article>
+
+{
+  books.length > 0 && (
+    <section class="mb-12">
+      <h3 class="font-space text-charcoal dark:text-primary-100 text-lg font-bold tracking-wide mb-4">
+        Lecture
+      </h3>
+      {entry.data.booksIntro && (
+        <p class="font-sans text-sm text-charcoal dark:text-primary-100 mb-4 opacity-80">{entry.data.booksIntro}</p>
+      )}
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        {books.map((book, i) => (
+          <MediaCard
+            title={book.title}
+            subtitle={book.author}
+            note={book.note}
+            status={book.status}
+            statusLabel={book.status === "en-cours" ? "▶ En cours" : "✓ Lu"}
+            coverUrl={bookCovers[i] ?? undefined}
+            type="book"
+          />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+{
+  games.length > 0 && (
+    <section class="mb-12">
+      <h3 class="font-space text-charcoal dark:text-primary-100 text-lg font-bold tracking-wide mb-4">
+        Gaming
+      </h3>
+      {entry.data.gamesIntro && (
+        <p class="font-sans text-sm text-charcoal dark:text-primary-100 mb-4 opacity-80">{entry.data.gamesIntro}</p>
+      )}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {games.map((game, i) => (
+          <MediaCard
+            title={game.title}
+            note={game.note}
+            status={game.status}
+            statusLabel={
+              game.status === "en-cours" ? "▶ En cours" : "✓ Terminé"
+            }
+            coverUrl={gameCovers[i] ?? undefined}
+            type="game"
+          />
+        ))}
+      </div>
+    </section>
+  )
+}

@@ -1,7 +1,8 @@
 ---
-import { getCollection, render } from "astro:content";
+import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
+import NowEntry from "../../components/NowEntry.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("now");
@@ -12,11 +13,6 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
-const fmt = (date: Date) => {
-  return date.toLocaleDateString();
-};
-
 ---
 
 <Layout title={"William Leemans — " + post.data.title} ogImage="/og/home.jpg">
@@ -33,8 +29,6 @@ const fmt = (date: Date) => {
       href="https://nownownow.com/about">nownownow.com</a
     >
     </p>
-    <article class="prose dark:prose-invert wave-enter-content">
-      <Content />
-    </article>
+    <NowEntry entry={post} />
   </main>
 </Layout>
