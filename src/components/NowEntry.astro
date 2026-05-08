@@ -16,7 +16,7 @@ const games = entry.data.games ?? [];
 const rawgKey = import.meta.env.RAWG_API_KEY ?? "";
 
 const [bookCovers, gameCovers] = await Promise.all([
-  Promise.all(books.map((b) => fetchBookCover(b.title, b.author))),
+  Promise.all(books.map((b) => b.coverUrl ? Promise.resolve(b.coverUrl) : fetchBookCover(b.title, b.author))),
   Promise.all(games.map((g) => fetchGameCover(g.title, rawgKey))),
 ]);
 ---

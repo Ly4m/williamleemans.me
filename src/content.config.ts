@@ -18,6 +18,7 @@ const bookSchema = z.object({
   author: z.string(),
   note: z.string().optional(),
   status: z.enum(["lu", "en-cours"]),
+  coverUrl: z.string().optional(),
 });
 
 const gameSchema = z.object({

@@ -3,7 +3,7 @@ export async function fetchBookCover(
   author: string,
 ): Promise<string | null> {
   try {
-    const q = encodeURIComponent(`${title}`);
+    const q = encodeURIComponent(`${title} ${author}`);
     const res = await fetch(
       `https://openlibrary.org/search.json?q=${q}&limit=1&fields=cover_i`,
     );
