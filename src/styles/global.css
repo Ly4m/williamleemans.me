@@ -310,4 +310,15 @@ pre code {
         transition: none !important;
         animation: none !important;
     }
+
+    /* Disable content-entrance motion; show final state immediately. */
+    h1 {
+        animation: none !important;
+    }
+
+    .wave-enter-content > * {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
 }

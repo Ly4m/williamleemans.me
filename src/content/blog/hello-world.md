@@ -1,7 +1,6 @@
 ---
 slug: "hello-world"
 title: "Hello World"
-lang: "fr"
 description: "Mon premier post : la création de ce site, un peu de design, et beaucoup d’envie de partager."
 pubDate: "2025-08-11"
 readingTime: 1

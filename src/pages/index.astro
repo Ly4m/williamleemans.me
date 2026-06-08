@@ -3,11 +3,31 @@ import BlogLayout from "../layouts/BlogLayout.astro";
 import HomeDecoration from "../components/HomeDecoration.astro";
 import HomeMarginDecoration from "../components/HomeMarginDecoration.astro";
 import HomeFooterDecoration from "../components/HomeFooterDecoration.astro";
+
+const site = Astro.site?.toString() ?? "https://lmns.fr";
+
+const structuredData = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "William Leemans",
+  url: site,
+  jobTitle: "Architecte logiciel & CTO",
+  worksFor: {
+    "@type": "Organization",
+    name: "Jetdev",
+    url: "https://www.jetdev.fr",
+  },
+  sameAs: [
+    "https://github.com/Ly4m",
+    "https://www.linkedin.com/in/wleemans",
+  ],
+});
 ---
 
 <BlogLayout
-  title="William Leemans — Software Engineer in Lille"
-  ogImage="/og/home.jpg"
+  title="William Leemans — Architecte logiciel à Lille"
+  ogImage="/og/default.jpg"
+  structuredData={structuredData}
 >
   <main class="py-8 md:py-12">
     <header class="mb-6 md:mb-8">

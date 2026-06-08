@@ -21,7 +21,10 @@ const oldestYear = posts[posts.length - 1].data.pubDate.getFullYear();
 const yearSpan = newestYear === oldestYear ? String(newestYear) : `${oldestYear}–${newestYear}`;
 ---
 
-<BlogLayout title="William Leemans">
+<BlogLayout
+  title="Le blog — William Leemans"
+  description="Articles de William Leemans sur l'architecture logicielle, les systèmes distribués, le développement et son setup."
+>
   <div class="max-w-2xl">
     <header class="py-12">
       <h1 class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl">
@@ -36,7 +39,7 @@ const yearSpan = newestYear === oldestYear ? String(newestYear) : `${oldestYear}
           posts.map((post: CollectionEntry) => (
             <li>
               <a
-                href={`/blog/${post.id}`}
+                href={`/blog/${post.data.slug}`}
                 class="group flex items-center justify-between gap-1"
               >
                 <time class="text-faded group-hover:text-charcoal dark:group-hover:text-primary-100 text-sm tabular-nums transition-colors group-hover:transition-none motion-reduce:transition-none">

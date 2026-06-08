@@ -7,7 +7,7 @@ import BlogPostDecoration from "../../components/BlogPostDecoration.astro";
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
   return posts.map((post: CollectionEntry<"blog">) => ({
-    params: { id: post.id },
+    params: { slug: post.data.slug },
     props: { post },
   }));
 }
@@ -25,9 +25,33 @@ const fmtDate = (date: Date) => {
 
 const readingTime = `T:${String(post.data.readingTime).padStart(2, "0")}`;
 const dateLabel   = fmtDate(post.data.pubDate);
+
+const site = Astro.site?.toString() ?? "https://lmns.fr";
+const postUrl = new URL(`/blog/${post.data.slug}`, site).toString();
+
+const structuredData = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.pubDate.toISOString(),
+  inLanguage: "fr",
+  mainEntityOfPage: postUrl,
+  url: postUrl,
+  author: {
+    "@type": "Person",
+    name: "William Leemans",
+    url: site,
+  },
+});
 ---
 
-<BlogLayout title={"William Leemans — " + post.data.title} ogImage="/og/home.jpg">
+<BlogLayout
+  title={post.data.title + " — William Leemans"}
+  description={post.data.description}
+  ogImage={post.data.ogImage ?? "/og/default.jpg"}
+  structuredData={structuredData}
+>
   <div id="reading-progress" aria-hidden="true"></div>
 
   <header class="py-12">

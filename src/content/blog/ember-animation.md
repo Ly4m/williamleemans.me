@@ -1,7 +1,6 @@
 ---
 slug: "animation-de-particules"
 title: "Animation de particules"
-lang: "fr"
 description: "Comment j’ai créé une animation de particules simple avec l’API Canvas pour le fond de mon site."
 pubDate: "2025-11-6"
 readingTime: 1

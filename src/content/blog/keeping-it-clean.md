@@ -1,7 +1,6 @@
 ---
 slug: "garder-un-historique-git-propre"
 title: "Garder un historique Git propre"
-lang: "fr"
 description: "Comment garder un historique Git propre, écrire de bons commits et utiliser rebase efficacement."
 pubDate: "2025-10-15"
 readingTime: 4

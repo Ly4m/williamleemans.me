@@ -6,6 +6,11 @@
   let system: EmberParticleSystem;
 
   onMount(() => {
+    // Respect an explicit reduced-motion opt-out: leave the canvas empty so the
+    // solid page background shows through, rather than animating the embers.
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) return;
+
     system = new EmberParticleSystem(canvas);
     system.start();
   });

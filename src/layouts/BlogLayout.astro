@@ -18,20 +18,22 @@ type Props = {
 
 const {
   title = "William Leemans",
-  description = "Salut ! Moi c'est William. Belge, entrepreneur, architecte logiciel passionné et CTO chez Jetdev. J'aime construire des systèmes, mentorer des développeurs et créer des produits utiles.",
+  description = "Salut ! Moi c'est William. Italo-belge, entrepreneur, architecte logiciel passionné et CTO chez Jetdev. J'aime construire des systèmes, mentorer des développeurs et créer des produits utiles.",
   ogImage = "/og/default.jpg",
   noindex = false,
   lang = "fr",
+  structuredData,
 } = Astro.props;
 
 const nav = [
-  { label: "Home", href: "/" },
+  { label: "Accueil", href: "/" },
   { label: "Blog", href: "/blog" },
-  { label: "Now", href: "/now" },
+  { label: "Maintenant", href: "/now" },
 ];
 
-const site = Astro.site?.toString() ?? "https://williamleemans.me";
+const site = Astro.site?.toString() ?? "https://lmns.fr";
 const canonical = new URL(Astro.url.pathname, site).toString();
+const ogImageUrl = new URL(ogImage, site).toString();
 ---
 
 <!doctype html>
@@ -73,10 +75,12 @@ const canonical = new URL(Astro.url.pathname, site).toString();
       title={title}
       description={description}
       canonical={canonical}
-      ogImage={ogImage}
+      ogImage={ogImageUrl}
     />
 
-    <TwitterMeta title={title} description={description} image={ogImage} />
+    <TwitterMeta title={title} description={description} image={ogImageUrl} />
+
+    {structuredData && <script type="application/ld+json" set:html={structuredData} is:inline />}
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />

@@ -31,3 +31,7 @@ CLAUDE.md
 .claude/worktrees/
 
 .claude/
+
+CONTEXT.md
+
+docs/adr/
