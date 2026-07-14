@@ -148,6 +148,23 @@ pre code {
     all: unset;
 }
 
+/* Shiki emits both --shiki-light and --shiki-dark per token but renders the
+   light one by default. Under .dark, flip tokens to their dark variables.
+   !important is required because Shiki writes colours as inline styles.
+   Background is set on the <pre> only (not spans) so the block sits flush
+   with the page; syntax colours snap on toggle rather than transitioning. */
+.dark .astro-code,
+.dark .astro-code span {
+    color: var(--shiki-dark) !important;
+    font-style: var(--shiki-dark-font-style) !important;
+    font-weight: var(--shiki-dark-font-weight) !important;
+    text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
+.dark .astro-code {
+    background-color: #1a1a1a !important;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
