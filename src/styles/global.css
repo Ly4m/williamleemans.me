@@ -16,6 +16,14 @@
     --text-base: 16px;
 }
 
+html {
+    background-color: var(--color-primary-100);
+}
+
+html.dark {
+    background-color: #1a1a1a;
+}
+
 body {
     line-height: 1.6;
     transition: background-color 0.2s ease, color 0.2s ease;
