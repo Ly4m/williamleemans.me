@@ -15,7 +15,11 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 ---
 
-<Layout title={post.data.title + " — William Leemans"} ogImage="/og/default.jpg">
+<Layout
+  title={post.data.title + " — William Leemans"}
+  description={`Ce que faisait William Leemans en ${post.data.title.toLowerCase()} : projets, travail, lectures et jeux vidéo. Archive de sa page Now.`}
+  ogImage="/og/default.png"
+>
   <header class="py-8 md:py-12">
     <h1 class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl">
       {post.data.title}

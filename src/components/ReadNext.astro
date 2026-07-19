@@ -1,0 +1,46 @@
+---
+type Props = {
+  posts: { slug: string; title: string; pubDate: Date }[];
+};
+
+const { posts } = Astro.props;
+const fmt = (d: Date) =>
+  `${d.getFullYear()} · ${(d.getMonth() + 1).toString().padStart(2, "0")}`;
+---
+
+<nav aria-label="À lire ensuite" class="mt-20 max-w-[68ch]">
+  <div class="mb-6 flex items-center gap-3">
+    <h2
+      class="text-faded shrink-0 font-sans text-xs tracking-[0.08em] uppercase"
+    >
+      À lire ensuite
+    </h2>
+    <span class="heading-trace-line" aria-hidden="true"></span>
+  </div>
+  <ul class="flex flex-col gap-2">
+    {
+      posts.map((p) => (
+        <li>
+          <a
+            href={`/blog/${p.slug}`}
+            class="group flex items-center justify-between gap-1"
+          >
+            <time
+              datetime={p.pubDate.toISOString().slice(0, 10)}
+              class="text-faded group-hover:text-charcoal dark:group-hover:text-primary-100 text-sm tabular-nums transition-colors group-hover:transition-none motion-reduce:transition-none"
+            >
+              {fmt(p.pubDate)}
+            </time>
+            <span
+              aria-hidden="true"
+              class="text-faded dot-leader group-hover:dot-leader-hover grow leading-none transition-colors group-hover:transition-none motion-reduce:transition-none"
+            />
+            <span class="group-hover:text-charcoal dark:group-hover:text-primary-100 text-faded">
+              {p.title}
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

@@ -6,6 +6,8 @@ type Props = {
   description: string;
   canonical: string;
   ogImage: string;
+  publishedTime?: string;
+  author?: string;
 };
 
 const {
@@ -15,12 +17,21 @@ const {
   description,
   canonical,
   ogImage,
+  publishedTime,
+  author = "William Leemans",
 } = Astro.props;
 ---
 
 <meta property="og:type" content={type} />
+<meta property="og:locale" content="fr_FR" />
 <meta property="og:site_name" content={siteName} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImage} />
+{
+  type === "article" && publishedTime && (
+    <meta property="article:published_time" content={publishedTime} />
+  )
+}
+{type === "article" && <meta property="article:author" content={author} />}

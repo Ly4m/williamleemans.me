@@ -45,7 +45,7 @@ J’ai une checklist pour optimiser l’espace sur l’écran, rendre les inputs
 
 J’ai essayé de passer au 100% terminal mais dans la réalité, j'en reviens toujours à certaines apps desktop : les IDE JetBrains, Obsidian, etc.
 
-Pour Git, j'utilise le terminal pour les fixups ou les rebases interactifs, mais GitKraken est plus rapide pour beaucoup de tâches de base.
+Pour Git, j'utilise le terminal pour [les fixups ou les rebases interactifs](/blog/garder-un-historique-git-propre), mais GitKraken est plus rapide pour beaucoup de tâches de base.
 Et l'intégration avec Github/Gitlab est vraiment bien.
 
 Mes must-haves:

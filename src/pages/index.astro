@@ -8,25 +8,36 @@ const site = Astro.site?.toString() ?? "https://lmns.fr";
 
 const structuredData = JSON.stringify({
   "@context": "https://schema.org",
-  "@type": "Person",
-  name: "William Leemans",
-  url: site,
-  jobTitle: "Architecte logiciel & CTO",
-  worksFor: {
-    "@type": "Organization",
-    name: "Jetdev",
-    url: "https://www.jetdev.fr",
+  "@type": "ProfilePage",
+  mainEntity: {
+    "@type": "Person",
+    name: "William Leemans",
+    url: site,
+    jobTitle: "Architecte logiciel & CTO",
+    worksFor: {
+      "@type": "Organization",
+      name: "Jetdev",
+      url: "https://www.jetdev.fr",
+    },
+    sameAs: [
+      "https://github.com/Ly4m",
+      "https://www.linkedin.com/in/wleemans",
+    ],
+    workLocation: {
+      "@type": "Place",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Lille",
+        addressCountry: "FR",
+      },
+    },
   },
-  sameAs: [
-    "https://github.com/Ly4m",
-    "https://www.linkedin.com/in/wleemans",
-  ],
 });
 ---
 
 <BlogLayout
   title="William Leemans — Architecte logiciel à Lille"
-  ogImage="/og/default.jpg"
+  ogImage="/og/default.png"
   structuredData={structuredData}
 >
   <main class="py-8 md:py-12">

@@ -3,16 +3,45 @@ import { getCollection, render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import BlogLayout from "../../layouts/BlogLayout.astro";
 import BlogPostDecoration from "../../components/BlogPostDecoration.astro";
+import ReadNext from "../../components/ReadNext.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
+
+  const readNextFor = (post: CollectionEntry<"blog">) => {
+    if (post.data.related?.length) {
+      return post.data.related.map((slug: string) => {
+        const target = posts.find((p) => p.data.slug === slug);
+        if (!target) {
+          throw new Error(`Unknown related slug "${slug}" in "${post.id}"`);
+        }
+        return target;
+      });
+    }
+    return posts
+      .filter((p) => p.data.slug !== post.data.slug)
+      .sort(
+        (a, b) =>
+          Math.abs(a.data.pubDate.getTime() - post.data.pubDate.getTime()) -
+          Math.abs(b.data.pubDate.getTime() - post.data.pubDate.getTime()),
+      )
+      .slice(0, 2);
+  };
+
   return posts.map((post: CollectionEntry<"blog">) => ({
     params: { slug: post.data.slug },
-    props: { post },
+    props: {
+      post,
+      readNext: readNextFor(post).map((p) => ({
+        slug: p.data.slug,
+        title: p.data.title,
+        pubDate: p.data.pubDate,
+      })),
+    },
   }));
 }
 
-const { post } = Astro.props;
+const { post, readNext } = Astro.props;
 const { Content } = await render(post);
 
 const fmtMeta = (date: Date) => date.toLocaleDateString();
@@ -24,38 +53,64 @@ const fmtDate = (date: Date) => {
 };
 
 const readingTime = `T:${String(post.data.readingTime).padStart(2, "0")}`;
-const dateLabel   = fmtDate(post.data.pubDate);
+const dateLabel = fmtDate(post.data.pubDate);
 
 const site = Astro.site?.toString() ?? "https://lmns.fr";
 const postUrl = new URL(`/blog/${post.data.slug}`, site).toString();
 
 const structuredData = JSON.stringify({
   "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  headline: post.data.title,
-  description: post.data.description,
-  datePublished: post.data.pubDate.toISOString(),
-  inLanguage: "fr",
-  mainEntityOfPage: postUrl,
-  url: postUrl,
-  author: {
-    "@type": "Person",
-    name: "William Leemans",
-    url: site,
-  },
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      headline: post.data.title,
+      description: post.data.description,
+      datePublished: post.data.pubDate.toISOString(),
+      inLanguage: "fr",
+      mainEntityOfPage: postUrl,
+      url: postUrl,
+      author: {
+        "@type": "Person",
+        name: "William Leemans",
+        url: site,
+      },
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Accueil", item: site },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Blog",
+          item: new URL("/blog", site).toString(),
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: post.data.title,
+          item: postUrl,
+        },
+      ],
+    },
+  ],
 });
 ---
 
 <BlogLayout
   title={post.data.title + " — William Leemans"}
   description={post.data.description}
-  ogImage={post.data.ogImage ?? "/og/default.jpg"}
+  ogImage={post.data.ogImage ?? `/blog/og/${post.data.slug}.png`}
+  ogType="article"
+  publishedTime={post.data.pubDate.toISOString()}
   structuredData={structuredData}
 >
   <div id="reading-progress" aria-hidden="true"></div>
 
   <header class="py-12">
-    <h1 class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl">
+    <h1
+      class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl"
+    >
       {post.data.title}
     </h1>
     <p class="text-faded">
@@ -68,9 +123,10 @@ const structuredData = JSON.stringify({
     <article class="prose dark:prose-invert wave-enter-content">
       <Content />
     </article>
+    {readNext.length > 0 && <ReadNext posts={readNext} />}
   </main>
 </BlogLayout>
 
 <script>
-  import '../../scripts/blog-post';
+  import "../../scripts/blog-post";
 </script>

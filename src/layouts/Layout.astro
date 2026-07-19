@@ -20,7 +20,7 @@ type Props = {
 const {
   title = "William Leemans",
   description = "Salut ! Moi c'est William. Italo-belge, entrepreneur, architecte logiciel passionné et CTO chez Jetdev. J'aime construire des systèmes, mentorer des développeurs et créer des produits utiles.",
-  ogImage = "/og/default.jpg",
+  ogImage = "/og/default.png",
   noindex = false,
   lang = "fr",
   structuredData,
@@ -46,7 +46,7 @@ const ogImageUrl = new URL(ogImage, site).toString();
 >
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>{title}</title>
     <meta name="description" content={description} />

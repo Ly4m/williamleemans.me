@@ -26,7 +26,7 @@ export async function GET(context) {
       <language>fr-fr</language>
       <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
       <generator>Astro</generator>
-      <managingEditor>william@leemans.me (William Leemans)</managingEditor>
+      <managingEditor>william@lmns.fr (William Leemans)</managingEditor>
       <copyright>Copyright © 2025 William Leemans</copyright>
       <atom:link href="${context.site}rss.xml" rel="self" type="application/rss+xml" />
     `,

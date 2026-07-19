@@ -6,7 +6,7 @@ pubDate: "2025-11-6"
 readingTime: 1
 ---
 
-La semaine dernière, en terminant mon article précédent, je me suis rendu compte que même si j’aimais bien le design minimaliste en noir et blanc, il manquait un peu de vie.
+La semaine dernière, en terminant [mon article précédent sur l’historique Git](/blog/garder-un-historique-git-propre), je me suis rendu compte que même si j’aimais bien le design minimaliste en noir et blanc, il manquait un peu de vie.
 
 C’était peut-être le poêle à pellet qui crépitait à côté de moi. Ou les particules flottantes de l'« Upside Down » de *Stranger Things* a la tv, que je me refais avant la dernière saison.  
 Mais, j’ai eu envie d’ajouter un peu de mouvement et de me créer une petite ambiance.

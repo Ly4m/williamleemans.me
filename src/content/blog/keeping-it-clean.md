@@ -14,7 +14,9 @@ Je me concentre toujours sur deux éléments :
 1. comment les messages de commit sont écrits
 2. comment l’historique est structuré
 
-## Écrire des bons messages de commit
+## Comment écrire un bon message de commit ?
+
+Un bon message de commit décrit le changement et son intention, pas juste "fix". Le plus important, c’est de choisir une convention et de s’y tenir : dans 99 % des cas, je recommande les Conventional Commits. Et si vous utilisez Jira ou Linear, ajoutez l’ID du ticket : votre futur vous vous remerciera.
 
 Imaginez que vous utilisez `git blame` pour comprendre pourquoi une ligne de code a été écrite. Ou que vous essayez de générer des release notes, ou d’identifier quand un bug a été ajouté dans le code.
 
@@ -41,7 +43,9 @@ Si vous utilisez un outil de ticketing comme Jira, Linear ou GitHub Issues, une 
 
 Une fois que vos commits sont clairs, l’étape suivante est de les organiser dans un historique propre et linéaire.
 
-## Garder un historique Git propre
+## Comment garder un historique Git propre ?
+
+Un historique propre, c’est un historique linéaire, sans branches emmêlées ni commits de merge inutiles. Comme un jardin : si vous laissez pousser sans entretenir, tout devient vite illisible. Git fournit heureusement les outils pour tailler tout ça — amend, rebase et fixup — et ce sont ceux que j’utilise au quotidien.
 
 J’aime l'analogie du jardin.  
 Si vous laissez les branches pousser sans vous en occuper, tout devient vite un amas emmêlé et difficile à comprendre.
@@ -50,7 +54,9 @@ Heureusement, Git nous donne plein d’outils pour entretenir tout ça.
 
 Voici ceux que j’utilise au quotidien :
 
-### Amend : corriger, reformuler ou compléter le dernier commit
+### Comment corriger son dernier commit avec amend ?
+
+Pour corriger votre dernier commit, stagez vos changements avec `git add` puis lancez `git commit --amend` : Git écrase le commit précédent et le remplace par une version corrigée, comme si l’erreur n’avait jamais existé. C’est aussi le moyen le plus rapide de reformuler un message, avec `git commit --amend -m`.
 
 Besoin de corriger votre dernier commit, d’en modifier le message ou d’y ajouter des changements ?  
 C’est exactement ce que permet l'option `--amend`.
@@ -75,17 +81,13 @@ Et pour modifier uniquement le message :
 git commit --amend -m "docs: fix typos in README"
 ```
 
-### Rebase : couper et coller une branche
+### C'est quoi git rebase ?
 
-Rebase peut faire peur au début, mais c’est l’un des outils les plus puissants de Git et mon préféré.
-
-Il déplace vos commits au-dessus d’un point donné, comme un couper-coller sur une nouvelle base.
-
-Par exemple, vous pouvez mettre à jour votre branche avec les derniers changements de main sans créer de commit de merge.
+Rebase déplace vos commits au-dessus d’un point donné, comme un couper-coller sur une nouvelle base. Ça peut faire peur au début, mais c’est l’un des outils les plus puissants de Git, et mon préféré. Par exemple, vous pouvez mettre à jour votre branche avec les derniers changements de main sans créer de commit de merge.
 
 Voici l’historique avant le rebase :
 
-![rebase-1](images/3/rebase-1.svg)
+![Avant le rebase : la branche new-feature part du commit B avec les commits C et D, tandis que main a avancé jusqu'au commit E](images/3/rebase-1.svg)
 
 ```bash
 git rebase main
@@ -93,16 +95,18 @@ git rebase main
 
 Git déplace vos commits au-dessus de main, gardant l’historique propre et linéaire :
 
-![rebase-2](images/3/rebase-2.svg)
+![Après le rebase : les commits C et D de new-feature sont déplacés au-dessus du commit E, dernier commit de main, pour un historique linéaire](images/3/rebase-2.svg)
 
 Mais ce n’est que le début. On peut aller beaucoup plus loin avec rebase.
 
-#### Rebase interactif
+### Comment fusionner des commits avec git rebase interactif ?
+
+Le rebase interactif (`git rebase -i main`) ouvre une todo list de vos commits dans l’éditeur. Pour fusionner deux commits, placez-les l’un sous l’autre et remplacez `pick` par `squash` sur le second ; `reword` permet de renommer un message. À la sauvegarde, Git réécrit l’historique.
 
 Imaginons que je viens de terminer une feature de scaffolding UI, et qu’elle est prête à être mergée dans main.
 Sauf qu’elle est divisée en deux commits, et qu’un commit lié à la documentation a besoin d’être renommé.
 
-![interactive-1](images/3/interactive-1.svg)
+![Avant le rebase interactif : la branche ui-scaffolding contient trois commits — feat: ui part 1 (C), add doc (D) et feat: ui part 2 (E) — tandis que main a avancé jusqu'au commit F](images/3/interactive-1.svg)
 
 Je veux faire trois choses :
 
@@ -112,7 +116,7 @@ Je veux faire trois choses :
 
 **Étape 1 : démarrer le rebase interactif**
 
-I use the rebase command with the -i (or --interactive) option to start the rebase in interactive mode.
+J’utilise la commande rebase avec l’option -i (ou --interactive) pour démarrer le rebase en mode interactif.
 
 ```bash
 git rebase -i main
@@ -148,7 +152,7 @@ reword D # add doc
 
 Une fois le fichier sauvegardé, Git applique les modifications sur l’historique.
 
-![interactive-2](images/3/interactive-2.svg)
+![Après le rebase interactif : ui-scaffolding, rebasée sur le commit F de main, ne contient plus que deux commits — feat: scaffolds UI et docs: adds UI screenshots](images/3/interactive-2.svg)
 
 Et voilà, un historique propre et une branche à jour avec main!
 
@@ -167,13 +171,15 @@ git push --force
 ```
 
 > Attention : git push --force peut écraser le travail des autres.
-> Utilises plutôt --force-with-lease pour éviter les mauvaises surprises.
+> Utilisez plutôt --force-with-lease pour éviter les mauvaises surprises.
 
-### Fixup : corriger rapidement un commit spécifique
+### Comment corriger un ancien commit avec git fixup ?
+
+Pour corriger un commit plus ancien que le dernier, créez un commit ciblé avec `git commit --fixup <hash>`, puis lancez `git rebase -i --autosquash main`. Git déplace automatiquement le commit fixup à côté de sa cible et les fusionne. Résultat : la correction est intégrée directement dans le bon commit, sans todo à éditer.
 
 Disons que vous avez plusieurs commits sur votre branche et que vous devez en corriger un en particulier.
 
-![fixup-1](images/3/fixup-1.svg)
+![La branche new-feature contient deux commits — feat: scaffolds UI (C) et docs: adds UI screenshots (D) — et c'est le commit C qu'il faut corriger](images/3/fixup-1.svg)
 
 Pour corriger le commit D, vous pourriez utiliser --amend.
 
@@ -196,7 +202,7 @@ pick D # docs: adds UI screenshots"
 
 Résultat : un historique propre, et la correction bien intégrée dans le commit C :
 
-![fixup-2](images/3/fixup-2.svg)
+![Après le fixup et l'autosquash : la correction est fusionnée dans le commit C, devenu feat: scaffolds UI with the fix, et l'historique reste propre avec deux commits](images/3/fixup-2.svg)
 
 ---
 

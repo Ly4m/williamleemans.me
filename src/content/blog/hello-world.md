@@ -7,7 +7,7 @@ readingTime: 1
 ---
 
 Après plusieurs années à partager mes idées ici et là, j'ai eu envie de me créer mon propre espace,
-sans plateforme ni algorithme,s ans plateforme, juste un espace à moi dans l'esprit du mouvement [IndieWeb](https://indieweb.org/)
+sans plateforme ni algorithme, juste un espace à moi dans l'esprit du mouvement [IndieWeb](https://indieweb.org/)
 
 Et donc voilà ! **Mon propre site perso !**
     
@@ -20,10 +20,10 @@ Voici ce que vous pourrez trouver sur ce blog :
 
 - Mes réflexions sur le développement logiciel, spécialement sur l'architecture et la developer experience.
 - Des notes et histoires sur mon parcours en tant que CTO de Jetdev. J'aimerais partager ce que j'apprends et les challenges auxquels je fais face.
-- Des devlogs autour de mes side projects et experimentations. 
+- Des devlogs autour de mes side projects et experimentations, comme [l'animation de particules](/blog/animation-de-particules) qui anime le fond de ce site.
 
 Ce blog va evoluer avec moi, tout est encore en construction.
 
 Une idée, une remarque ou juste envie d’échanger ?
 
-Écris-moi à [hi@williamleemans.me](mailto:hi@williamleemans.me) ou passe me dire bonjour sur [LinkedIn](https://www.linkedin.com/in/wleemans).
+Écris-moi à [william@lmns.fr](mailto:william@lmns.fr) ou passe me dire bonjour sur [LinkedIn](https://www.linkedin.com/in/wleemans).
