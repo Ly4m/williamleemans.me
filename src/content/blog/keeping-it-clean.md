@@ -4,6 +4,19 @@ title: "Garder un historique Git propre"
 description: "Comment garder un historique Git propre, écrire de bons commits et utiliser rebase efficacement."
 pubDate: "2025-10-15"
 readingTime: 4
+howTo:
+  name: "Comment garder un historique Git propre"
+  steps:
+    - name: "Écrire de bons messages de commit"
+      text: "Choisir une convention et s'y tenir — les Conventional Commits dans 99 % des cas — et inclure l'ID du ticket (Jira, Linear, GitHub Issues) dans la description."
+    - name: "Corriger le dernier commit avec amend"
+      text: "Stager les changements avec git add puis lancer git commit --amend : Git remplace le commit précédent par une version corrigée."
+    - name: "Rebaser sa branche sur main"
+      text: "Lancer git rebase main pour déplacer ses commits au-dessus des derniers changements de main, sans commit de merge, et garder un historique linéaire."
+    - name: "Fusionner des commits avec le rebase interactif"
+      text: "Lancer git rebase -i main, puis dans la todo list remplacer pick par squash pour fusionner un commit avec le précédent, ou reword pour renommer un message."
+    - name: "Corriger un ancien commit avec fixup"
+      text: "Créer un commit ciblé avec git commit --fixup <hash>, puis lancer git rebase -i --autosquash main : Git fusionne automatiquement la correction dans le bon commit."
 ---
 
 La première chose que je fais quand j’arrive sur un nouveau projet, c’est de regarder l’historique Git.  

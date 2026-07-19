@@ -19,7 +19,7 @@ type Props = {
 
 const {
   title = "William Leemans",
-  description = "Salut ! Moi c'est William. Italo-belge, entrepreneur, architecte logiciel passionné et CTO chez Jetdev. J'aime construire des systèmes, mentorer des développeurs et créer des produits utiles.",
+  description = "Salut ! Moi c'est William, architecte logiciel et CTO chez Jetdev à Lille. Je construis des systèmes, mentore des développeurs et crée des produits utiles.",
   ogImage = "/og/default.png",
   noindex = false,
   lang = "fr",
@@ -60,12 +60,21 @@ const ogImageUrl = new URL(ogImage, site).toString();
     />
 
     <!-- Privacy-friendly analytics by Plausible -->
-    <script async src="https://plausible.io/js/pa-QovbWITZik5-tHtN9XgGD.js"></script>
+    <script async src="https://plausible.io/js/pa-QovbWITZik5-tHtN9XgGD.js"
+    ></script>
     <script>
-      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
-      plausible.init()
+      ((window.plausible =
+        window.plausible ||
+        function () {
+          (plausible.q = plausible.q || []).push(arguments);
+        }),
+        (plausible.init =
+          plausible.init ||
+          function (i) {
+            plausible.o = i || {};
+          }));
+      plausible.init();
     </script>
-
 
     <!-- Robots -->
     <meta
@@ -82,7 +91,15 @@ const ogImageUrl = new URL(ogImage, site).toString();
 
     <TwitterMeta title={title} description={description} image={ogImageUrl} />
 
-    {structuredData && <script type="application/ld+json" set:html={structuredData} is:inline />}
+    {
+      structuredData && (
+        <script
+          type="application/ld+json"
+          set:html={structuredData}
+          is:inline
+        />
+      )
+    }
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
@@ -91,16 +108,20 @@ const ogImageUrl = new URL(ogImage, site).toString();
 
     <script is:inline>
       function applyTheme() {
-        const stored = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const dark = stored === 'dark' || (!stored && prefersDark);
-        document.documentElement.classList.toggle('dark', dark);
+        const stored = localStorage.getItem("theme");
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+        const dark = stored === "dark" || (!stored && prefersDark);
+        document.documentElement.classList.toggle("dark", dark);
       }
       applyTheme();
-      document.addEventListener('astro:after-swap', applyTheme);
+      document.addEventListener("astro:after-swap", applyTheme);
     </script>
   </head>
-  <body class="bg-primary-100 dark:bg-[#1a1a1a] dark:text-primary-100 h-full min-h-screen antialiased">
+  <body
+    class="bg-primary-100 dark:text-primary-100 h-full min-h-screen antialiased dark:bg-[#1a1a1a]"
+  >
     <FlowField client:load transition:persist />
 
     <!-- Content area -->

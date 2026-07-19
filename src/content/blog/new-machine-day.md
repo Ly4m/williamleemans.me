@@ -1,7 +1,7 @@
 ---
 slug: "nouvelle-machine"
 title: "Nouvelle Machine"
-description: "Passage au MacBook Pro 14″, reconstruction complète de mon dev setup et adoption d’un thème Gruvbox : voici comment je remets mon environnement au carré à chaque nouvelle machine."
+description: "Passage au MacBook Pro 14″ : comment je reconstruis mon dev setup de zéro, apps, terminal, dotfiles et thème Gruvbox, à chaque nouvelle machine."
 pubDate: "2025-09-23"
 readingTime: 2
 

@@ -12,6 +12,12 @@ const blog = defineCollection({
     readingTime: z.number(),
     ogImage: z.string().optional(),
     related: z.array(z.string()).max(2).optional(),
+    howTo: z
+      .object({
+        name: z.string(),
+        steps: z.array(z.object({ name: z.string(), text: z.string() })).min(2),
+      })
+      .optional(),
   }),
 });
 
