@@ -64,6 +64,7 @@ const graph: object[] = [
     headline: post.data.title,
     description: post.data.description,
     datePublished: post.data.pubDate.toISOString(),
+    dateModified: (post.data.dateModified ?? post.data.pubDate).toISOString(),
     inLanguage: "fr",
     mainEntityOfPage: postUrl,
     url: postUrl,
