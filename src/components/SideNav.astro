@@ -80,13 +80,14 @@ const socialLinks: SocialLink[] = [
         return (
           <a
             href={href}
+            data-active={active ? "true" : undefined}
             class={[
               "mobile-menu-link flex flex-col items-center gap-2 text-2xl font-medium tracking-wide uppercase transition-all duration-200",
               active ? "text-black dark:text-white" : "text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white",
             ].join(" ")}
           >
             {icon && <i class={`${icon} text-3xl`} />}
-            <span>{label}</span>
+            <span class="mobile-nav-label relative inline-block">{label}</span>
           </a>
         );
       })
@@ -128,12 +129,10 @@ const socialLinks: SocialLink[] = [
         return (
           <a
             href={href}
+            data-active={active ? "true" : undefined}
             class={[
-              "group block px-3 py-2 text-sm tracking-wide uppercase transition",
-              "border-l-2",
-              active
-                ? "border-black dark:border-white font-medium"
-                : "border-transparent opacity-70 hover:opacity-100",
+              "nav-link group relative block px-3 py-2 text-sm tracking-wide uppercase transition",
+              active ? "font-medium" : "opacity-70 hover:opacity-100",
             ].join(" ")}
           >
             <span class="inline-block translate-x-0 transition group-hover:translate-x-1">
@@ -170,6 +169,62 @@ const socialLinks: SocialLink[] = [
 </aside>
 
 <style>
+  /* The active rail. Hover and active differ by length, not opacity — a stub
+     that grows to full height — so the two states stay tellable apart at a
+     glance in either theme. */
+  .nav-link::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 3px;
+    background: var(--color-brass-ink);
+    transform: scaleY(0);
+    transition: transform 0.25s ease;
+  }
+
+  :global(.dark) .nav-link::before {
+    background: var(--color-brass);
+  }
+
+  .nav-link:not([data-active]):hover::before {
+    transform: scaleY(0.4);
+  }
+
+  .nav-link[data-active]::before {
+    transform: scaleY(1);
+  }
+
+  /* Same rail, laid on its side. No hover half-state — this menu is touch-only. */
+  .mobile-nav-label::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: -0.4rem;
+    left: 0;
+    height: 3px;
+    background: var(--color-brass-ink);
+    transform: scaleX(0);
+    transition: transform 0.25s ease;
+  }
+
+  :global(.dark) .mobile-nav-label::after {
+    background: var(--color-brass);
+  }
+
+  [data-active] .mobile-nav-label::after {
+    transform: scaleX(1);
+  }
+
+  /* The rail's length carries information, so it stays; only the travel goes. */
+  @media (prefers-reduced-motion: reduce) {
+    .nav-link::before,
+    .mobile-nav-label::after {
+      transition: none;
+    }
+  }
+
   .menu-open #mobile-menu-toggle .hamburger-line:nth-child(1) {
     transform: rotate(45deg) translate(6px, 6px);
   }
