@@ -7,8 +7,7 @@ const TAU = Math.PI * 2;
  * simplex flow field and leave smearing tails. The "flowing" register of the site's
  * thin-line language (the rigid circuit decorations are the "constrained" register).
  * The "alive" counterpart to the reading pages' calm dot-grid. Replaces the retired
- * ember effect. Charcoal in light mode; a warm brass accent (#E4A94D) in dark mode —
- * the site's one exception to monochrome (see ADR-0003).
+ * ember effect. Charcoal in light mode; a warm brass accent (#E4A94D) in dark mode.
  *
  * Tuning from the /prototype/flow-field session (variant A — Streamlines/smear):
  * density 1, glow 1, turbulence 1. Speed dialled down to 0.4 post-prototype for a
@@ -48,7 +47,7 @@ export class FlowField {
     this.ctx = canvas.getContext("2d")!;
   }
 
-  // ----- palette (theme-aware; charcoal in light, brass accent in dark — ADR-0003) -----
+  // ----- palette (theme-aware; charcoal in light, brass accent in dark) -----
   private lineRGB() {
     return this.dark ? [228, 169, 77] : [44, 44, 48];
   }

@@ -19,7 +19,4 @@ No test/lint commands; formatting is handled by Prettier (`.prettierrc`, with th
 
 - **Content** lives in `src/content/` as Astro Content Collections (`blog/`, `now/`), validated by Zod schemas in `src/content.config.ts`.
 - **Blog posts** route by their `slug` frontmatter field (e.g. `/blog/flux-rss`).
-- **Two layouts** by design: `BlogLayout` (static dot-grid background — Home, Blog, posts) and `Layout` (ember canvas background — Now pages).
-- The site's visual craft (ember canvas, animated heading traces, decorations) is intentional and is the differentiator. All motion respects `prefers-reduced-motion`.
-
-See [`CLAUDE.md`](./CLAUDE.md) for the full architecture notes, [`CONTEXT.md`](./CONTEXT.md) for the project's language/glossary, and [`docs/adr/`](./docs/adr/) for recorded decisions.
+- **Two layouts** by design: `BlogLayout` (Home, Blog, posts) and `Layout` (Now pages).

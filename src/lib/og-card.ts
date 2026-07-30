@@ -5,8 +5,7 @@ import { Resvg } from "@resvg/resvg-js";
 
 // Template C « framed plate » (issue #9): charcoal plate over a faint dot grid,
 // HomeDecoration-style dashed trace across the top, big left-aligned title,
-// hairline-ruled meta strip along the bottom. Brass is allowed here as a static
-// accent — an ADR-0003 exception scoped to OG cards (off-site surfaces).
+// hairline-ruled meta strip along the bottom.
 
 const WIDTH = 1200;
 const HEIGHT = 630;
