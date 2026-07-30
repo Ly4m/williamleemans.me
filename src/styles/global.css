@@ -64,6 +64,15 @@ article {
     border-bottom-color: var(--color-primary-100);
 }
 
+/* Long-form measure. Monospace flattens word shapes, so sustained reading wants
+   a shorter line and slightly more size than the site's default prose. `ch` is a
+   literal character count here, and Plex Mono's 0.6em advance makes 68ch a long
+   line — 62ch lands where proportional prose would sit at ~70. */
+.prose.prose-longform {
+    max-width: 62ch;
+    font-size: 1.0625rem;
+}
+
 .prose {
     max-width: 68ch;
 
@@ -75,6 +84,87 @@ article {
         content: none;
     }
 
+}
+
+/* A portrait photo set into running prose. Vertical shots read best floated —
+   the text has the vertical run to hug them — so this wraps rather than breaks
+   the column. Same hairline and corner ticks as MediaCard, one visual language. */
+.prose:has(.photo-portrait) {
+    display: flow-root; /* contains the float so it can't spill past the article */
+}
+
+.photo-portrait {
+    position: relative;
+    width: 100%;
+    max-width: 17rem;
+    margin: 0 auto 1.5rem;
+    border: 1px solid rgba(37, 37, 37, 0.15);
+    border-radius: 3px;
+}
+
+.dark .photo-portrait {
+    border-color: rgba(250, 250, 250, 0.1);
+}
+
+@media (min-width: 768px) {
+    .photo-portrait {
+        float: right;
+        width: min(42%, 15rem);
+        margin: 0.4rem 0 1.25rem 1.75rem;
+    }
+}
+
+.photo-portrait::before,
+.photo-portrait::after {
+    content: "";
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-color: rgba(37, 37, 37, 0.3);
+    border-style: solid;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.photo-portrait::before {
+    top: -1px;
+    left: -1px;
+    border-width: 1px 0 0 1px;
+}
+
+.photo-portrait::after {
+    bottom: -1px;
+    right: -1px;
+    border-width: 0 1px 1px 0;
+}
+
+.dark .photo-portrait::before,
+.dark .photo-portrait::after {
+    border-color: rgba(250, 250, 250, 0.25);
+}
+
+.photo-portrait img {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    border-radius: 2px;
+}
+
+/* Brass earns its place here: a single hairline tick, on a line, not on text. */
+.photo-portrait figcaption {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    color: #555;
+    margin: 0.65rem 0.75rem 0.75rem;
+    padding-left: 0.6rem;
+    border-left: 1px solid var(--color-brass-ink);
+}
+
+.dark .photo-portrait figcaption {
+    color: #aaa;
+    border-left-color: var(--color-brass);
 }
 
 #reading-progress {
