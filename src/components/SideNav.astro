@@ -184,10 +184,6 @@ const socialLinks: SocialLink[] = [
     transition: transform 0.25s ease;
   }
 
-  :global(.dark) .nav-link::before {
-    background: var(--color-brass);
-  }
-
   .nav-link:not([data-active]):hover::before {
     transform: scaleY(0.4);
   }
@@ -213,12 +209,17 @@ const socialLinks: SocialLink[] = [
     transition: transform 0.25s ease;
   }
 
-  :global(.dark) .mobile-nav-label::after {
-    background: var(--color-brass);
-  }
-
   [data-active] .mobile-nav-label::after {
     transform: scaleX(1);
+  }
+
+  /* Full-strength brass is the loudest thing on a dark page — every other brass
+     element sits at 28-35%. Knocking it back toward the page colour lands at
+     4.3:1, comfortably above the 3:1 a state indicator needs, without the glare.
+     Light mode keeps the full --color-brass-ink; it doesn't have this problem. */
+  :global(.dark) .nav-link::before,
+  :global(.dark) .mobile-nav-label::after {
+    background: color-mix(in srgb, var(--color-brass) 65%, #1a1a1a);
   }
 
   /* The rail's length carries information, so it stays; only the travel goes. */
