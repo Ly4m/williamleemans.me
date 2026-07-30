@@ -352,4 +352,9 @@ pre code {
         opacity: 1 !important;
         transform: none !important;
     }
+
+    /* The nav rail keeps its position and length; it just stops travelling. */
+    ::view-transition-group(nav-rail) {
+        animation: none !important;
+    }
 }
