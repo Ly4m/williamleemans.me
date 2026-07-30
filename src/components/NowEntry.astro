@@ -2,6 +2,7 @@
 import { render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import MediaCard from "./MediaCard.astro";
+import AlbumRow from "./AlbumRow.astro";
 import { fetchBookCover, fetchGameCover } from "../lib/coverArt";
 
 interface Props {
@@ -13,6 +14,7 @@ const { Content } = await render(entry);
 
 const books = entry.data.books ?? [];
 const games = entry.data.games ?? [];
+const music = entry.data.music ?? [];
 const rawgKey = import.meta.env.RAWG_API_KEY ?? "";
 
 const [bookCovers, gameCovers] = await Promise.all([
@@ -77,3 +79,44 @@ const [bookCovers, gameCovers] = await Promise.all([
     </section>
   )
 }
+
+{
+  music.length > 0 && (
+    <section class="mb-12">
+      <h3 class="font-space text-charcoal dark:text-primary-100 text-lg font-bold tracking-wide mb-4">
+        En écoute
+      </h3>
+      {entry.data.musicIntro && (
+        <p class="font-sans text-sm text-charcoal dark:text-primary-100 mb-4 opacity-80">{entry.data.musicIntro}</p>
+      )}
+      <ol class="album-list">
+        {music.map((album, i) => (
+          <AlbumRow
+            index={i}
+            title={album.title}
+            artist={album.artist}
+            note={album.note}
+            url={album.url}
+            statusLabel={
+              album.status === "découverte" ? "✦ Découverte" : "↻ En boucle"
+            }
+            tone={album.status === "découverte" ? "accent" : "neutral"}
+          />
+        ))}
+      </ol>
+    </section>
+  )
+}
+
+<style>
+  .album-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid rgba(37, 37, 37, 0.12);
+  }
+
+  :global(.dark) .album-list {
+    border-top-color: rgba(250, 250, 250, 0.1);
+  }
+</style>

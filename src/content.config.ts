@@ -36,6 +36,14 @@ const gameSchema = z.object({
   status: z.enum(["terminé", "en-cours"]),
 });
 
+const albumSchema = z.object({
+  title: z.string(),
+  artist: z.string(),
+  note: z.string().optional(),
+  status: z.enum(["découverte", "en-boucle"]),
+  url: z.string().url(),
+});
+
 const now = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/now" }),
   schema: z.object({
@@ -47,6 +55,8 @@ const now = defineCollection({
     books: z.array(bookSchema).optional(),
     gamesIntro: z.string().optional(),
     games: z.array(gameSchema).optional(),
+    musicIntro: z.string().optional(),
+    music: z.array(albumSchema).optional(),
   }),
 });
 
