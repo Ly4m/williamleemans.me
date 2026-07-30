@@ -194,6 +194,10 @@ const socialLinks: SocialLink[] = [
 
   .nav-link[data-active]::before {
     transform: scaleY(1);
+    /* Lets the rail slide between items across a navigation. Only one item is
+       active per page, so the name is never duplicated; the mobile menu is
+       display:none at this breakpoint and can't collide with it. */
+    view-transition-name: nav-rail;
   }
 
   /* Same rail, laid on its side. No hover half-state — this menu is touch-only. */
