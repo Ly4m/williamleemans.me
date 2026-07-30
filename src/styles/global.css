@@ -13,6 +13,11 @@
     --color-charcoal: #252525;
     --color-faded: #858585;
 
+    /* The single accent. Dark mode uses the true brass; light mode needs the
+       darker value to clear 3:1 against #fafafa (#E4A94D manages only 1.9:1). */
+    --color-brass: #e4a94d;
+    --color-brass-ink: #8f6a1a;
+
     --text-base: 16px;
 }
 

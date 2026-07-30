@@ -122,15 +122,15 @@ const num = String(index + 1).padStart(2, "0");
   }
 
   .badge-accent {
-    background: rgba(228, 169, 77, 0.14);
-    color: #8f6a1a;
-    border: 1px solid rgba(143, 106, 26, 0.3);
+    background: color-mix(in srgb, var(--color-brass) 14%, transparent);
+    color: var(--color-brass-ink);
+    border: 1px solid color-mix(in srgb, var(--color-brass-ink) 30%, transparent);
   }
 
   :global(.dark) .badge-accent {
-    background: rgba(228, 169, 77, 0.15);
-    color: #e4a94d;
-    border-color: rgba(228, 169, 77, 0.35);
+    background: color-mix(in srgb, var(--color-brass) 15%, transparent);
+    color: var(--color-brass);
+    border-color: color-mix(in srgb, var(--color-brass) 35%, transparent);
   }
 
   @media (max-width: 639px) {
