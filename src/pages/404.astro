@@ -1,0 +1,84 @@
+---
+import BlogLayout from "../layouts/BlogLayout.astro";
+
+/*
+ * Dot grid rather than flow field: 404 belongs to the constrained register
+ * (Home, Blog, Talks), not to Now.
+ *
+ * No circuit decoration here on purpose. Every other header carries one whose
+ * motif means something — a plateau for the stage, a span of years for the
+ * archive — and a missing page has nothing to count. Better empty than
+ * decorated with a shape that says nothing.
+ */
+---
+
+<BlogLayout
+  title="Page introuvable — William Leemans"
+  description="Cette adresse ne mène nulle part."
+  noindex
+>
+  <div class="max-w-2xl">
+    <header class="py-12">
+      <h1
+        class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl"
+      >
+        Page introuvable
+      </h1>
+      <p class="text-faded font-space mt-2 text-sm tabular-nums">404</p>
+    </header>
+
+    <main class="text-charcoal dark:text-primary-100">
+      <p>
+        Cette adresse ne mène nulle part. Elle a peut-être changé de nom, ou je
+        l'ai cassée en rangeant.
+      </p>
+
+      <p class="mt-4">
+        Il y a <a class="mine" href="/blog">le blog</a>, <a
+          class="mine"
+          href="/talks">les talks</a
+        >, et <a class="mine" href="/">l'accueil</a> pour repartir du bon pied.
+      </p>
+
+      <p class="text-faded mt-10 text-sm">
+        Si vous êtes arrivé ici en suivant un lien depuis un autre site, <a
+          class="mine"
+          href="mailto:william@lmns.fr">dites-le moi</a
+        > : je le réparerai.
+      </p>
+    </main>
+  </div>
+</BlogLayout>
+
+<style>
+  /* Same link treatment as the home page and /talks: the rule sits under the
+     text, and brass marks the surfaces that are mine. */
+  a {
+    font-weight: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(125, 125, 125, 0.3);
+    transition: border 0.3s ease-in-out;
+  }
+
+  a:hover {
+    border-bottom-color: var(--color-charcoal);
+  }
+
+  :global(.dark) a:hover {
+    border-bottom-color: var(--color-primary-100);
+  }
+
+  a.mine:hover {
+    border-bottom-color: var(--color-brass-ink);
+  }
+
+  :global(.dark) a.mine:hover {
+    border-bottom-color: var(--color-brass);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    a {
+      transition: none;
+    }
+  }
+</style>
