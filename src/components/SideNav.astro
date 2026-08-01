@@ -75,7 +75,7 @@ const opensInNewTab = (href: string) => href.startsWith("http");
 <div
   id="mobile-menu"
   class="bg-primary-100 fixed inset-0 z-40 flex translate-x-full flex-col items-center justify-center transition-transform duration-300 md:hidden dark:bg-[#1a1a1a]"
-  aria-hidden="true"
+  inert
 >
   <nav class="flex flex-col items-center gap-8">
     {
@@ -283,37 +283,46 @@ const opensInNewTab = (href: string) => href.startsWith("http");
   }
 
   function initMobileMenu() {
-    const toggle = document.getElementById("mobile-menu-toggle");
-    const menu = document.getElementById("mobile-menu");
+    const toggleEl = document.getElementById("mobile-menu-toggle");
+    const menuEl = document.getElementById("mobile-menu");
     const menuLinks = document.querySelectorAll(".mobile-menu-link");
 
-    if (!toggle || !menu) return;
+    if (!toggleEl || !menuEl) return;
 
+    // Re-bound after the guard: the handlers below are hoisted declarations, so
+    // TypeScript won't carry the narrowing into them from the originals.
+    const toggle = toggleEl;
+    const menu = menuEl;
+
+    /* The closed menu is still on the page, parked off-screen. `inert` is what
+       takes it out of the tab order and the accessibility tree at once —
+       `aria-hidden` alone claimed it was gone while its links stayed
+       focusable. */
     function closeMenu() {
+      // Focus can't stay inside an inert subtree; hand it back to the toggle.
+      const hadFocus = menu.contains(document.activeElement);
       menu.classList.add("translate-x-full");
-      menu.setAttribute("aria-hidden", "true");
+      menu.inert = true;
       toggle.setAttribute("aria-expanded", "false");
       document.body.classList.remove("menu-open");
       document.body.style.overflow = "";
+      if (hadFocus) toggle.focus();
     }
 
     function openMenu() {
       menu.classList.remove("translate-x-full");
-      menu.setAttribute("aria-hidden", "false");
+      menu.inert = false;
       toggle.setAttribute("aria-expanded", "true");
       document.body.classList.add("menu-open");
       document.body.style.overflow = "hidden";
     }
 
     function toggleMenu() {
-      const isOpen = menu.getAttribute("aria-hidden") === "false";
-      isOpen ? closeMenu() : openMenu();
+      menu.inert ? openMenu() : closeMenu();
     }
 
     function handleEscape(e: KeyboardEvent) {
-      if (e.key === "Escape" && menu.getAttribute("aria-hidden") === "false") {
-        closeMenu();
-      }
+      if (e.key === "Escape" && !menu.inert) closeMenu();
     }
 
     toggle.removeEventListener("click", toggleMenu);
