@@ -5,6 +5,7 @@ import { ClientRouter } from "astro:transitions";
 import FlowField from "../components/FlowField.svelte";
 import TwitterMeta from "../components/meta/TwitterMeta.astro";
 import OpenGraphMeta from "../components/meta/OpenGraphMeta.astro";
+import PlausibleAnalytics from "../components/meta/PlausibleAnalytics.astro";
 import { nav } from "../data/nav.ts";
 
 type Props = {
@@ -52,22 +53,7 @@ const ogImageUrl = new URL(ogImage, site).toString();
       href={new URL("rss.xml", Astro.site)}
     />
 
-    <!-- Privacy-friendly analytics by Plausible -->
-    <script async src="https://plausible.io/js/pa-QovbWITZik5-tHtN9XgGD.js"
-    ></script>
-    <script>
-      ((window.plausible =
-        window.plausible ||
-        function () {
-          (plausible.q = plausible.q || []).push(arguments);
-        }),
-        (plausible.init =
-          plausible.init ||
-          function (i) {
-            plausible.o = i || {};
-          }));
-      plausible.init();
-    </script>
+    <PlausibleAnalytics />
 
     <!-- Robots -->
     <meta
