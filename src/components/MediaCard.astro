@@ -155,16 +155,25 @@ const sizing =
     text-transform: uppercase;
   }
 
+  /* Brass marks the finished state; unfinished stays neutral. This badge was
+     green, which made it the site's only second accent — and it was carrying
+     state, which is brass's whole job.
+
+     The light tint stops at 8%: the label is 9.6px, so it needs 4.5:1, and
+     --color-brass-ink over an 8% brass wash on #fafafa lands at 4.51:1. Push
+     the wash to 12% and it drops to 4.37 and fails. Dark has room to spare
+     (6.3:1 at a 15% wash), so it keeps the fuller tint. */
   .badge-done {
-    background: rgba(34, 120, 60, 0.12);
-    color: #22783c;
-    border: 1px solid rgba(34, 120, 60, 0.25);
+    background: color-mix(in srgb, var(--color-brass) 8%, transparent);
+    color: var(--color-brass-ink);
+    border: 1px solid
+      color-mix(in srgb, var(--color-brass-ink) 30%, transparent);
   }
 
   :global(.dark) .badge-done {
-    background: rgba(52, 168, 83, 0.15);
-    color: #4ade80;
-    border-color: rgba(52, 168, 83, 0.3);
+    background: color-mix(in srgb, var(--color-brass) 15%, transparent);
+    color: var(--color-brass);
+    border-color: color-mix(in srgb, var(--color-brass) 30%, transparent);
   }
 
   .badge-progress {
