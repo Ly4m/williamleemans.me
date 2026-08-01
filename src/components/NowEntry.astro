@@ -3,7 +3,7 @@ import { render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import MediaCard from "./MediaCard.astro";
 import AlbumRow from "./AlbumRow.astro";
-import { fetchBookCover, fetchGameCover } from "../lib/coverArt";
+import { coverSlug } from "../lib/covers.mjs";
 
 interface Props {
   entry: CollectionEntry<"now">;
@@ -15,18 +15,23 @@ const { Content } = await render(entry);
 const books = entry.data.books ?? [];
 const games = entry.data.games ?? [];
 const music = entry.data.music ?? [];
-const rawgKey = import.meta.env.RAWG_API_KEY ?? "";
 
-const [bookCovers, gameCovers] = await Promise.all([
-  Promise.all(
-    books.map((b) =>
-      b.coverUrl
-        ? Promise.resolve(b.coverUrl)
-        : fetchBookCover(b.title, b.author),
-    ),
-  ),
-  Promise.all(games.map((g) => fetchGameCover(g.title, rawgKey))),
-]);
+/*
+ * Covers come from the repo, matched by convention on the slug — see
+ * src/lib/covers.mjs. This used to be two `fetch` calls to openlibrary.org and
+ * rawg.io per entry, at build time: ~17 seconds of a 21-second build, and a
+ * silent blank card whenever an upstream was slow or the API key was missing.
+ * `pnpm covers` now does that lookup once, at authoring time.
+ *
+ * A title with no file on disk still renders — it just has no cover.
+ */
+const covers = import.meta.glob<{ default: ImageMetadata }>(
+  "../content/now/covers/*.jpg",
+  { eager: true },
+);
+
+const coverFor = (title: string, author?: string) =>
+  covers[`../content/now/covers/${coverSlug(title, author)}.jpg`]?.default;
 ---
 
 <article class="prose dark:prose-invert wave-enter-content mb-12">
@@ -45,14 +50,14 @@ const [bookCovers, gameCovers] = await Promise.all([
         </p>
       )}
       <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-        {books.map((book, i) => (
+        {books.map((book) => (
           <MediaCard
             title={book.title}
             subtitle={book.author}
             note={book.note}
             status={book.status}
             statusLabel={book.status === "en-cours" ? "▶ En cours" : "✓ Lu"}
-            coverUrl={bookCovers[i] ?? undefined}
+            cover={coverFor(book.title, book.author)}
             type="book"
           />
         ))}
@@ -73,7 +78,7 @@ const [bookCovers, gameCovers] = await Promise.all([
         </p>
       )}
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {games.map((game, i) => (
+        {games.map((game) => (
           <MediaCard
             title={game.title}
             note={game.note}
@@ -81,7 +86,7 @@ const [bookCovers, gameCovers] = await Promise.all([
             statusLabel={
               game.status === "en-cours" ? "▶ En cours" : "✓ Terminé"
             }
-            coverUrl={gameCovers[i] ?? undefined}
+            cover={coverFor(game.title)}
             type="game"
           />
         ))}

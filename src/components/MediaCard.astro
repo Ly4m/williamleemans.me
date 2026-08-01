@@ -1,29 +1,58 @@
 ---
+import { Image } from "astro:assets";
+
 interface Props {
   title: string;
   subtitle?: string;
   note?: string;
   status: string;
   statusLabel: string;
-  coverUrl?: string;
+  cover?: ImageMetadata;
   type: "book" | "game";
 }
 
-const { title, subtitle, note, status, statusLabel, coverUrl, type } =
-  Astro.props;
+const { title, subtitle, note, status, statusLabel, cover, type } = Astro.props;
 const isDone = status === "lu" || status === "terminé";
+
+/*
+ * `layout="none"` because the card's own CSS owns the geometry — width 100%,
+ * a fixed aspect ratio per type, object-fit: cover. Astro's constrained layout
+ * would set a competing aspect ratio from the file's intrinsic size.
+ *
+ * The widths track the grids in NowEntry: books run 2/3/4 across, games 1/2/3.
+ */
+const sizing =
+  type === "game"
+    ? {
+        widths: [215, 330, 430, 660],
+        sizes: "(min-width: 1024px) 215px, (min-width: 640px) 330px, 92vw",
+      }
+    : {
+        widths: [160, 210, 320, 420],
+        sizes: "(min-width: 1024px) 160px, (min-width: 768px) 210px, 45vw",
+      };
 ---
 
 <div class="card">
   {
-    coverUrl && (
+    cover && (
       <div
         class:list={[
           "card-cover",
           type === "game" ? "game-cover" : "book-cover",
         ]}
       >
-        <img src={coverUrl} alt={title} loading="lazy" decoding="async" />
+        {/* Decorative: the title, author and status all sit in the card body
+            directly below, so announcing the cover would just repeat them. */}
+        <Image
+          src={cover}
+          alt=""
+          layout="none"
+          widths={sizing.widths}
+          sizes={sizing.sizes}
+          loading="lazy"
+          decoding="async"
+        />
       </div>
     )
   }
