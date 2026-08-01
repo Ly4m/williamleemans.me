@@ -67,6 +67,16 @@ export default defineConfig({
     }),
     svelte(),
   ],
+  /*
+   * Markdown images were being requested at their intrinsic size — the desktop
+   * screenshot went out at 3600px wide into a 62ch column. `constrained` gives
+   * every image a srcset capped at its natural width, so the browser asks the
+   * Netlify Image CDN for the size it will actually paint.
+   */
+  image: {
+    layout: "constrained",
+    responsiveStyles: true,
+  },
   markdown: {
     shikiConfig: {
       themes: {
