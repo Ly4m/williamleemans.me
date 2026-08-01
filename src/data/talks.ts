@@ -54,7 +54,8 @@ export const talks: Talk[] = [
   },
   {
     title: "C4 Model",
-    pitch: "Découvrez le C4 Model, une approche visuelle simplifiant la communication autour des architectures logicielles. ",
+    pitch:
+      "Découvrez le C4 Model, une approche visuelle simplifiant la communication autour des architectures logicielles. ",
     occurrences: [
       {
         event: "JetTalk",
@@ -65,7 +66,8 @@ export const talks: Talk[] = [
   },
   {
     title: "Hype Driven Development : The Good, the bad and the Ugly",
-    pitch: "De nouvelles technologies émergent à un rythme effréné dans le monde du développement logiciel. Dans ce talk, William aborde les bons et mauvais côtés de la Hype. À travers son expérience, il nous offre des outils et conseils pour mieux tirer parti des tendances, sans en subir les revers.",
+    pitch:
+      "De nouvelles technologies émergent à un rythme effréné dans le monde du développement logiciel. Dans ce talk, William aborde les bons et mauvais côtés de la Hype. À travers son expérience, il nous offre des outils et conseils pour mieux tirer parti des tendances, sans en subir les revers.",
     occurrences: [
       {
         event: "JetTalk",
@@ -76,7 +78,8 @@ export const talks: Talk[] = [
   },
   {
     title: "Maîtriser la Hype : Passion versus Raison.",
-    pitch: "Ce talk est une invitation à prendre du recul, à réfléchir de manière critique et à faire des choix technologiques qui servent réellement vos objectifs à long terme.",
+    pitch:
+      "Ce talk est une invitation à prendre du recul, à réfléchir de manière critique et à faire des choix technologiques qui servent réellement vos objectifs à long terme.",
     occurrences: [
       {
         event: "Devfest Lille",

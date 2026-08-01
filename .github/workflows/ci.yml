@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Netlify already builds every push; this exists to fail a PR before it merges.
+# A newer push to the same branch makes the running check redundant.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Reads the pnpm version from package.json#packageManager, so CI and
+      # Netlify can't drift apart.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Cheapest first: formatting, then types, then the real build.
+      - run: pnpm run format:check
+
+      - run: pnpm run check
+
+      # Fully offline: cover art is committed under src/content/now/images/ and
+      # refreshed by `pnpm covers`, so nothing here calls a third-party API. A
+      # failure at this step is ours.
+      - run: pnpm build
