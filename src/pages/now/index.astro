@@ -1,11 +1,12 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import NowEntry from "../../components/NowEntry.astro";
+import NowDecoration from "../../components/NowDecoration.astro";
 import { getCollection } from "astro:content";
 
 const nowEntries = await getCollection("now");
 const sortedEntries = nowEntries.sort(
-  (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
+  (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
 );
 
 const latestEntry = sortedEntries[0];
@@ -19,38 +20,43 @@ const previousEntries = sortedEntries.slice(1);
 >
   <div class="max-w-2xl">
     <header class="py-8 md:py-12">
-      <h1 class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl">
+      <h1
+        class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl"
+      >
         Now
       </h1>
+      <NowDecoration />
     </header>
     <main class="text-charcoal dark:text-primary-100 max-w-2xl">
       <p class="mb-8">
         Ce qu'il se passe dans ma vie en ce moment, inspiré par <a
-        target="_blank"
-        referrerpolicy="no-referrer"
-        href="https://nownownow.com/about">nownownow.com</a
-      >
+          target="_blank"
+          referrerpolicy="no-referrer"
+          href="https://nownownow.com/about">nownownow.com</a
+        >
       </p>
 
       {latestEntry && <NowEntry entry={latestEntry} />}
 
-      {previousEntries.length > 0 && (
-        <section class="mt-12 mb-40">
-          <h2 class="font-space text-xl mb-4">Précédentes entrées</h2>
-          <ul class="space-y-2">
-            {previousEntries.map((entry) => (
-              <li>
-                <a
-                  href={`/now/${entry.id}`}
-                  class="text-charcoal dark:text-primary-100 hover:underline"
-                >
-                  {entry.data.title}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      {
+        previousEntries.length > 0 && (
+          <section class="mt-12 mb-40">
+            <h2 class="font-space mb-4 text-xl">Précédentes entrées</h2>
+            <ul class="space-y-2">
+              {previousEntries.map((entry) => (
+                <li>
+                  <a
+                    href={`/now/${entry.id}`}
+                    class="text-charcoal dark:text-primary-100 hover:underline"
+                  >
+                    {entry.data.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
     </main>
   </div>
 </Layout>

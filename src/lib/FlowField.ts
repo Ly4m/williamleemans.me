@@ -161,13 +161,24 @@ export class FlowField {
     this.raf = requestAnimationFrame(this.loop);
   }
 
-  /** prefers-reduced-motion: paint one still frame of frozen flow, no animation. */
+  /**
+   * prefers-reduced-motion: paint one still frame of frozen flow, no animation.
+   *
+   * The per-frame background bleed has to be applied here too. Without it the
+   * tails never fade and 220 accumulated steps produce a dense tangle — far
+   * heavier than anything the running animation ever shows, and dense enough to
+   * fight the page text. With it, the still frame is a genuine freeze-frame of
+   * the live steady state, which is the whole point.
+   */
   renderStatic() {
     this.dark = this.isDark();
     this.resize();
     this.initParticles();
     this.fillBg();
+    const [r, g, b] = this.bgRGB();
     for (let i = 0; i < 220; i++) {
+      this.ctx.fillStyle = `rgba(${r},${g},${b},${this.FADE})`;
+      this.ctx.fillRect(0, 0, this.w, this.h);
       this.step(i * 0.0001);
       this.drawSegments();
     }

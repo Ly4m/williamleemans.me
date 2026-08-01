@@ -3,7 +3,7 @@
 ---
 
 <!--
-  Full-height vertical decoration.
+  Vertical decoration, centred in the margin column.
   A ladder section (secondary trace + 2 rungs) occupies the upper portion.
   A single rightward arc — the same motif as the header, rotated 90° — anchors the lower half.
   One L-branch closes the composition near the bottom.
@@ -11,11 +11,11 @@
   The arc is a gentle curve (not a semicircle): r=28, chord=40, peak Δx≈8px to the right.
 -->
 <div class="hidden lg:block flex-none self-stretch overflow-visible" aria-hidden="true">
-  <svg width="60" height="100%" viewBox="0 0 60 500" fill="none" class="decoration" preserveAspectRatio="xMidYMin meet" style="overflow: visible">
+  <svg width="60" height="100%" viewBox="0 0 60 500" fill="none" class="decoration" preserveAspectRatio="xMidYMid meet" style="overflow: visible">
 
     <!-- Main trace (split into two segments around the arc) -->
-    <path d="M 44 0 L 44 340"   stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
-    <path d="M 44 380 L 44 500" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
+    <path d="M 44 0 L 44 340"   stroke="currentColor" stroke-width="1" class="circuit-trace" />
+    <path d="M 44 380 L 44 500" stroke="currentColor" stroke-width="1" class="circuit-trace" />
 
     <!-- Arc: rightward detour on the main trace (same motif as header, rotated 90°) -->
     <!-- chord=40, r=28 → gentle curve, peak at x≈52 -->
@@ -27,7 +27,7 @@
     <path d="M 40 455 L 48 455" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
 
     <!-- Secondary trace: x=16, y=70 to y=300 -->
-    <path d="M 16 70 L 16 300" stroke="currentColor" stroke-width="1" stroke-dasharray="3 6" class="circuit-trace" />
+    <path d="M 16 70 L 16 300" stroke="currentColor" stroke-width="1" class="circuit-trace" />
 
     <!-- Stubs extending left from secondary trace endpoints -->
     <path d="M 16 70  L 4 70"  stroke="currentColor" stroke-width="1" class="circuit-trace" />

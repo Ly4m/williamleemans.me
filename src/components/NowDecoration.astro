@@ -1,0 +1,122 @@
+---
+// No props — purely visual header decoration for the Now pages.
+---
+
+<!--
+  Circuit decoration for the Now page headers.
+
+  Its signature is inversion: the arc rises *above* the trace and the via drops
+  *below* it. Every other decoration on the site does the reverse — sweep-flag 0
+  between two points on the same horizontal dips the arc downward, and their
+  branches all rise. Same five primitives, mirrored: the Now pages as the
+  underside of the reading pages.
+
+  Note the sweep flag. Left-to-right between two points at equal y, flag 1 arcs
+  *up* and flag 0 arcs *down* — the opposite of what the other components'
+  comments claim. Verified against getBBox in the browser, not assumed.
+
+  Weight is raised over the other decorations (0.85 / brass 50% vs 0.65 / 28%)
+  because this one sits on the animated flow field rather than the static dot
+  grid, and the field's own strokes are drawn at 0.5 alpha. At the shared
+  values the decoration would read as *behind* the background.
+
+  y=8                ●  apex(100)
+  y=28  ──|──────●───────●────────●─────|──────────
+         tick(20) arc-L    arc-R  via(180) tick(240)
+  y=44                             ●  via-tip
+-->
+<div class="mt-4 hidden md:block" aria-hidden="true">
+  <svg
+    width="300"
+    height="52"
+    viewBox="0 0 300 52"
+    fill="none"
+    class="decoration"
+  >
+    <!-- Left segment: start → arc -->
+    <path
+      d="M 0 28 L 80 28"
+      stroke="currentColor"
+      stroke-width="1"
+      class="circuit-trace"></path>
+
+    <!-- Tick at x=20 -->
+    <path
+      d="M 20 24 L 20 32"
+      stroke="currentColor"
+      stroke-width="0.75"
+      class="circuit-trace"></path>
+
+    <!-- Arc rise: x=80→x=120, center (100,28), radius 20, apex at (100,8) -->
+    <path
+      d="M 80 28 A 20 20 0 0 1 120 28"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      class="circuit-trace"></path>
+
+    <!-- Middle segment: arc → via -->
+    <path
+      d="M 120 28 L 180 28"
+      stroke="currentColor"
+      stroke-width="1"
+      class="circuit-trace"></path>
+
+    <!-- Via at x=180: down to y=44 -->
+    <path
+      d="M 180 28 L 180 44"
+      stroke="currentColor"
+      stroke-width="1"
+      class="circuit-trace"></path>
+
+    <!-- Right segment: via → end -->
+    <path
+      d="M 180 28 L 300 28"
+      stroke="currentColor"
+      stroke-width="1"
+      class="circuit-trace"></path>
+
+    <!-- Tick at x=240 -->
+    <path
+      d="M 240 24 L 240 32"
+      stroke="currentColor"
+      stroke-width="0.75"
+      class="circuit-trace"></path>
+
+    <!-- Arc junction dots -->
+    <circle cx="80" cy="28" r="2" fill="currentColor" class="circuit-dot"
+    ></circle>
+    <circle cx="120" cy="28" r="2" fill="currentColor" class="circuit-dot"
+    ></circle>
+    <!-- Arc apex dot -->
+    <circle cx="100" cy="8" r="1.5" fill="currentColor" class="circuit-dot"
+    ></circle>
+    <!-- Via junction dot -->
+    <circle cx="180" cy="28" r="2" fill="currentColor" class="circuit-dot"
+    ></circle>
+    <!-- Via tip dot -->
+    <circle cx="180" cy="44" r="1.5" fill="currentColor" class="circuit-dot"
+    ></circle>
+  </svg>
+</div>
+
+<style>
+  .decoration {
+    color: rgba(107, 107, 107, 0.85);
+  }
+
+  :global(.dark) .decoration {
+    color: color-mix(in srgb, var(--color-brass) 50%, transparent);
+  }
+
+  .circuit-dot {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .circuit-dot {
+      opacity: 1 !important;
+      animation: none !important;
+    }
+  }
+</style>

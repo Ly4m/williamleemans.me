@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import NowEntry from "../../components/NowEntry.astro";
+import NowDecoration from "../../components/NowDecoration.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("now");
@@ -21,17 +22,20 @@ const { post } = Astro.props;
   ogImage="/og/default.png"
 >
   <header class="py-8 md:py-12">
-    <h1 class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl">
+    <h1
+      class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl"
+    >
       {post.data.title}
     </h1>
+    <NowDecoration />
   </header>
   <main class="text-charcoal dark:text-primary-100 mb-40">
     <p class="mb-8">
       Ce qu'il se passe dans ma vie en ce moment, inspiré par <a
-      target="_blank"
-      referrerpolicy="no-referrer"
-      href="https://nownownow.com/about">nownownow.com</a
-    >
+        target="_blank"
+        referrerpolicy="no-referrer"
+        href="https://nownownow.com/about">nownownow.com</a
+      >
     </p>
     <NowEntry entry={post} />
   </main>

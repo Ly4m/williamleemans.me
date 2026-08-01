@@ -9,16 +9,31 @@ const posts = (await getCollection("blog")).sort(
     b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 
-const fmt = (date: Date) => {
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  return `${year} · ${month}`;
-};
+// The year is carried by the group heading, so the row only needs the month.
+const fmtMonth = (date: Date) =>
+  (date.getMonth() + 1).toString().padStart(2, "0");
+
+const groups = posts.reduce(
+  (
+    acc: { year: number; posts: CollectionEntry<"blog">[] }[],
+    post: CollectionEntry<"blog">,
+  ) => {
+    const year = post.data.pubDate.getFullYear();
+    const last = acc[acc.length - 1];
+    if (last && last.year === year) last.posts.push(post);
+    else acc.push({ year, posts: [post] });
+    return acc;
+  },
+  [],
+);
 
 const postCount = `N:${String(posts.length).padStart(2, "0")}`;
 const newestYear = posts[0].data.pubDate.getFullYear();
 const oldestYear = posts[posts.length - 1].data.pubDate.getFullYear();
-const yearSpan = newestYear === oldestYear ? String(newestYear) : `${oldestYear}–${newestYear}`;
+const yearSpan =
+  newestYear === oldestYear
+    ? String(newestYear)
+    : `${oldestYear}–${newestYear}`;
 ---
 
 <BlogLayout
@@ -27,36 +42,48 @@ const yearSpan = newestYear === oldestYear ? String(newestYear) : `${oldestYear}
 >
   <div class="max-w-2xl">
     <header class="py-12">
-      <h1 class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl">
+      <h1
+        class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl"
+      >
         Le blog
       </h1>
       <BlogListDecoration postCount={postCount} yearSpan={yearSpan} />
     </header>
 
     <main class="text-ash">
-      <ul>
-        {
-          posts.map((post: CollectionEntry) => (
-            <li>
-              <a
-                href={`/blog/${post.data.slug}`}
-                class="group flex items-center justify-between gap-1"
-              >
-                <time class="text-faded group-hover:text-charcoal dark:group-hover:text-primary-100 text-sm tabular-nums transition-colors group-hover:transition-none motion-reduce:transition-none">
-                  {fmt(post.data.pubDate)}
-                </time>
-                <span
-                  aria-hidden="true"
-                  class="text-faded dot-leader group-hover:dot-leader-hover grow leading-none transition-colors group-hover:transition-none motion-reduce:transition-none"
-                />
-                <span class="group-hover:text-charcoal dark:group-hover:text-primary-100 text-faded">
-                  {post.data.title}
-                </span>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
+      {
+        groups.map(({ year, posts: yearPosts }) => (
+          <section class="mb-8 last:mb-0">
+            <h2 class="text-faded font-space mb-2 text-sm tabular-nums">
+              {year}
+            </h2>
+            <ul>
+              {yearPosts.map((post: CollectionEntry<"blog">) => (
+                <li>
+                  <a
+                    href={`/blog/${post.data.slug}`}
+                    class="group flex items-center justify-between gap-1"
+                  >
+                    <time class="text-faded group-hover:text-charcoal dark:group-hover:text-primary-100 text-sm tabular-nums transition-colors group-hover:transition-none motion-reduce:transition-none">
+                      {fmtMonth(post.data.pubDate)}
+                    </time>
+                    <span
+                      aria-hidden="true"
+                      class="text-faded dot-leader group-hover:dot-leader-hover grow leading-none transition-colors group-hover:transition-none motion-reduce:transition-none"
+                    />
+                    <span class="group-hover:text-charcoal dark:group-hover:text-primary-100 text-faded">
+                      {post.data.title}
+                    </span>
+                    <span class="text-faded ml-3 w-12 shrink-0 text-right text-sm tabular-nums">
+                      {post.data.readingTime} min
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
     </main>
   </div>
 </BlogLayout>
