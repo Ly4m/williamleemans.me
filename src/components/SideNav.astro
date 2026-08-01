@@ -33,12 +33,6 @@ const socialLinks: SocialLink[] = [
     icon: "icon-[tabler--brand-linkedin]",
   },
   {
-    label: "YouTube",
-    // TODO: replace with the real channel URL.
-    href: "https://www.youtube.com/@PLACEHOLDER",
-    icon: "icon-[tabler--brand-youtube]",
-  },
-  {
     label: "RSS",
     href: "/rss.xml",
     icon: "icon-[tabler--rss]",
@@ -49,6 +43,10 @@ const socialLinks: SocialLink[] = [
     icon: "icon-[tabler--mail]",
   },
 ];
+
+/* A new tab is for leaving the site. The feed is part of it, and a mail client
+   isn't a tab at all — both stay in place. */
+const opensInNewTab = (href: string) => href.startsWith("http");
 ---
 
 <header
@@ -107,8 +105,8 @@ const socialLinks: SocialLink[] = [
       socialLinks.map((s) => (
         <a
           href={s.href}
-          rel="noopener noreferrer"
-          target="_blank"
+          rel={opensInNewTab(s.href) ? "noopener noreferrer" : undefined}
+          target={opensInNewTab(s.href) ? "_blank" : undefined}
           class="flex h-12 w-12 items-center justify-center rounded-md text-gray-600 transition hover:bg-gray-100 hover:text-black dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
           title={s.label}
         >
@@ -158,8 +156,8 @@ const socialLinks: SocialLink[] = [
       socialLinks.map((s) => (
         <a
           href={s.href}
-          rel="noopener noreferrer"
-          target="_blank"
+          rel={opensInNewTab(s.href) ? "noopener noreferrer" : undefined}
+          target={opensInNewTab(s.href) ? "_blank" : undefined}
           class="flex h-8 w-8 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 hover:text-black dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
           title={s.label}
         >
