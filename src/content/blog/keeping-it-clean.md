@@ -100,7 +100,7 @@ Rebase déplace vos commits au-dessus d’un point donné, comme un couper-colle
 
 Voici l’historique avant le rebase :
 
-![Avant le rebase : la branche new-feature part du commit B avec les commits C et D, tandis que main a avancé jusqu'au commit E](images/3/rebase-1.svg)
+![Avant le rebase : la branche new-feature part du commit B avec les commits C et D, tandis que main a avancé jusqu’au commit E](images/3/rebase-1.svg)
 
 ```bash
 git rebase main
@@ -119,7 +119,7 @@ Le rebase interactif (`git rebase -i main`) ouvre une todo list de vos commits d
 Imaginons que je viens de terminer une feature de scaffolding UI, et qu’elle est prête à être mergée dans main.
 Sauf qu’elle est divisée en deux commits, et qu’un commit lié à la documentation a besoin d’être renommé.
 
-![Avant le rebase interactif : la branche ui-scaffolding contient trois commits — feat: ui part 1 (C), add doc (D) et feat: ui part 2 (E) — tandis que main a avancé jusqu'au commit F](images/3/interactive-1.svg)
+![Avant le rebase interactif : la branche ui-scaffolding contient trois commits — feat: ui part 1 (C), add doc (D) et feat: ui part 2 (E) — tandis que main a avancé jusqu’au commit F](images/3/interactive-1.svg)
 
 Je veux faire trois choses :
 
@@ -192,7 +192,7 @@ Pour corriger un commit plus ancien que le dernier, créez un commit ciblé avec
 
 Disons que vous avez plusieurs commits sur votre branche et que vous devez en corriger un en particulier.
 
-![La branche new-feature contient deux commits — feat: scaffolds UI (C) et docs: adds UI screenshots (D) — et c'est le commit C qu'il faut corriger](images/3/fixup-1.svg)
+![La branche new-feature contient deux commits — feat: scaffolds UI (C) et docs: adds UI screenshots (D) — et c’est le commit C qu’il faut corriger](images/3/fixup-1.svg)
 
 Pour corriger le commit D, vous pourriez utiliser --amend.
 
@@ -215,7 +215,7 @@ pick D # docs: adds UI screenshots"
 
 Résultat : un historique propre, et la correction bien intégrée dans le commit C :
 
-![Après le fixup et l'autosquash : la correction est fusionnée dans le commit C, devenu feat: scaffolds UI with the fix, et l'historique reste propre avec deux commits](images/3/fixup-2.svg)
+![Après le fixup et l’autosquash : la correction est fusionnée dans le commit C, devenu feat: scaffolds UI with the fix, et l'historique reste propre avec deux commits](images/3/fixup-2.svg)
 
 ---
 
