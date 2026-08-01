@@ -33,6 +33,12 @@ const socialLinks: SocialLink[] = [
     icon: "icon-[tabler--brand-linkedin]",
   },
   {
+    label: "YouTube",
+    // TODO: replace with the real channel URL.
+    href: "https://www.youtube.com/@PLACEHOLDER",
+    icon: "icon-[tabler--brand-youtube]",
+  },
+  {
     label: "RSS",
     href: "/rss.xml",
     icon: "icon-[tabler--rss]",
@@ -46,7 +52,7 @@ const socialLinks: SocialLink[] = [
 ---
 
 <header
-  class="bg-primary-100 dark:bg-[#1a1a1a] fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between px-4 md:hidden"
+  class="bg-primary-100 fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between px-4 md:hidden dark:bg-[#1a1a1a]"
 >
   <AnimatedLogo />
 
@@ -70,7 +76,7 @@ const socialLinks: SocialLink[] = [
 
 <div
   id="mobile-menu"
-  class="bg-primary-100 dark:bg-[#1a1a1a] fixed inset-0 z-40 flex translate-x-full flex-col items-center justify-center transition-transform duration-300 md:hidden"
+  class="bg-primary-100 fixed inset-0 z-40 flex translate-x-full flex-col items-center justify-center transition-transform duration-300 md:hidden dark:bg-[#1a1a1a]"
   aria-hidden="true"
 >
   <nav class="flex flex-col items-center gap-8">
@@ -83,7 +89,9 @@ const socialLinks: SocialLink[] = [
             data-active={active ? "true" : undefined}
             class={[
               "mobile-menu-link flex flex-col items-center gap-2 text-2xl font-medium tracking-wide uppercase transition-all duration-200",
-              active ? "text-black dark:text-white" : "text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white",
+              active
+                ? "text-black dark:text-white"
+                : "text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white",
             ].join(" ")}
           >
             {icon && <i class={`${icon} text-3xl`} />}
@@ -113,7 +121,8 @@ const socialLinks: SocialLink[] = [
       aria-label="Toggle theme"
       class="flex h-12 w-12 items-center justify-center rounded-md text-gray-600 transition hover:bg-gray-100 hover:text-black dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
     >
-      <i data-theme-icon class="icon-[tabler--sun] text-2xl" aria-hidden="true"></i>
+      <i data-theme-icon class="icon-[tabler--sun] text-2xl" aria-hidden="true"
+      ></i>
     </button>
   </div>
 </div>
@@ -163,7 +172,8 @@ const socialLinks: SocialLink[] = [
       aria-label="Toggle theme"
       class="flex h-8 w-8 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 hover:text-black dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
     >
-      <i data-theme-icon class="icon-[tabler--sun] text-lg" aria-hidden="true"></i>
+      <i data-theme-icon class="icon-[tabler--sun] text-lg" aria-hidden="true"
+      ></i>
     </button>
   </div>
 </aside>
@@ -245,26 +255,33 @@ const socialLinks: SocialLink[] = [
 
 <script>
   function initThemeToggle() {
-    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]');
+    const buttons = document.querySelectorAll<HTMLButtonElement>(
+      "[data-theme-toggle]",
+    );
 
     function updateIcons() {
-      const isDark = document.documentElement.classList.contains('dark');
-      document.querySelectorAll<HTMLElement>('[data-theme-icon]').forEach((icon) => {
-        icon.className = isDark ? 'icon-[tabler--moon] text-lg' : 'icon-[tabler--sun] text-lg';
-      });
+      const isDark = document.documentElement.classList.contains("dark");
+      document
+        .querySelectorAll<HTMLElement>("[data-theme-icon]")
+        .forEach((icon) => {
+          icon.className = isDark
+            ? "icon-[tabler--moon] text-lg"
+            : "icon-[tabler--sun] text-lg";
+        });
     }
 
     function toggleTheme() {
-      const isDark = document.documentElement.classList.contains('dark');
-      document.documentElement.classList.toggle('dark', !isDark);
-      localStorage.setItem('theme', isDark ? 'light' : 'dark');
+      const isDark = document.documentElement.classList.contains("dark");
+      document.documentElement.classList.toggle("dark", !isDark);
+      localStorage.setItem("theme", isDark ? "light" : "dark");
       updateIcons();
     }
 
-    buttons.forEach((btn) => btn.addEventListener('click', toggleTheme));
+    buttons.forEach((btn) => btn.addEventListener("click", toggleTheme));
     updateIcons();
 
-    return () => buttons.forEach((btn) => btn.removeEventListener('click', toggleTheme));
+    return () =>
+      buttons.forEach((btn) => btn.removeEventListener("click", toggleTheme));
   }
 
   function initMobileMenu() {

@@ -10,71 +10,139 @@
 
   The arc is a gentle curve (not a semicircle): r=28, chord=40, peak Δx≈8px to the right.
 -->
-<div class="hidden lg:block flex-none self-stretch overflow-visible" aria-hidden="true">
-  <svg width="60" height="100%" viewBox="0 0 60 500" fill="none" class="decoration" preserveAspectRatio="xMidYMid meet" style="overflow: visible">
-
+<div
+  class="hidden flex-none self-stretch overflow-visible lg:block"
+  aria-hidden="true"
+>
+  <svg
+    width="60"
+    height="100%"
+    viewBox="0 0 60 500"
+    fill="none"
+    class="decoration"
+    preserveAspectRatio="xMidYMid meet"
+    style="overflow: visible"
+  >
     <!-- Main trace (split into two segments around the arc) -->
-    <path d="M 44 0 L 44 340"   stroke="currentColor" stroke-width="1" class="circuit-trace" />
-    <path d="M 44 380 L 44 500" stroke="currentColor" stroke-width="1" class="circuit-trace" />
+    <path
+      d="M 44 0 L 44 340"
+      stroke="currentColor"
+      stroke-width="1"
+      class="circuit-trace"></path>
+    <path
+      d="M 44 380 L 44 500"
+      stroke="currentColor"
+      stroke-width="1"
+      class="circuit-trace"></path>
 
     <!-- Arc: rightward detour on the main trace (same motif as header, rotated 90°) -->
     <!-- chord=40, r=28 → gentle curve, peak at x≈52 -->
-    <path d="M 44 340 A 28 28 0 0 1 44 380" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="circuit-trace" />
+    <path
+      d="M 44 340 A 28 28 0 0 1 44 380"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      class="circuit-trace"></path>
 
     <!-- Tick marks on main trace -->
-    <path d="M 40 25  L 48 25"  stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
-    <path d="M 40 180 L 48 180" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
-    <path d="M 40 455 L 48 455" stroke="currentColor" stroke-width="0.75" class="circuit-trace" />
+    <path
+      d="M 40 25  L 48 25"
+      stroke="currentColor"
+      stroke-width="0.75"
+      class="circuit-trace"></path>
+    <path
+      d="M 40 180 L 48 180"
+      stroke="currentColor"
+      stroke-width="0.75"
+      class="circuit-trace"></path>
+    <path
+      d="M 40 455 L 48 455"
+      stroke="currentColor"
+      stroke-width="0.75"
+      class="circuit-trace"></path>
 
     <!-- Secondary trace: x=16, y=70 to y=300 -->
-    <path d="M 16 70 L 16 300" stroke="currentColor" stroke-width="1" class="circuit-trace" />
+    <path
+      d="M 16 70 L 16 300"
+      stroke="currentColor"
+      stroke-width="1"
+      class="circuit-trace"></path>
 
     <!-- Stubs extending left from secondary trace endpoints -->
-    <path d="M 16 70  L 4 70"  stroke="currentColor" stroke-width="1" class="circuit-trace" />
-    <path d="M 16 300 L 4 300" stroke="currentColor" stroke-width="1" class="circuit-trace" />
+    <path
+      d="M 16 70  L 4 70"
+      stroke="currentColor"
+      stroke-width="1"
+      class="circuit-trace"></path>
+    <path
+      d="M 16 300 L 4 300"
+      stroke="currentColor"
+      stroke-width="1"
+      class="circuit-trace"></path>
 
     <!-- Rungs connecting secondary (x=16) to main (x=44) -->
-    <path d="M 16 110 L 44 110" stroke="currentColor" stroke-width="1" class="circuit-trace" />
-    <path d="M 16 260 L 44 260" stroke="currentColor" stroke-width="1" class="circuit-trace" />
+    <path
+      d="M 16 110 L 44 110"
+      stroke="currentColor"
+      stroke-width="1"
+      class="circuit-trace"></path>
+    <path
+      d="M 16 260 L 44 260"
+      stroke="currentColor"
+      stroke-width="1"
+      class="circuit-trace"></path>
 
     <!-- L-branch near the bottom: goes left, then turns down -->
-    <path d="M 44 430 L 24 430 L 24 455" stroke="currentColor" stroke-width="1" class="circuit-trace" />
+    <path
+      d="M 44 430 L 24 430 L 24 455"
+      stroke="currentColor"
+      stroke-width="1"
+      class="circuit-trace"></path>
 
     <!-- Arc junction dots -->
-    <circle cx="44" cy="340" r="1.75" fill="currentColor" class="circuit-dot" />
-    <circle cx="44" cy="380" r="1.75" fill="currentColor" class="circuit-dot" />
+    <circle cx="44" cy="340" r="1.75" fill="currentColor" class="circuit-dot"
+    ></circle>
+    <circle cx="44" cy="380" r="1.75" fill="currentColor" class="circuit-dot"
+    ></circle>
 
     <!-- Rung junction dots on main trace -->
-    <circle cx="44" cy="110" r="1.75" fill="currentColor" class="circuit-dot" />
-    <circle cx="44" cy="260" r="1.75" fill="currentColor" class="circuit-dot" />
+    <circle cx="44" cy="110" r="1.75" fill="currentColor" class="circuit-dot"
+    ></circle>
+    <circle cx="44" cy="260" r="1.75" fill="currentColor" class="circuit-dot"
+    ></circle>
 
     <!-- Rung junction dots on secondary trace -->
-    <circle cx="16" cy="110" r="1.75" fill="currentColor" class="circuit-dot" />
-    <circle cx="16" cy="260" r="1.75" fill="currentColor" class="circuit-dot" />
+    <circle cx="16" cy="110" r="1.75" fill="currentColor" class="circuit-dot"
+    ></circle>
+    <circle cx="16" cy="260" r="1.75" fill="currentColor" class="circuit-dot"
+    ></circle>
 
     <!-- Secondary trace endpoint dots -->
-    <circle cx="16" cy="70"  r="1.5"  fill="currentColor" class="circuit-dot" />
-    <circle cx="16" cy="300" r="1.5"  fill="currentColor" class="circuit-dot" />
+    <circle cx="16" cy="70" r="1.5" fill="currentColor" class="circuit-dot"
+    ></circle>
+    <circle cx="16" cy="300" r="1.5" fill="currentColor" class="circuit-dot"
+    ></circle>
 
     <!-- Stub tip dots -->
-    <circle cx="4" cy="70"  r="1.25" fill="currentColor" class="circuit-dot" />
-    <circle cx="4" cy="300" r="1.25" fill="currentColor" class="circuit-dot" />
+    <circle cx="4" cy="70" r="1.25" fill="currentColor" class="circuit-dot"
+    ></circle>
+    <circle cx="4" cy="300" r="1.25" fill="currentColor" class="circuit-dot"
+    ></circle>
 
     <!-- L-branch dots: origin, corner, tip -->
-    <circle cx="44" cy="430" r="1.75" fill="currentColor" class="circuit-dot" />
-    <circle cx="24" cy="430" r="1.25" fill="currentColor" class="circuit-dot" />
-    <circle cx="24" cy="455" r="1.25" fill="currentColor" class="circuit-dot" />
+    <circle cx="44" cy="430" r="1.75" fill="currentColor" class="circuit-dot"
+    ></circle>
+    <circle cx="24" cy="430" r="1.25" fill="currentColor" class="circuit-dot"
+    ></circle>
+    <circle cx="24" cy="455" r="1.25" fill="currentColor" class="circuit-dot"
+    ></circle>
   </svg>
 </div>
 
 <style>
   .decoration {
-    color: rgba(107, 107, 107, 0.65);
+    color: var(--ink-circuit);
     min-height: 100%;
-  }
-
-  :global(.dark) .decoration {
-    color: color-mix(in srgb, var(--color-brass) 28%, transparent);
   }
 
   .circuit-dot {

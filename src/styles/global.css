@@ -21,6 +21,28 @@
   --text-base: 16px;
 }
 
+/* The ink of the hand-drawn circuit decorations. One source for all of them:
+   neutral grey on the light page, knocked-back brass on the dark one. These
+   can't live in @theme — that block is static, and the value has to flip with
+   the theme.
+
+   Two strengths, and the difference is the background they sit on. The dot-grid
+   pages are quiet, so the decorations stay faint; NowDecoration sits over the
+   moving flow field and needs the extra weight to read at all. Don't collapse
+   them into one.
+
+   Canvas and satori can't read these (FlowField.ts, og-card.ts) — they carry
+   their own named constants, and those must be changed in step. */
+:root {
+  --ink-circuit: rgba(107, 107, 107, 0.65);
+  --ink-circuit-strong: rgba(107, 107, 107, 0.85);
+}
+
+.dark {
+  --ink-circuit: color-mix(in srgb, var(--color-brass) 28%, transparent);
+  --ink-circuit-strong: color-mix(in srgb, var(--color-brass) 50%, transparent);
+}
+
 html {
   background-color: var(--color-primary-100);
   transition: background-color 0.2s ease;

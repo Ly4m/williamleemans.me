@@ -124,7 +124,8 @@ const num = String(index + 1).padStart(2, "0");
   .badge-accent {
     background: color-mix(in srgb, var(--color-brass) 14%, transparent);
     color: var(--color-brass-ink);
-    border: 1px solid color-mix(in srgb, var(--color-brass-ink) 30%, transparent);
+    border: 1px solid
+      color-mix(in srgb, var(--color-brass-ink) 30%, transparent);
   }
 
   :global(.dark) .badge-accent {

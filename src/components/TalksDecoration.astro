@@ -1,19 +1,22 @@
 ---
 type Props = {
-  postCount: string;
+  talkCount: string;
   yearSpan: string;
 };
 
-const { postCount, yearSpan } = Astro.props;
+const { talkCount, yearSpan } = Astro.props;
 ---
 
 <!--
-  Grid-aligned circuit decoration for the blog list page header.
-  All key x/y positions are multiples of 20px to rhyme with the dot grid.
+  Grid-aligned circuit decoration for the talks page header.
+  Same 20px grid as the other decorations, so it rhymes with the dot grid.
 
-  y=40  ──|──────●══╮══●────────────────●───────────────|────────────|────
-           tick arc-L  arc-R          branch           tick          tick
-  y=20             apex              branch-top
+  The motif is a raised plateau — the trace steps up, runs level, steps back
+  down. A stage, without drawing one.
+
+  y=40  ──|──────╭────────────╮────────────|──────────|────
+                 │            │
+  y=20           ╰─ plateau ──╯
 -->
 <div class="mt-5 hidden md:block" aria-hidden="true">
   <svg
@@ -30,51 +33,40 @@ const { postCount, yearSpan } = Astro.props;
       stroke-width="0.75"
       class="circuit-trace"></path>
 
-    <!-- Left segment: start → arc -->
+    <!-- Left segment: start → foot of the rise -->
     <path
-      d="M 0 40 L 60 40"
+      d="M 0 40 L 80 40"
       stroke="currentColor"
       stroke-width="1"
       class="circuit-trace"></path>
 
-    <!-- Arc dome: x=60→x=100, center (80,40), radius 20, apex at (80,20) -->
+    <!-- The plateau: up at x=80, level to x=160, back down -->
     <path
-      d="M 60 40 A 20 20 0 0 1 100 40"
+      d="M 80 40 L 80 20"
+      stroke="currentColor"
+      stroke-width="1"
+      class="circuit-trace"></path>
+    <path
+      d="M 80 20 L 160 20"
+      stroke="currentColor"
+      stroke-width="1"
+      class="circuit-trace"></path>
+    <path
+      d="M 160 20 L 160 40"
       stroke="currentColor"
       stroke-width="1"
       class="circuit-trace"></path>
 
-    <!-- Tick at x=140 -->
+    <!-- Right segment: foot of the fall → end -->
     <path
-      d="M 140 36 L 140 44"
-      stroke="currentColor"
-      stroke-width="0.75"
-      class="circuit-trace"></path>
-
-    <!-- Middle segment: arc → branch -->
-    <path
-      d="M 100 40 L 180 40"
+      d="M 160 40 L 380 40"
       stroke="currentColor"
       stroke-width="1"
       class="circuit-trace"></path>
 
-    <!-- Branch at x=180: up to y=20 -->
+    <!-- Ticks at x=240 and x=340 -->
     <path
-      d="M 180 40 L 180 20"
-      stroke="currentColor"
-      stroke-width="1"
-      class="circuit-trace"></path>
-
-    <!-- Right segment: branch → end -->
-    <path
-      d="M 180 40 L 380 40"
-      stroke="currentColor"
-      stroke-width="1"
-      class="circuit-trace"></path>
-
-    <!-- Ticks at x=260 and x=340 -->
-    <path
-      d="M 260 36 L 260 44"
+      d="M 240 36 L 240 44"
       stroke="currentColor"
       stroke-width="0.75"
       class="circuit-trace"></path>
@@ -84,22 +76,17 @@ const { postCount, yearSpan } = Astro.props;
       stroke-width="0.75"
       class="circuit-trace"></path>
 
-    <!-- Arc junction dots -->
-    <circle cx="60" cy="40" r="2" fill="currentColor" class="circuit-dot"
+    <!-- Junction dots at the feet, smaller ones at the corners -->
+    <circle cx="80" cy="40" r="2" fill="currentColor" class="circuit-dot"
     ></circle>
-    <circle cx="100" cy="40" r="2" fill="currentColor" class="circuit-dot"
+    <circle cx="160" cy="40" r="2" fill="currentColor" class="circuit-dot"
     ></circle>
-    <!-- Arc apex dot -->
     <circle cx="80" cy="20" r="1.5" fill="currentColor" class="circuit-dot"
     ></circle>
-    <!-- Branch junction dot -->
-    <circle cx="180" cy="40" r="2" fill="currentColor" class="circuit-dot"
-    ></circle>
-    <!-- Branch top dot -->
-    <circle cx="180" cy="20" r="1.5" fill="currentColor" class="circuit-dot"
+    <circle cx="160" cy="20" r="1.5" fill="currentColor" class="circuit-dot"
     ></circle>
 
-    <!-- Labels: post count (left) and year span (right of branch) -->
+    <!-- Labels: talk count (left) and year span (right of the plateau) -->
     <text
       x="0"
       y="57"
@@ -107,7 +94,7 @@ const { postCount, yearSpan } = Astro.props;
       font-size="8"
       letter-spacing="0.08em"
       fill="currentColor"
-      class="circuit-label">{postCount}</text
+      class="circuit-label">{talkCount}</text
     >
     <text
       x="200"

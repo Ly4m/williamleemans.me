@@ -10,6 +10,9 @@ import { Resvg } from "@resvg/resvg-js";
 const WIDTH = 1200;
 const HEIGHT = 630;
 
+// Satori renders outside the document, so it can't read the CSS custom
+// properties either. These mirror global.css — keep them in step with
+// `--color-primary-100`, `--color-brass` and `--color-faded`.
 const INK = "#fafafa";
 const CHARCOAL = "#1a1a1a";
 const BRASS = "#E4A94D";

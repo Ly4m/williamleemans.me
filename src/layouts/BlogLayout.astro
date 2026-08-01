@@ -6,6 +6,7 @@ import SideNav from "../components/SideNav.astro";
 import { ClientRouter } from "astro:transitions";
 import TwitterMeta from "../components/meta/TwitterMeta.astro";
 import OpenGraphMeta from "../components/meta/OpenGraphMeta.astro";
+import { nav } from "../data/nav.ts";
 
 type Props = {
   title?: string;
@@ -28,12 +29,6 @@ const {
   lang = "fr",
   structuredData,
 } = Astro.props;
-
-const nav = [
-  { label: "Accueil", href: "/" },
-  { label: "Blog", href: "/blog" },
-  { label: "Now", href: "/now" },
-];
 
 const site = Astro.site?.toString() ?? "https://lmns.fr";
 const canonical = new URL(Astro.url.pathname, site).toString();

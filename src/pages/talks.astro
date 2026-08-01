@@ -1,0 +1,135 @@
+---
+import BlogLayout from "../layouts/BlogLayout.astro";
+import TalksDecoration from "../components/TalksDecoration.astro";
+import { sortedTalks, talkCount, yearSpan, formatDate } from "../data/talks.ts";
+
+const countLabel = `N:${String(talkCount).padStart(2, "0")}`;
+
+const site = Astro.site?.toString() ?? "https://lmns.fr";
+
+/*
+ * CollectionPage only. Not VideoObject — Google wants the video playable on the
+ * page for that, and these deliberately link out. Not Event — those rich
+ * results are for events you can still attend. The entity gain lives on the
+ * home page instead, in the Person's `sameAs`.
+ */
+const structuredData = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "Talks — William Leemans",
+  description: "Les talks que William Leemans a donnés en conférence.",
+  url: new URL("/talks", site).toString(),
+  inLanguage: "fr-FR",
+  author: {
+    "@type": "Person",
+    name: "William Leemans",
+    url: site,
+  },
+});
+---
+
+<BlogLayout
+  title="Talks — William Leemans"
+  description="Les talks que j'ai donnés en conférence."
+  structuredData={structuredData}
+>
+  <div class="max-w-2xl">
+    <header class="py-12">
+      <h1
+        class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl"
+      >
+        Talks
+      </h1>
+      <TalksDecoration talkCount={countLabel} yearSpan={yearSpan} />
+    </header>
+
+    <p class="text-faded mb-10 text-sm">Ce que j'ai raconté sur scène.</p>
+
+    <main>
+      <ul class="space-y-10">
+        {
+          sortedTalks.map((talk) => (
+            <li>
+              <h2 class="font-space text-charcoal dark:text-primary-100 text-base">
+                {talk.title}
+              </h2>
+
+              <p class="text-faded mt-1 text-sm">{talk.pitch}</p>
+
+              <ul class="mt-3 space-y-1">
+                {talk.occurrences.map((o) => (
+                  <li class="text-faded flex flex-wrap items-baseline gap-x-2 text-sm">
+                    {o.eventUrl ? (
+                      <a
+                        href={o.eventUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {o.event}
+                      </a>
+                    ) : (
+                      <span>{o.event}</span>
+                    )}
+                    <time datetime={o.date} class="tabular-nums">
+                      {formatDate(o.date)}
+                    </time>
+                    {o.video && (
+                      <a
+                        href={o.video}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="mine"
+                      >
+                        Voir la vidéo
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ul>
+    </main>
+
+    <p class="text-faded mt-16 text-sm">
+      Je donne ces talks en français, depuis Lille, et je me déplace volontiers.
+      Si l'un d'eux a sa place dans votre programme, <a
+        class="mine"
+        href="mailto:william@lmns.fr">écrivez-moi</a
+      >.
+    </p>
+  </div>
+</BlogLayout>
+
+<style>
+  a {
+    font-weight: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(125, 125, 125, 0.3);
+    transition: border 0.3s ease-in-out;
+  }
+
+  a:hover {
+    border-bottom-color: var(--color-charcoal);
+  }
+
+  :global(.dark) a:hover {
+    border-bottom-color: var(--color-primary-100);
+  }
+
+  /* My own surfaces wear brass on hover; outbound conference links stay neutral. */
+  a.mine:hover {
+    border-bottom-color: var(--color-brass-ink);
+  }
+
+  :global(.dark) a.mine:hover {
+    border-bottom-color: var(--color-brass);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    a {
+      transition: none;
+    }
+  }
+</style>

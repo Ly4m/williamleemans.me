@@ -101,12 +101,9 @@
 </div>
 
 <style>
+  /* The strong ink: this one sits over the moving flow field, not the dot grid. */
   .decoration {
-    color: rgba(107, 107, 107, 0.85);
-  }
-
-  :global(.dark) .decoration {
-    color: color-mix(in srgb, var(--color-brass) 50%, transparent);
+    color: var(--ink-circuit-strong);
   }
 
   .circuit-dot {

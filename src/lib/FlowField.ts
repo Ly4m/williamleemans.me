@@ -2,6 +2,12 @@ import { createNoise3D } from "simplex-noise";
 
 const TAU = Math.PI * 2;
 
+/* Canvas can't read the CSS custom properties, so the palette is duplicated here
+   as named constants. BRASS_RGB is `--color-brass` (#E4A94D) in channel form —
+   if that token moves in global.css, move it here too. */
+const BRASS_RGB = [228, 169, 77];
+const CHARCOAL_RGB = [44, 44, 48];
+
 /**
  * FlowField — the Now-page background: slow, drifting streamlines that follow a
  * simplex flow field and leave smearing tails. The "flowing" register of the site's
@@ -49,7 +55,7 @@ export class FlowField {
 
   // ----- palette (theme-aware; charcoal in light, brass accent in dark) -----
   private lineRGB() {
-    return this.dark ? [228, 169, 77] : [44, 44, 48];
+    return this.dark ? BRASS_RGB : CHARCOAL_RGB;
   }
   private bgRGB() {
     return this.dark ? [26, 26, 26] : [250, 250, 250];

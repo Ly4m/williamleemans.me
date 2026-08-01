@@ -19,7 +19,12 @@ const structuredData = JSON.stringify({
       name: "Jetdev",
       url: "https://www.jetdev.fr",
     },
-    sameAs: ["https://github.com/Ly4m", "https://www.linkedin.com/in/wleemans"],
+    sameAs: [
+      "https://github.com/Ly4m",
+      "https://www.linkedin.com/in/wleemans",
+      // TODO: replace with the real channel URL.
+      "https://www.youtube.com/@PLACEHOLDER",
+    ],
     workLocation: {
       "@type": "Place",
       address: {
@@ -72,8 +77,12 @@ const structuredData = JSON.stringify({
           et Distract.
         </p>
         <p>
-          J'adore apprendre, puis partager, autour d'un café, d'un talk ou
-          simplement sur internet : <a class="mine" href="/blog">j'écris ici</a>
+          J'adore apprendre, puis partager, autour d'un café, <a
+            class="mine"
+            href="/talks">d'un talk</a
+          > ou simplement sur internet : <a class="mine" href="/blog"
+            >j'écris ici</a
+          >
           sur les systèmes distribués et l'ingénierie logicielle.
         </p>
         <p>

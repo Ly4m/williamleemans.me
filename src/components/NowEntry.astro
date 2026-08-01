@@ -18,7 +18,13 @@ const music = entry.data.music ?? [];
 const rawgKey = import.meta.env.RAWG_API_KEY ?? "";
 
 const [bookCovers, gameCovers] = await Promise.all([
-  Promise.all(books.map((b) => b.coverUrl ? Promise.resolve(b.coverUrl) : fetchBookCover(b.title, b.author))),
+  Promise.all(
+    books.map((b) =>
+      b.coverUrl
+        ? Promise.resolve(b.coverUrl)
+        : fetchBookCover(b.title, b.author),
+    ),
+  ),
   Promise.all(games.map((g) => fetchGameCover(g.title, rawgKey))),
 ]);
 ---
@@ -30,13 +36,15 @@ const [bookCovers, gameCovers] = await Promise.all([
 {
   books.length > 0 && (
     <section class="mb-12">
-      <h3 class="font-space text-charcoal dark:text-primary-100 text-lg font-bold tracking-wide mb-4">
+      <h3 class="font-space text-charcoal dark:text-primary-100 mb-4 text-lg font-bold tracking-wide">
         Lecture
       </h3>
       {entry.data.booksIntro && (
-        <p class="font-sans text-sm text-charcoal dark:text-primary-100 mb-4 opacity-80">{entry.data.booksIntro}</p>
+        <p class="text-charcoal dark:text-primary-100 mb-4 font-sans text-sm opacity-80">
+          {entry.data.booksIntro}
+        </p>
       )}
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+      <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
         {books.map((book, i) => (
           <MediaCard
             title={book.title}
@@ -56,13 +64,15 @@ const [bookCovers, gameCovers] = await Promise.all([
 {
   games.length > 0 && (
     <section class="mb-12">
-      <h3 class="font-space text-charcoal dark:text-primary-100 text-lg font-bold tracking-wide mb-4">
+      <h3 class="font-space text-charcoal dark:text-primary-100 mb-4 text-lg font-bold tracking-wide">
         Gaming
       </h3>
       {entry.data.gamesIntro && (
-        <p class="font-sans text-sm text-charcoal dark:text-primary-100 mb-4 opacity-80">{entry.data.gamesIntro}</p>
+        <p class="text-charcoal dark:text-primary-100 mb-4 font-sans text-sm opacity-80">
+          {entry.data.gamesIntro}
+        </p>
       )}
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {games.map((game, i) => (
           <MediaCard
             title={game.title}
@@ -83,11 +93,13 @@ const [bookCovers, gameCovers] = await Promise.all([
 {
   music.length > 0 && (
     <section class="mb-12">
-      <h3 class="font-space text-charcoal dark:text-primary-100 text-lg font-bold tracking-wide mb-4">
+      <h3 class="font-space text-charcoal dark:text-primary-100 mb-4 text-lg font-bold tracking-wide">
         En écoute
       </h3>
       {entry.data.musicIntro && (
-        <p class="font-sans text-sm text-charcoal dark:text-primary-100 mb-4 opacity-80">{entry.data.musicIntro}</p>
+        <p class="text-charcoal dark:text-primary-100 mb-4 font-sans text-sm opacity-80">
+          {entry.data.musicIntro}
+        </p>
       )}
       <ol class="album-list">
         {music.map((album, i) => (

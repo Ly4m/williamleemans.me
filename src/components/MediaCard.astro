@@ -17,7 +17,12 @@ const isDone = status === "lu" || status === "terminé";
 <div class="card">
   {
     coverUrl && (
-      <div class:list={["card-cover", type === "game" ? "game-cover" : "book-cover"]}>
+      <div
+        class:list={[
+          "card-cover",
+          type === "game" ? "game-cover" : "book-cover",
+        ]}
+      >
         <img src={coverUrl} alt={title} loading="lazy" decoding="async" />
       </div>
     )
