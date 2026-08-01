@@ -61,7 +61,7 @@ type OgCardOptions = {
 export async function renderOgCard({
   title,
   metaRight,
-}: OgCardOptions): Promise<Uint8Array> {
+}: OgCardOptions): Promise<Uint8Array<ArrayBuffer>> {
   const fontSize = title.length > 32 ? 60 : 74;
 
   const svg = await satori(
@@ -227,5 +227,8 @@ export async function renderOgCard({
     },
   );
 
-  return new Resvg(svg).render().asPng();
+  // Copied into a plain Uint8Array: resvg hands back a Node Buffer, which is a
+  // view into a shared pool and isn't a valid `BodyInit` for the Response the
+  // OG endpoints return.
+  return Uint8Array.from(new Resvg(svg).render().asPng());
 }

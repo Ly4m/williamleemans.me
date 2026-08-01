@@ -13,7 +13,10 @@ import svelte from "@astrojs/svelte";
 
 const SITE = "https://lmns.fr";
 
-/** Extract a flat key/value map from a markdown frontmatter block. */
+/**
+ * Extract a flat key/value map from a markdown frontmatter block.
+ * @param {string} raw
+ */
 function readFrontmatter(raw) {
   const block = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!block) return {};
@@ -26,7 +29,10 @@ function readFrontmatter(raw) {
   return fields;
 }
 
-/** Normalize a `YYYY-M-D` date to a UTC-midnight ISO string, matching Zod's coercion. */
+/**
+ * Normalize a `YYYY-M-D` date to a UTC-midnight ISO string, matching Zod's coercion.
+ * @param {string} value
+ */
 function toIso(value) {
   const [y, m, d] = value.split("-").map(Number);
   if ([y, m, d].every((n) => Number.isInteger(n))) {
@@ -35,7 +41,11 @@ function toIso(value) {
   return new Date(value).toISOString();
 }
 
-/** Build a `full URL -> lastmod ISO` map from a content collection directory. */
+/**
+ * Build a `full URL -> lastmod ISO` map from a content collection directory.
+ * @param {string} dir Directory to scan, relative to this file.
+ * @param {string} urlPrefix Route prefix the slugs hang off, e.g. `/blog/`.
+ */
 function collectLastmod(dir, urlPrefix) {
   const base = new URL(dir, import.meta.url);
   /** @type {Map<string, string>} */
