@@ -79,6 +79,23 @@ body {
   /*animation: fadeIn 1s ease-out;*/
 }
 
+/* Keyboard focus. The site had none, so the only ring was the browser's own,
+   landing on a dot grid or a moving flow field.
+
+   Brass is right here for once: focus is state, it rides on a line rather than
+   on running text, and it's transient. `:focus-visible` keeps it off mouse
+   clicks. The offset keeps the ring clear of the hairline underlines links
+   already wear, so the two never read as one thick rule. */
+:focus-visible {
+  outline: 2px solid var(--color-brass-ink);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.dark :focus-visible {
+  outline-color: var(--color-brass);
+}
+
 h1,
 h2,
 h3 {
