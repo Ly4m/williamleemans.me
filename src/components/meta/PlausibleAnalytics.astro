@@ -1,0 +1,31 @@
+---
+/*
+ * Plausible's install snippet, verbatim, and in one place instead of two.
+ *
+ * The queue stub is not optional: the `pa-*` script does nothing until
+ * `plausible.init()` runs, so deleting what looks like dead boilerplate would
+ * silently switch analytics off. Both tags are `is:inline` — that's the form
+ * Plausible documents, and it keeps the stub in the head ahead of the async
+ * script rather than deferring it into a bundled module. Inline also keeps this
+ * vendor code out of the TypeScript check, which is right: we don't own it.
+ */
+---
+
+<!-- Privacy-friendly analytics by Plausible -->
+<script
+  is:inline
+  async
+  src="https://plausible.io/js/pa-QovbWITZik5-tHtN9XgGD.js"></script>
+<script is:inline>
+  ((window.plausible =
+    window.plausible ||
+    function () {
+      (plausible.q = plausible.q || []).push(arguments);
+    }),
+    (plausible.init =
+      plausible.init ||
+      function (i) {
+        plausible.o = i || {};
+      }));
+  plausible.init();
+</script>
