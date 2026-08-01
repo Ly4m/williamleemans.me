@@ -26,12 +26,8 @@ pnpm-debug.log*
 # Local Netlify folder
 .netlify
 
-CLAUDE.md
-
-.claude/worktrees/
-
+# Local agent scratch. CLAUDE.md and docs/adr/ are deliberately NOT ignored:
+# they carry the project rules and the decisions behind them.
 .claude/
 
 CONTEXT.md
-
-docs/adr/
