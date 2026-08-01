@@ -26,4 +26,6 @@ const info = await sharp(svg, { density: 144 })
   .jpeg({ quality: 88, mozjpeg: true })
   .toFile("public/og/default.jpg");
 
-console.log(`Wrote public/og/default.jpg (${info.width}x${info.height}, ${info.size} bytes)`);
+console.log(
+  `Wrote public/og/default.jpg (${info.width}x${info.height}, ${info.size} bytes)`,
+);

@@ -1,0 +1,11 @@
+# Generated or vendored — not ours to format.
+dist/
+.astro/
+.netlify/
+pnpm-lock.yaml
+
+# Prose is the author's, not the formatter's. Prettier also rewrites the fenced
+# code blocks inside articles — quotes, trailing commas, arrow parens — which
+# silently edits published posts to match a style the article may not be
+# demonstrating.
+src/content/

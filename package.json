@@ -2,11 +2,15 @@
   "name": "williamleemans",
   "type": "module",
   "version": "0.0.1",
+  "packageManager": "pnpm@10.18.0",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "check": "astro check",
     "covers": "node --env-file-if-exists=.env scripts/fetch-covers.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "astro": "astro"
   },
   "dependencies": {
@@ -24,6 +28,7 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.10",
     "@iconify/json": "^2.2.369",
     "@iconify/tailwind4": "^1.0.6",
     "@resvg/resvg-js": "^2.6.2",
