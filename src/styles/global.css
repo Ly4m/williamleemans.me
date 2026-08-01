@@ -1,5 +1,26 @@
 @import "tailwindcss";
 
+/* Every weight the site actually sets, and nothing else. A bare
+   `@fontsource/<family>` import ships weight 400 only, which left every bold
+   heading, every `<strong>` and every italic to be synthesised by the browser —
+   smeared or slanted 400 outlines instead of the real cuts.
+
+   Space Grotesk carries the headings (400 and 700). IBM Plex Mono carries
+   everything else: 400 body, 400-italic for `<em>`, 500 for the nav's active
+   item, 600 for `<strong>` and the logo, 700 for markdown headings inside
+   `.prose` — those inherit the body family, not `--font-space`.
+
+   Subsets are unicode-range gated: the cyrillic and vietnamese files are built
+   but never downloaded for French. src/lib/og-card.ts reads the 700 and 400
+   files straight out of these packages — keep them installed. */
+@import "@fontsource/space-grotesk/400.css";
+@import "@fontsource/space-grotesk/700.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/400-italic.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+@import "@fontsource/ibm-plex-mono/600.css";
+@import "@fontsource/ibm-plex-mono/700.css";
+
 @plugin "@iconify/tailwind4";
 @plugin "@tailwindcss/typography";
 
