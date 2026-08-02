@@ -11,6 +11,9 @@ interface SocialLink {
   label: string;
   href: string;
   icon: string;
+  /* A profile is me, somewhere else. The feed and the mailbox aren't — they
+     carry no identity to claim, so only profiles get rel="me". */
+  profile?: boolean;
 }
 
 const { items = [] }: { items?: NavItem[] } = Astro.props;
@@ -26,11 +29,13 @@ const socialLinks: SocialLink[] = [
     label: "GitHub",
     href: "https://github.com/Ly4m",
     icon: "icon-[tabler--brand-github]",
+    profile: true,
   },
   {
     label: "LinkedIn",
     href: "https://www.linkedin.com/in/wleemans",
     icon: "icon-[tabler--brand-linkedin]",
+    profile: true,
   },
   {
     label: "RSS",
@@ -47,6 +52,15 @@ const socialLinks: SocialLink[] = [
 /* A new tab is for leaving the site. The feed is part of it, and a mail client
    isn't a tab at all — both stay in place. */
 const opensInNewTab = (href: string) => href.startsWith("http");
+
+/* Both renders below draw their rel from here, so the two can't drift. */
+const relFor = (s: SocialLink) => {
+  const tokens = [
+    s.profile && "me",
+    opensInNewTab(s.href) && "noopener noreferrer",
+  ].filter(Boolean);
+  return tokens.length ? tokens.join(" ") : undefined;
+};
 ---
 
 <header
@@ -105,7 +119,7 @@ const opensInNewTab = (href: string) => href.startsWith("http");
       socialLinks.map((s) => (
         <a
           href={s.href}
-          rel={opensInNewTab(s.href) ? "noopener noreferrer" : undefined}
+          rel={relFor(s)}
           target={opensInNewTab(s.href) ? "_blank" : undefined}
           class="flex h-12 w-12 items-center justify-center rounded-md text-gray-600 transition hover:bg-gray-100 hover:text-black dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
           title={s.label}
@@ -156,7 +170,7 @@ const opensInNewTab = (href: string) => href.startsWith("http");
       socialLinks.map((s) => (
         <a
           href={s.href}
-          rel={opensInNewTab(s.href) ? "noopener noreferrer" : undefined}
+          rel={relFor(s)}
           target={opensInNewTab(s.href) ? "_blank" : undefined}
           class="flex h-8 w-8 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 hover:text-black dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
           title={s.label}
