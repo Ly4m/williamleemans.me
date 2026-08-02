@@ -9,14 +9,14 @@ Date: 2026-08-02. All sources accessed 2026-08-02. Primary sources fetched direc
 Reasoning, candidate by candidate:
 
 - **Links: `lychee --offline --root-dir "$PWD/dist"`.** Measured: **4–9 ms** for the whole site (654 link instances, 235 unique) and it resolves slash-less root-relative hrefs against the filesystem correctly — `/blog` → `dist/blog/index.html` — which is the exact shape this site emits. It caught all three breaks I injected. It needs one exclusion (`--exclude '\.netlify/images'`) or it reports **206 false errors** from the Netlify Image CDN URLs Astro writes into `srcset`. Fragment checking (`--include-fragments`) works and is free.
-- **Links: `linkinator` is disqualified, measured, on two independent grounds.** It has **no offline mode** — during a directory crawl it made real requests to `plausible.io`, four `youtube.com` URLs, `craftomancer.dev`, `devlille.fr` and `nownownow.com`, and the only way to stop it is to enumerate every external domain by hand. And it **never parsed the article pages at all**: across three flag combinations it found 11–46 links and missed the broken in-body link I planted in `blog/flux-rss`. Given a single HTML file instead of a directory it resolves `/talks` against *the file's own directory*, producing 13 false 404s. There is no `--root-dir` equivalent.
+- **Links: `linkinator` is disqualified, measured, on two independent grounds.** It has **no offline mode** — during a directory crawl it made real requests to `plausible.io`, four `youtube.com` URLs, `craftomancer.dev`, `devlille.fr` and `nownownow.com`, and the only way to stop it is to enumerate every external domain by hand. And it **never parsed the article pages at all**: across three flag combinations it found 11–46 links and missed the broken in-body link I planted in `blog/flux-rss`. Given a single HTML file instead of a directory it resolves `/talks` against _the file's own directory_, producing 13 false 404s. There is no `--root-dir` equivalent.
 - **Accessibility: `axe-core` under `jsdom`, in a plain Node script.** Measured: **1.5 s** for all 15 pages, 28 MB / 34 packages of install, ~2.3 s to install. It **would have caught defect (i)** of issue #20 — I reintroduced the nested `<main>` and got three violations: `landmark-no-duplicate-main`, `landmark-main-is-top-level`, `landmark-unique`. It **would not have caught (ii)** — axe-core 4.12.1 has **no rule of any kind** matching `time` or `datetime` across its 105 rules — nor (iii), which no static tool can see.
-- **Colour contrast under jsdom cannot fire, and that is the decisive argument for jsdom over a browser.** Measured: `color-contrast` errors out (`TypeError: Cannot read properties of null (reading 'canvas')`) and lands in `incomplete`, never in `violations`. The hand-arbitrated palette is therefore *structurally* un-re-flaggable — not suppressed by a config line someone can delete, but impossible. Two other rules degrade the same way (`landmark-one-main`, `page-has-heading-one`, both via `document.elementFromPoint is not a function`); everything else runs.
+- **Colour contrast under jsdom cannot fire, and that is the decisive argument for jsdom over a browser.** Measured: `color-contrast` errors out (`TypeError: Cannot read properties of null (reading 'canvas')`) and lands in `incomplete`, never in `violations`. The hand-arbitrated palette is therefore _structurally_ un-re-flaggable — not suppressed by a config line someone can delete, but impossible. Two other rules degrade the same way (`landmark-one-main`, `page-has-heading-one`, both via `document.elementFromPoint is not a function`); everything else runs.
 - **The counterfactual, measured in real Chrome, is damning.** Driving the same 15 pages through `@axe-core/playwright` and a real Chrome gives **342 `color-contrast` violations** in light mode with `prefers-reduced-motion: reduce`, **100** without it, **14** in dark, **10** in dark with reduce. 243 of the 342 are Shiki's syntax colours, which `CLAUDE.md` explicitly places outside the palette; 87 are `--color-faded` (`#858585` on `#fafafa`, 3.53:1); and 2 are `#8f6a1a` on `#f7efe2` at 4.33:1 — `--color-brass-ink`, the value `CLAUDE.md` documents as deliberately arbitrated. A guard whose output swings from 100 to 342 findings on an animation preference, and whose findings are the site's own documented decisions, is a guard that gets disabled within a month.
 - **A real, currently-shipping defect fell out of the experiment.** `heading-order` fires **4 times** on `main` today: `<h3 id="projets--travail">` follows the `<h1>` with no `<h2>` between, on `/now/`, `/now/janvier-2026/`, `/now/mai-2026/` and `/now/juillet-2026/`. It reproduces identically under jsdom and under real Chrome, in both themes. The guard is not purely regression-prevention: it has something to fix on day one.
-- **`html-validate` is a *complement*, not an alternative, and needs work before it is usable.** It carries `no-multiple-main` (verified: it flags the nested `<main>`), but on `html-validate:recommended` it emits **1152 messages** on the current `dist/`, of which **995 are `no-inline-style` from Shiki's output**. Once that noise is off it leaves ~157 messages, a mix of genuine minor findings (two unlabelled `<nav>` landmarks; `<style>` inside `<body>`) and disputes with axe (`wcag/h30` rejects `title` as an accessible name where axe accepts it). Worth a follow-up, not worth blocking #25.
+- **`html-validate` is a _complement_, not an alternative, and needs work before it is usable.** It carries `no-multiple-main` (verified: it flags the nested `<main>`), but on `html-validate:recommended` it emits **1152 messages** on the current `dist/`, of which **995 are `no-inline-style` from Shiki's output**. Once that noise is off it leaves ~157 messages, a mix of genuine minor findings (two unlabelled `<nav>` landmarks; `<style>` inside `<body>`) and disputes with axe (`wcag/h30` rejects `title` as an accessible name where axe accepts it). Worth a follow-up, not worth blocking #25.
 - **Every browser-driven candidate is ruled out on the same reasoning, not on install cost.** `ubuntu-24.04` runners already ship Chrome 150 and ChromeDriver, so the install argument is weaker than the ticket assumed — but `pa11y-ci` (`puppeteer ^24.37.5`), `@axe-core/cli` (`chromedriver: "latest"`, unpinned) and Lighthouse CI all buy you the contrast checking you specifically do not want, at 5–10× the runtime.
-- **Weight: none of the off-the-shelf budget tools fit; a ~50-line script does.** Lighthouse CI's last release is **v0.15.1, 2025-06-26** — over a year old. `bundlesize` last published 2024-03, `bundlemon` 2024-10; both are effectively dormant. `size-limit` is healthy but is a JS-bundle tool. And the honest finding is that a naive budget would be wrong here anyway: my prototype charges every page **605 KiB of fonts** because @fontsource emits **62 font files** (Cyrillic, Greek, Vietnamese subsets included) that `unicode-range` guarantees a French page will never fetch. What a budget can usefully bound is **gzipped HTML + referenced CSS + referenced JS + the *latin* font subsets**, per page; what it must not bound is total `dist/` bytes, because 6.1 MB of 7.7 MB is cover art and `CLAUDE.md` says flourish wins.
+- **Weight: none of the off-the-shelf budget tools fit; a ~50-line script does.** Lighthouse CI's last release is **v0.15.1, 2025-06-26** — over a year old. `bundlesize` last published 2024-03, `bundlemon` 2024-10; both are effectively dormant. `size-limit` is healthy but is a JS-bundle tool. And the honest finding is that a naive budget would be wrong here anyway: my prototype charges every page **605 KiB of fonts** because @fontsource emits **62 font files** (Cyrillic, Greek, Vietnamese subsets included) that `unicode-range` guarantees a French page will never fetch. What a budget can usefully bound is **gzipped HTML + referenced CSS + referenced JS + the _latin_ font subsets**, per page; what it must not bound is total `dist/` bytes, because 6.1 MB of 7.7 MB is cover art and `CLAUDE.md` says flourish wins.
 - **The `rel="me"` return loop does not belong in this guard**, and lychee cannot do it in any mode: lychee checks status codes, never response content, so an online lychee run against `https://github.com/Ly4m` would pass whether or not the profile still links back. The cheap correct check is one authenticated-free REST call — `GET /users/Ly4m/social_accounts`, which returns `{"provider":"generic","url":"https://lmns.fr"}` today (verified 2026-08-02) — on a `schedule:` workflow, never on a PR. Laid out in §6; deliberately not decided in.
 
 ---
@@ -25,18 +25,18 @@ Reasoning, candidate by candidate:
 
 The repo's constraints (from `.github/workflows/ci.yml` and `CLAUDE.md`) turn into five tests every candidate is judged against below.
 
-| # | Test | Why |
-| --- | --- | --- |
-| T1 | Does it work with **no third-party network call**? | `ci.yml` says so verbatim: "Fully offline: … nothing here calls a third-party API. A failure at this step is ours." |
-| T2 | Does it need a **headless browser** on the runner? | The map (#19) parks the job's shape on this answer. |
-| T3 | Can it see **both themes**, given that dark is a class on `<html>`? | `CLAUDE.md`; a static check never sees dark by accident. |
-| T4 | Can **contrast rules be disabled** — or better, are they incapable of firing? | `--color-brass-ink` on `#fafafa` and the 4.3:1 nav rail are decided, not defects. |
-| T5 | Would it have caught the **three defects of #20**? | (i) nested `<main>`, (ii) `<time>` with no `datetime`, (iii) `toLocaleDateString()` with no locale. |
+| #   | Test                                                                          | Why                                                                                                                 |
+| --- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| T1  | Does it work with **no third-party network call**?                            | `ci.yml` says so verbatim: "Fully offline: … nothing here calls a third-party API. A failure at this step is ours." |
+| T2  | Does it need a **headless browser** on the runner?                            | The map (#19) parks the job's shape on this answer.                                                                 |
+| T3  | Can it see **both themes**, given that dark is a class on `<html>`?           | `CLAUDE.md`; a static check never sees dark by accident.                                                            |
+| T4  | Can **contrast rules be disabled** — or better, are they incapable of firing? | `--color-brass-ink` on `#fafafa` and the 4.3:1 nav rail are decided, not defects.                                   |
+| T5  | Would it have caught the **three defects of #20**?                            | (i) nested `<main>`, (ii) `<time>` with no `datetime`, (iii) `toLocaleDateString()` with no locale.                 |
 
 Two facts about the runner change the shape of T2 more than the ticket assumed:
 
-- **`ubuntu-24.04` already has a browser.** The image manifest lists `Google Chrome 150.0.7871.128`, `ChromeDriver 150.0.7871.124`, `Chromium 150.0.7871.0`, plus `CHROMEWEBDRIVER=/usr/local/share/chromedriver-linux64` ([actions/runner-images, `images/ubuntu/Ubuntu2404-Readme.md`](https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md), fetched via the GitHub contents API 2026-08-02). So "needs a browser" costs *runtime*, not a 150 MB download — provided the tool is told to use the system Chrome rather than letting Puppeteer/Playwright fetch its own.
-- **The repo is public** (`gh repo view Ly4m/williamleemans.me` → `"visibility":"PUBLIC"`, 2026-08-02), so GitHub-hosted standard runners are free of charge. Runner *minutes* are therefore a wall-clock/attention cost on every PR, not a billing cost. That lowers the stakes but does not remove them: a 90 s job on a 6-articles-in-9-months blog is a job people learn to ignore.
+- **`ubuntu-24.04` already has a browser.** The image manifest lists `Google Chrome 150.0.7871.128`, `ChromeDriver 150.0.7871.124`, `Chromium 150.0.7871.0`, plus `CHROMEWEBDRIVER=/usr/local/share/chromedriver-linux64` ([actions/runner-images, `images/ubuntu/Ubuntu2404-Readme.md`](https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md), fetched via the GitHub contents API 2026-08-02). So "needs a browser" costs _runtime_, not a 150 MB download — provided the tool is told to use the system Chrome rather than letting Puppeteer/Playwright fetch its own.
+- **The repo is public** (`gh repo view Ly4m/williamleemans.me` → `"visibility":"PUBLIC"`, 2026-08-02), so GitHub-hosted standard runners are free of charge. Runner _minutes_ are therefore a wall-clock/attention cost on every PR, not a billing cost. That lowers the stakes but does not remove them: a 90 s job on a 6-articles-in-9-months blog is a job people learn to ignore.
 
 The site as built (measured, `dist/` on 2026-08-02): 15 HTML files, largest `blog/flux-rss/index.html` at 64,405 B raw / **11,437 B gzip -9**. `dist` 7.9 MB, `dist/_astro` 7.1 MB, of which 6.1 MB images. JS 60 KB, CSS 72 KB, 62 font files totalling 740 KB (376 KB woff2 + 364 KB woff).
 
@@ -61,11 +61,11 @@ Total added wall clock for the a11y step on this machine: **~1.5 s**. On a GitHu
 
 I reconstructed defects (i) and (ii) on top of the fixed `dist/blog/index.html` (nested a second `<main>` inside the layout's; stripped `datetime=` from the list's `<time>`) and re-ran.
 
-| #20 defect | Caught? | Rule id |
-| --- | --- | --- |
-| (i) two `<main>` on one page | **yes** | `landmark-no-duplicate-main`, and also `landmark-main-is-top-level` and `landmark-unique` |
-| (ii) `<time>` with no `datetime` | **no** | none exists |
-| (iii) date in the wrong locale | **no** | out of reach of any tool in this note |
+| #20 defect                       | Caught? | Rule id                                                                                   |
+| -------------------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| (i) two `<main>` on one page     | **yes** | `landmark-no-duplicate-main`, and also `landmark-main-is-top-level` and `landmark-unique` |
+| (ii) `<time>` with no `datetime` | **no**  | none exists                                                                               |
+| (iii) date in the wrong locale   | **no**  | out of reach of any tool in this note                                                     |
 
 On (ii): `axe.getRules()` over `wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa, best-practice` returns **zero** rules whose id or description matches `time` or `datetime`, out of **105 rules total** (measured). `html-validate@11.4.0`'s 80-rule `recommended` config likewise has no `time`/`datetime` rule (measured via `html-validate --print-config`), and it does **not** flag `<time>01</time>` — I tested it directly. Nothing off the shelf catches (ii). Say it plainly rather than implying the guard covers #20.
 
@@ -75,43 +75,43 @@ On (iii): a locale bug produces well-formed HTML with correct semantics. No a11y
 
 Measured, by reading the `error-occurred` check data out of `results.incomplete`:
 
-| Rule | Error under jsdom 29.1.1 | Consequence |
-| --- | --- | --- |
-| `color-contrast` | `TypeError: Cannot read properties of null (reading 'canvas')` (jsdom's `HTMLCanvasElement.getContext()` returns `null` without the optional `canvas` package) | never evaluated |
-| `landmark-one-main` | `TypeError: document.elementFromPoint is not a function` | "page has **no** main" is not detected |
-| `page-has-heading-one` | same | not detected |
+| Rule                   | Error under jsdom 29.1.1                                                                                                                                       | Consequence                            |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `color-contrast`       | `TypeError: Cannot read properties of null (reading 'canvas')` (jsdom's `HTMLCanvasElement.getContext()` returns `null` without the optional `canvas` package) | never evaluated                        |
+| `landmark-one-main`    | `TypeError: document.elementFromPoint is not a function`                                                                                                       | "page has **no** main" is not detected |
+| `page-has-heading-one` | same                                                                                                                                                           | not detected                           |
 
-Every other rule runs. Critically, axe routes a rule that throws into `incomplete`, not into `violations` — so a CI script that fails on `violations.length > 0` cannot be tripped by these. This is documented maintainer behaviour, not luck: on [dequelabs/axe-core#595](https://github.com/dequelabs/axe-core/issues/595) (opened 2017-11-01, closed), Deque's Marcy Sutton wrote *"I would just turn off the color contrast rule in JSDOM, because you're right that it won't ever work. We don't recommend testing color contrast in JSDOM due to the lack of support."*, and Dylan Barrell confirmed the results land *"in the `incomplete` array"*. Steve Straker later re-tested on jsdom 18 and 19 and reported the same skip, with a different message: <code>&#96;TypeError: range.getClientRects is not a function&#96; - feature unsupported in your environment. Skipping color-contrast rule</code> (2021-11-09 and 2022-01-03). On jsdom 29 the failure has moved from `Range` to `<canvas>` but the outcome is unchanged — measured above.
+Every other rule runs. Critically, axe routes a rule that throws into `incomplete`, not into `violations` — so a CI script that fails on `violations.length > 0` cannot be tripped by these. This is documented maintainer behaviour, not luck: on [dequelabs/axe-core#595](https://github.com/dequelabs/axe-core/issues/595) (opened 2017-11-01, closed), Deque's Marcy Sutton wrote _"I would just turn off the color contrast rule in JSDOM, because you're right that it won't ever work. We don't recommend testing color contrast in JSDOM due to the lack of support."_, and Dylan Barrell confirmed the results land _"in the `incomplete` array"_. Steve Straker later re-tested on jsdom 18 and 19 and reported the same skip, with a different message: <code>&#96;TypeError: range.getClientRects is not a function&#96; - feature unsupported in your environment. Skipping color-contrast rule</code> (2021-11-09 and 2022-01-03). On jsdom 29 the failure has moved from `Range` to `<canvas>` but the outcome is unchanged — measured above.
 
-The `landmark-one-main` loss is the one real price. Under jsdom the guard detects *duplicate* `main` (which is what #20 was) but not *missing* `main`. Two cheap covers, if #25 wants it: `html-validate`'s `element-required-content`/landmark rules, or a three-line assertion in the same script (`document.querySelectorAll("main").length === 1`), which also subsumes `landmark-no-duplicate-main` and costs nothing.
+The `landmark-one-main` loss is the one real price. Under jsdom the guard detects _duplicate_ `main` (which is what #20 was) but not _missing_ `main`. Two cheap covers, if #25 wants it: `html-validate`'s `element-required-content`/landmark rules, or a three-line assertion in the same script (`document.querySelectorAll("main").length === 1`), which also subsumes `landmark-no-duplicate-main` and costs nothing.
 
 Note the axe-core rule catalogue marks `color-contrast`'s Issue Type as **"failure, needs review"** ([axe-core `doc/rule-descriptions.md`](https://github.com/dequelabs/axe-core/blob/develop/doc/rule-descriptions.md)) — i.e. even in a browser it is a rule Deque expects a human to arbitrate. That is precisely what this repo already did.
 
 ### 2.4 The contrast counterfactual, measured in real Chrome
 
-To be fair to the browser-based candidates I actually ran them: `playwright-core@latest` (13 MB, browser download skipped) driving the **system Chrome**, `@axe-core/playwright@4.12.1`, a 30-line static file server over `dist/`, theme seeded into `localStorage` via `context.addInitScript` *before* navigation so the site's own inline theme script picks it up.
+To be fair to the browser-based candidates I actually ran them: `playwright-core@latest` (13 MB, browser download skipped) driving the **system Chrome**, `@axe-core/playwright@4.12.1`, a 30-line static file server over `dist/`, theme seeded into `localStorage` via `context.addInitScript` _before_ navigation so the site's own inline theme script picks it up.
 
-| Configuration | `color-contrast` violations | `heading-order` |
-| --- | --- | --- |
-| light, motion allowed | **100** | 4 |
-| light, `reducedMotion: "reduce"` | **342** | 4 |
-| dark, motion allowed | **14** (stable over two runs) | 4 |
-| dark, `reducedMotion: "reduce"` | **10** | 4 |
+| Configuration                    | `color-contrast` violations   | `heading-order` |
+| -------------------------------- | ----------------------------- | --------------- |
+| light, motion allowed            | **100**                       | 4               |
+| light, `reducedMotion: "reduce"` | **342**                       | 4               |
+| dark, motion allowed             | **14** (stable over two runs) | 4               |
+| dark, `reducedMotion: "reduce"`  | **10**                        | 4               |
 
 Wall clock: **~4.6 s per theme** for 15 pages, plus **~200–320 ms** to launch Chrome. Both themes ≈ 10 s locally; budget 25–40 s on a runner.
 
 The light-mode swing from 100 to 342 is not noise, it is the site's entrance animations: with motion allowed, `wave-enter` content is still at `opacity: 0` when axe samples, and axe skips invisible text. The guard's verdict would depend on whether the runner claims to prefer reduced motion. Grouping the 342 by colour pair (measured):
 
-| count | ratio | foreground | background | what it is |
-| --- | --- | --- | --- | --- |
-| 113 | 3.42 | `#b07d48` | `#fafafa` | Shiki `vitesse-light` |
-| 87 | 3.53 | `#858585` | `#fafafa` | `--color-faded` |
-| 56 | 3.92 | `#b56959` | `#fafafa` | Shiki |
-| 47 | 4.06 | `#59873a` | `#fafafa` | Shiki |
-| 14 | 3.74 | `#2e8f82` | `#fafafa` | Shiki |
-| 13 | 3.54 | `#998418` | `#fafafa` | Shiki |
-| 10 | 2.24 | `#a0ada0` | `#fafafa` | Shiki comments |
-| 2 | **4.33** | **`#8f6a1a`** | `#f7efe2` | **`--color-brass-ink`** |
+| count | ratio    | foreground    | background | what it is              |
+| ----- | -------- | ------------- | ---------- | ----------------------- |
+| 113   | 3.42     | `#b07d48`     | `#fafafa`  | Shiki `vitesse-light`   |
+| 87    | 3.53     | `#858585`     | `#fafafa`  | `--color-faded`         |
+| 56    | 3.92     | `#b56959`     | `#fafafa`  | Shiki                   |
+| 47    | 4.06     | `#59873a`     | `#fafafa`  | Shiki                   |
+| 14    | 3.74     | `#2e8f82`     | `#fafafa`  | Shiki                   |
+| 13    | 3.54     | `#998418`     | `#fafafa`  | Shiki                   |
+| 10    | 2.24     | `#a0ada0`     | `#fafafa`  | Shiki comments          |
+| 2     | **4.33** | **`#8f6a1a`** | `#f7efe2`  | **`--color-brass-ink`** |
 
 Dark mode's 10 are all `#697769` on `#1a1a1a` at 3.68:1 — `vitesse-dark` comments.
 
@@ -120,7 +120,7 @@ So a browser-driven contrast check on this site reports, in order of volume: (1)
 ### 2.5 Dark mode (T3), per approach
 
 - **axe + jsdom:** you can stage it — `document.documentElement.classList.add("dark")` before `axe.run` — for **zero cost**. But measured, it changes **nothing**: 4 `heading-order` violations in both themes, identical rule sets. That is expected, because the only rule whose verdict depends on colour is the one jsdom cannot run. Conclusion: with jsdom, **theme staging is pointless, and its pointlessness is the same fact as T4**. Structural rules (landmarks, names, roles, heading order) do not vary by theme on this site, because the theme is expressed entirely in colour tokens.
-- **axe + Playwright/Chrome:** staging works and matters, but must be done *before* load. Flipping the class after `goto` produces garbage — I measured **286** dark "violations" that way, with impossible pairs like `#ededed` on `#eaeaea`, because the class landed mid-repaint. Seeded via `addInitScript` + `localStorage` the same run gives 14. Cost: 2× the runtime, and 2× the contrast noise from §2.4.
+- **axe + Playwright/Chrome:** staging works and matters, but must be done _before_ load. Flipping the class after `goto` produces garbage — I measured **286** dark "violations" that way, with impossible pairs like `#ededed` on `#eaeaea`, because the class landed mid-repaint. Seeded via `addInitScript` + `localStorage` the same run gives 14. Cost: 2× the runtime, and 2× the contrast noise from §2.4.
 - **html-validate:** the question does not arise. It never computes styles at all.
 
 ### 2.6 html-validate — a complement, with a noise problem
@@ -131,15 +131,15 @@ Its accessibility rule set includes `no-multiple-main` ("Disallow multiple `<mai
 
 Measured, `html-validate:recommended` over `dist/**/*.html`: **0.57 s**, 15 files, **1152 messages**.
 
-| count | rule |
-| --- | --- |
-| 995 | `no-inline-style` |
-| 60 | `wcag/h30` |
-| 45 | `no-implicit-button-type` |
-| 30 | `unique-landmark` |
-| 15 | `no-raw-characters` |
-| 5 | `element-permitted-content` |
-| 2 | `valid-id` |
+| count | rule                        |
+| ----- | --------------------------- |
+| 995   | `no-inline-style`           |
+| 60    | `wcag/h30`                  |
+| 45    | `no-implicit-button-type`   |
+| 30    | `unique-landmark`           |
+| 15    | `no-raw-characters`         |
+| 5     | `element-permitted-content` |
+| 2     | `valid-id`                  |
 
 Reading the sample:
 
@@ -154,15 +154,15 @@ Verdict: `html-validate` earns a place only after someone writes a `.htmlvalidat
 
 ### 2.7 Candidates ruled out
 
-| Candidate | Browser? | Offline? | Verdict |
-| --- | --- | --- | --- |
-| `pa11y-ci@4.1.1` (npm 2026-05-12; repo pushed 2026-07-14, not archived) | yes — `"puppeteer": "^24.37.5"` in its dependencies (npm registry, 2026-08-02) | yes, against a local server | **Alive and fine, wrong tool.** It runs axe *and* HTML_CodeSniffer in Chrome, i.e. it maximises exactly the contrast output of §2.4. Puppeteer also downloads its own Chrome at install unless `PUPPETEER_SKIP_DOWNLOAD` is set, which defeats the runner's preinstalled one. |
-| `@axe-core/cli@4.12.1` | yes — `"chromedriver": "latest"` + `selenium-webdriver` (npm registry, 2026-08-02) | needs a served URL | **No.** An unpinned `latest` dependency that downloads a driver binary at install is the opposite of what `ci.yml` is defending. |
-| `@axe-core/playwright@4.12.1` | yes | yes, local server | **Technically viable** (I ran it, §2.4) and the right choice *if* you ever want contrast. Costs ~10 s for both themes, plus Playwright, plus the noise. Not now. |
-| IBM `equal-access` / `accessibility-checker@4.0.29` (npm 2026-07-20; repo release 4.0.29 2026-07-14, not archived) | its README describes driving it from "Selenium, Puppeteer, or Playwright" ([IBMa/equal-access](https://github.com/IBMa/equal-access)) | — | **No.** Same browser dependency, a second rule vocabulary to arbitrate, and no upside over axe for 15 pages. |
-| Lighthouse CI a11y category (`@lhci/cli@0.15.1`) | yes; docs describe resolving Chrome from `chromePath` / `CHROME_PATH` / puppeteer / `chrome-launcher` ([lighthouse-ci configuration docs](https://github.com/GoogleChrome/lighthouse-ci/blob/main/docs/configuration.md)) | yes via `staticDistDir` | **No for a11y** — its a11y category *is* axe, run in a browser, i.e. §2.4 again, at Lighthouse's runtime. Also see §4 on its maintenance. |
-| Astro a11y dev-toolbar audit | — | — | **Cannot run in CI at all.** The docs state the toolbar "is a development tool only and will not appear on your published site" ([Astro dev toolbar guide](https://docs.astro.build/en/guides/dev-toolbar/)). It is `astro dev` only; there is no build or CLI entry point. |
-| `linkedom` as the DOM for axe | no | yes | **Does not work — measured.** `axe` is never installed on the `window` linkedom provides; the run dies with `TypeError: Cannot read properties of undefined (reading 'run')`. linkedom is a parser, not a `window` implementation, and axe reaches for far more of the platform than it exposes. Use jsdom. |
+| Candidate                                                                                                          | Browser?                                                                                                                                                                                                                  | Offline?                    | Verdict                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pa11y-ci@4.1.1` (npm 2026-05-12; repo pushed 2026-07-14, not archived)                                            | yes — `"puppeteer": "^24.37.5"` in its dependencies (npm registry, 2026-08-02)                                                                                                                                            | yes, against a local server | **Alive and fine, wrong tool.** It runs axe _and_ HTML_CodeSniffer in Chrome, i.e. it maximises exactly the contrast output of §2.4. Puppeteer also downloads its own Chrome at install unless `PUPPETEER_SKIP_DOWNLOAD` is set, which defeats the runner's preinstalled one.                               |
+| `@axe-core/cli@4.12.1`                                                                                             | yes — `"chromedriver": "latest"` + `selenium-webdriver` (npm registry, 2026-08-02)                                                                                                                                        | needs a served URL          | **No.** An unpinned `latest` dependency that downloads a driver binary at install is the opposite of what `ci.yml` is defending.                                                                                                                                                                            |
+| `@axe-core/playwright@4.12.1`                                                                                      | yes                                                                                                                                                                                                                       | yes, local server           | **Technically viable** (I ran it, §2.4) and the right choice _if_ you ever want contrast. Costs ~10 s for both themes, plus Playwright, plus the noise. Not now.                                                                                                                                            |
+| IBM `equal-access` / `accessibility-checker@4.0.29` (npm 2026-07-20; repo release 4.0.29 2026-07-14, not archived) | its README describes driving it from "Selenium, Puppeteer, or Playwright" ([IBMa/equal-access](https://github.com/IBMa/equal-access))                                                                                     | —                           | **No.** Same browser dependency, a second rule vocabulary to arbitrate, and no upside over axe for 15 pages.                                                                                                                                                                                                |
+| Lighthouse CI a11y category (`@lhci/cli@0.15.1`)                                                                   | yes; docs describe resolving Chrome from `chromePath` / `CHROME_PATH` / puppeteer / `chrome-launcher` ([lighthouse-ci configuration docs](https://github.com/GoogleChrome/lighthouse-ci/blob/main/docs/configuration.md)) | yes via `staticDistDir`     | **No for a11y** — its a11y category _is_ axe, run in a browser, i.e. §2.4 again, at Lighthouse's runtime. Also see §4 on its maintenance.                                                                                                                                                                   |
+| Astro a11y dev-toolbar audit                                                                                       | —                                                                                                                                                                                                                         | —                           | **Cannot run in CI at all.** The docs state the toolbar "is a development tool only and will not appear on your published site" ([Astro dev toolbar guide](https://docs.astro.build/en/guides/dev-toolbar/)). It is `astro dev` only; there is no build or CLI entry point.                                 |
+| `linkedom` as the DOM for axe                                                                                      | no                                                                                                                                                                                                                        | yes                         | **Does not work — measured.** `axe` is never installed on the `window` linkedom provides; the run dies with `TypeError: Cannot read properties of undefined (reading 'run')`. linkedom is a parser, not a `window` implementation, and axe reaches for far more of the platform than it exposes. Use jsdom. |
 
 ## 3. Family (b) — link checking
 
@@ -174,8 +174,8 @@ Repo facts this family has to survive: internal hrefs are slash-less (`href="/bl
 
 The two flags that matter, quoted from `lychee --help` on the installed binary (primary source, the binary itself):
 
-- `--offline[=<false|true>]` — *"Only check local files and block network requests"*
-- `--root-dir <ROOT_DIR>` — *"Root directory to use when checking absolute links in local files. This option is required if absolute links appear in local files, otherwise those links will be flagged as errors. This must be an absolute path (i.e., one beginning with `/`)."*
+- `--offline[=<false|true>]` — _"Only check local files and block network requests"_
+- `--root-dir <ROOT_DIR>` — _"Root directory to use when checking absolute links in local files. This option is required if absolute links appear in local files, otherwise those links will be flagged as errors. This must be an absolute path (i.e., one beginning with `/`)."_
 
 That second sentence is the whole answer to the trailing-slash question: `--root-dir "$PWD/dist"` maps `/blog` to `dist/blog`, and lychee then resolves the directory to its `index.html`. Verified by both a green run and an injected-break run.
 
@@ -191,16 +191,16 @@ Adding `'dist/**/*.xml'` (feed + sitemap) → 676 total, still 0 errors, 9 ms.
 
 **Break detection, measured.** I copied `dist/`, broke three links, and re-ran:
 
-| Injected | Reported |
-| --- | --- |
-| `href="/talks"` → `/talkz` in `404.html` | `ERROR … /distcopy/talkz \| File not found` |
-| `href="/rss.xml"` → `/rss.xmlz` in `404.html` | `ERROR … /distcopy/rss.xmlz \| File not found` |
+| Injected                                                                              | Reported                                               |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `href="/talks"` → `/talkz` in `404.html`                                              | `ERROR … /distcopy/talkz \| File not found`            |
+| `href="/rss.xml"` → `/rss.xmlz` in `404.html`                                         | `ERROR … /distcopy/rss.xmlz \| File not found`         |
 | `href="/blog/hello-world"` → `/blog/hello-wurld`, in the **prose body** of `flux-rss` | `ERROR … /distcopy/blog/hello-wurld \| File not found` |
-| `#nope-not-here` fragment on a real page (with `--include-fragments`) | `ERROR … \| Cannot find fragment` |
+| `#nope-not-here` fragment on a real page (with `--include-fragments`)                 | `ERROR … \| Cannot find fragment`                      |
 
 All three plus the fragment, in 4–8 ms. Note `404.html` was caught: lychee globs the filesystem, so unreachable-by-crawl pages are still checked — a property the crawler-based tools do not have.
 
-**What offline mode does *not* check.** All `http(s)` URLs are reported as `EXCLUDED`. That includes the canonical, `og:url` and `sitemap` absolute URLs — so lychee offline is blind to the trailing-slash inconsistency between hrefs and canonicals. If #25 wants that consistency asserted, it is a separate string check, not a link check.
+**What offline mode does _not_ check.** All `http(s)` URLs are reported as `EXCLUDED`. That includes the canonical, `og:url` and `sitemap` absolute URLs — so lychee offline is blind to the trailing-slash inconsistency between hrefs and canonicals. If #25 wants that consistency asserted, it is a separate string check, not a link check.
 
 **In CI.** [`lycheeverse/lychee-action`](https://github.com/lycheeverse/lychee-action/blob/master/action.yml) (v2.9.0, 2026-07-09) downloads a pinned pre-compiled Linux binary from GitHub releases and puts it on `$GITHUB_PATH`; its `lycheeVersion` input defaults to `v0.24.2`. That download is a GitHub request, in the same class as `actions/checkout` — not a "third-party API" in the sense `ci.yml` means, but worth stating explicitly in #25 so nobody has to re-litigate it. Its default `args` is `--verbose --no-progress './**/*.md' './**/*.html' './**/*.rst'` and must be replaced wholesale.
 
@@ -212,23 +212,23 @@ All three plus the fragment, in 4–8 ms. Note `404.html` was caught: lychee glo
 
 **Failure 2 — it never read the articles.** Three flag combinations against the broken copy:
 
-| Flags | Links found | Parsed `flux-rss`? | Injected breaks found |
-| --- | --- | --- | --- |
-| `--recurse --clean-urls --check-fragments` | 46 | no | **0 of 3** |
-| `--recurse` | 36 | no | **0 of 3** |
-| `--recurse --directory-listing` | 11 | no | **0 of 3** |
+| Flags                                      | Links found | Parsed `flux-rss`? | Injected breaks found |
+| ------------------------------------------ | ----------- | ------------------ | --------------------- |
+| `--recurse --clean-urls --check-fragments` | 46          | no                 | **0 of 3**            |
+| `--recurse`                                | 36          | no                 | **0 of 3**            |
+| `--recurse --directory-listing`            | 11          | no                 | **0 of 3**            |
 
 "Parsed `flux-rss`?" is decided by whether `feedly.com` and `rssboard.org`, which only appear in that article, show up in the results. They never do. `/blog/flux-rss` is reported `OK 200` — it is fetched and status-checked, but its links are never extracted. `404.html`, being unlinked, is never visited at all.
 
-**Failure 3 — no root-dir concept.** Given the single file `distcopy/blog/flux-rss/index.html` it resolved every root-relative href against *that file's directory*: 13 BROKEN including `…/blog/flux-rss/talks`, `…/blog/flux-rss/rss.xml`, `…/blog/flux-rss/favicon.svg`. There is no `--root-dir`/`--base` in its help output.
+**Failure 3 — no root-dir concept.** Given the single file `distcopy/blog/flux-rss/index.html` it resolved every root-relative href against _that file's directory_: 13 BROKEN including `…/blog/flux-rss/talks`, `…/blog/flux-rss/rss.xml`, `…/blog/flux-rss/favicon.svg`. There is no `--root-dir`/`--base` in its help output.
 
 ### 3.3 The rest
 
-| Candidate | Status | Verdict |
-| --- | --- | --- |
-| `htmltest` | last release **v0.17.0, 2022-11-04**; last push 2025-01-20 (GitHub API, 2026-08-02) | **Dormant.** Functionally a good fit — Go binary, `CheckInternal`/`CheckInternalHash` on by default, `--skip-external` for offline ([wjdp/htmltest](https://github.com/wjdp/htmltest)) — but a link checker four years without a release, against lychee's three-month cadence, is not a dependency to adopt in 2026. |
-| `hyperlink` | npm `5.0.4` last published **2022-06-18**; last release v4.7.0 2021-08-09; last push 2022-07-09 | **Dead.** Rule out. |
-| `markdown-link-check@3.15.0` (npm 2026-07-28, alive) | — | **Wrong target.** It checks Markdown sources, not built HTML — so it would never see the rendered nav, the `srcset`, or `404.html`, and it would check links in `src/content/*.md` whose relative resolution differs from the routed output. |
+| Candidate                                            | Status                                                                                          | Verdict                                                                                                                                                                                                                                                                                                               |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `htmltest`                                           | last release **v0.17.0, 2022-11-04**; last push 2025-01-20 (GitHub API, 2026-08-02)             | **Dormant.** Functionally a good fit — Go binary, `CheckInternal`/`CheckInternalHash` on by default, `--skip-external` for offline ([wjdp/htmltest](https://github.com/wjdp/htmltest)) — but a link checker four years without a release, against lychee's three-month cadence, is not a dependency to adopt in 2026. |
+| `hyperlink`                                          | npm `5.0.4` last published **2022-06-18**; last release v4.7.0 2021-08-09; last push 2022-07-09 | **Dead.** Rule out.                                                                                                                                                                                                                                                                                                   |
+| `markdown-link-check@3.15.0` (npm 2026-07-28, alive) | —                                                                                               | **Wrong target.** It checks Markdown sources, not built HTML — so it would never see the rendered nav, the `srcset`, or `404.html`, and it would check links in `src/content/*.md` whose relative resolution differs from the routed output.                                                                          |
 
 ## 4. Family (c) — weight / performance budget
 
@@ -256,43 +256,43 @@ page                                    htmlGz   cssGz    jsGz   fonts   TOTAL (
 So the contract #25 writes should be:
 
 - **Bound:** gzipped HTML per page; total gzipped CSS referenced per page; total gzipped JS referenced per page. Measured today: max 12.2 / 12.1 / 5.6 KiB. Sensible first ceilings: 20 / 20 / 12 KiB per page — headroom for a long article without leaving room for a client-side framework to sneak in.
-- **Bound, with care:** the **latin** font subsets only, or better, the *count* of `@font-face` families — a third font family is the regression worth catching, not a byte.
+- **Bound, with care:** the **latin** font subsets only, or better, the _count_ of `@font-face` families — a third font family is the regression worth catching, not a byte.
 - **Do not bound:** total `dist/` size, total image bytes, per-image size. That is an editorial decision, and the repo has already made it.
 
 ### 4.3 Off-the-shelf alternatives
 
-| Candidate | Status | Verdict |
-| --- | --- | --- |
-| Lighthouse CI + `budget.json` | `@lhci/cli` last published **2025-06-25**; last GitHub release **v0.15.1, 2025-06-26**; repo last push 2026-03-27 (GitHub API, 2026-08-02) | **No.** It does what is asked — `staticDistDir` serves `dist/`, `budgetsFile` takes a `budget.json`, or assertions like `"resource-summary:document:size": ["error", {"maxNumericValue": 14000}]` ([lighthouse-ci configuration docs](https://github.com/GoogleChrome/lighthouse-ci/blob/main/docs/configuration.md)) — but it needs Chrome, drags in the a11y and contrast categories of §2.4 unless carefully scoped, its `resource-summary` buckets cannot separate "cover art" from "decoration", and 14 months without a release on a Google project is a signal. Note the unit trap the docs call out: assertion `maxNumericValue` is **bytes** while `budget.json` is **kilobytes**. |
-| `size-limit@13.0.3` (npm 2026-07-30; release 13.0.3 same day; 6934 stars — healthiest of the three) | — | **Close, but the wrong shape.** `@size-limit/file` "checks the size of files with Brotli (default), Gzip or without compression" and would happily take a glob of `dist/**/*.html`, but size-limit's model is *"this entry point, this limit"*, configured per path. It has no notion of "the assets this page references", which is the whole question here, and `@size-limit/time` "uses headless Chrome" ([ai/size-limit](https://github.com/ai/size-limit)). Using it would mean 15 hand-maintained entries that still ignore CSS/JS/fonts. |
-| `bundlesize` | npm `0.18.2`, last published **2024-03-15** | **Dormant.** No. |
-| `bundlemon` | npm `3.1.0`, last published **2024-10-18**; last release 2024-10-18; repo push 2026-04-10 | **Dormant, and it wants a hosted service** for history/PR comments. No. |
+| Candidate                                                                                           | Status                                                                                                                                     | Verdict                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Lighthouse CI + `budget.json`                                                                       | `@lhci/cli` last published **2025-06-25**; last GitHub release **v0.15.1, 2025-06-26**; repo last push 2026-03-27 (GitHub API, 2026-08-02) | **No.** It does what is asked — `staticDistDir` serves `dist/`, `budgetsFile` takes a `budget.json`, or assertions like `"resource-summary:document:size": ["error", {"maxNumericValue": 14000}]` ([lighthouse-ci configuration docs](https://github.com/GoogleChrome/lighthouse-ci/blob/main/docs/configuration.md)) — but it needs Chrome, drags in the a11y and contrast categories of §2.4 unless carefully scoped, its `resource-summary` buckets cannot separate "cover art" from "decoration", and 14 months without a release on a Google project is a signal. Note the unit trap the docs call out: assertion `maxNumericValue` is **bytes** while `budget.json` is **kilobytes**. |
+| `size-limit@13.0.3` (npm 2026-07-30; release 13.0.3 same day; 6934 stars — healthiest of the three) | —                                                                                                                                          | **Close, but the wrong shape.** `@size-limit/file` "checks the size of files with Brotli (default), Gzip or without compression" and would happily take a glob of `dist/**/*.html`, but size-limit's model is _"this entry point, this limit"_, configured per path. It has no notion of "the assets this page references", which is the whole question here, and `@size-limit/time` "uses headless Chrome" ([ai/size-limit](https://github.com/ai/size-limit)). Using it would mean 15 hand-maintained entries that still ignore CSS/JS/fonts.                                                                                                                                             |
+| `bundlesize`                                                                                        | npm `0.18.2`, last published **2024-03-15**                                                                                                | **Dormant.** No.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `bundlemon`                                                                                         | npm `3.1.0`, last published **2024-10-18**; last release 2024-10-18; repo push 2026-04-10                                                  | **Dormant, and it wants a hosted service** for history/PR comments. No.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
-The script wins by being the only option that can express the one rule that matters here: *count the shell, ignore the pictures.*
+The script wins by being the only option that can express the one rule that matters here: _count the shell, ignore the pictures._
 
 ## 5. Maintenance status of everything named (all checked 2026-08-02)
 
 Sources: npm registry (`npm view <pkg> version time.modified`) and the GitHub REST API (`repos/{r}`, `repos/{r}/releases/latest`). None of the repos below is archived.
 
-| Tool | npm latest / published | GitHub latest release | Last push | Read |
-| --- | --- | --- | --- | --- |
-| `axe-core` | 4.12.1 / 2026-07-30 | v4.12.1 / 2026-06-10 | 2026-08-01 | healthy |
-| `html-validate` | 11.6.1 / 2026-08-02 | *(npm-only releases)* | 2026-08-02 | healthy |
-| `lychee` | — | lychee-v0.24.2 / 2026-05-01 | 2026-07-31 | healthy |
-| `lychee-action` | — | v2.9.0 / 2026-07-09 | 2026-07-09 | healthy |
-| `linkinator` | 8.0.3 / 2026-07-30 | v8.0.3 / 2026-07-30 | 2026-08-02 | healthy, but unfit (§3.2) |
-| `pa11y-ci` | 4.1.1 / 2026-05-12 | 4.1.1 / 2026-05-12 | 2026-07-14 | healthy, but browser-bound |
-| `pa11y` | 9.1.1 / 2026-02-26 | — | — | healthy |
-| `@axe-core/cli` | 4.12.1 / 2026-07-27 | — | — | healthy, but `chromedriver: "latest"` |
-| `@axe-core/playwright` | 4.12.1 / 2026-07-27 | — | — | healthy |
-| `accessibility-checker` (IBM) | 4.0.29 / 2026-07-20 | 4.0.29 / 2026-07-14 | 2026-07-30 | healthy, but browser-bound |
-| `size-limit` | 13.0.3 / 2026-07-30 | 13.0.3 / 2026-07-30 | 2026-07-30 | healthy, wrong shape |
-| `markdown-link-check` | 3.15.0 / 2026-07-28 | v3.15.0 / 2026-07-28 | 2026-07-28 | healthy, wrong target |
-| `@lhci/cli` | 0.15.1 / 2025-06-25 | v0.15.1 / 2025-06-26 | 2026-03-27 | **slowing** |
-| `bundlemon` | 3.1.0 / 2024-10-18 | v3.1.0 / 2024-10-18 | 2026-04-10 | **dormant** |
-| `bundlesize` | 0.18.2 / 2024-03-15 | — | — | **dormant** |
-| `htmltest` | — | v0.17.0 / 2022-11-04 | 2025-01-20 | **dormant** |
-| `hyperlink` | 5.0.4 / 2022-06-18 | v4.7.0 / 2021-08-09 | 2022-07-09 | **dead** |
+| Tool                          | npm latest / published | GitHub latest release       | Last push  | Read                                  |
+| ----------------------------- | ---------------------- | --------------------------- | ---------- | ------------------------------------- |
+| `axe-core`                    | 4.12.1 / 2026-07-30    | v4.12.1 / 2026-06-10        | 2026-08-01 | healthy                               |
+| `html-validate`               | 11.6.1 / 2026-08-02    | _(npm-only releases)_       | 2026-08-02 | healthy                               |
+| `lychee`                      | —                      | lychee-v0.24.2 / 2026-05-01 | 2026-07-31 | healthy                               |
+| `lychee-action`               | —                      | v2.9.0 / 2026-07-09         | 2026-07-09 | healthy                               |
+| `linkinator`                  | 8.0.3 / 2026-07-30     | v8.0.3 / 2026-07-30         | 2026-08-02 | healthy, but unfit (§3.2)             |
+| `pa11y-ci`                    | 4.1.1 / 2026-05-12     | 4.1.1 / 2026-05-12          | 2026-07-14 | healthy, but browser-bound            |
+| `pa11y`                       | 9.1.1 / 2026-02-26     | —                           | —          | healthy                               |
+| `@axe-core/cli`               | 4.12.1 / 2026-07-27    | —                           | —          | healthy, but `chromedriver: "latest"` |
+| `@axe-core/playwright`        | 4.12.1 / 2026-07-27    | —                           | —          | healthy                               |
+| `accessibility-checker` (IBM) | 4.0.29 / 2026-07-20    | 4.0.29 / 2026-07-14         | 2026-07-30 | healthy, but browser-bound            |
+| `size-limit`                  | 13.0.3 / 2026-07-30    | 13.0.3 / 2026-07-30         | 2026-07-30 | healthy, wrong shape                  |
+| `markdown-link-check`         | 3.15.0 / 2026-07-28    | v3.15.0 / 2026-07-28        | 2026-07-28 | healthy, wrong target                 |
+| `@lhci/cli`                   | 0.15.1 / 2025-06-25    | v0.15.1 / 2025-06-26        | 2026-03-27 | **slowing**                           |
+| `bundlemon`                   | 3.1.0 / 2024-10-18     | v3.1.0 / 2024-10-18         | 2026-04-10 | **dormant**                           |
+| `bundlesize`                  | 0.18.2 / 2024-03-15    | —                           | —          | **dormant**                           |
+| `htmltest`                    | —                      | v0.17.0 / 2022-11-04        | 2025-01-20 | **dormant**                           |
+| `hyperlink`                   | 5.0.4 / 2022-06-18     | v4.7.0 / 2021-08-09         | 2022-07-09 | **dead**                              |
 
 ## 6. The `rel="me"` return loop (from map #19) — the option, and its price
 
@@ -303,11 +303,13 @@ Three honest findings:
 1. **lychee cannot do this in any mode.** lychee checks reachability — a status code — never response content. An online lychee run against `https://github.com/Ly4m` would return `200 OK` whether or not the profile still lists `lmns.fr`. There is no `--expect-body` / content-assertion flag anywhere in `lychee --help`. The same is true of every other checker in §3. **This is not a link-checking problem wearing a disguise; it is a content assertion against a third party.** The families in this ticket do not contain a tool for it.
 2. **The cheap correct check is the GitHub REST API, not scraping.** `GET /users/Ly4m/social_accounts` returns, verified 2026-08-02:
    ```json
-   [{"provider":"twitter","url":"https://twitter.com/WillLeemans"},
-    {"provider":"generic","url":"https://lmns.fr"}]
+   [
+     { "provider": "twitter", "url": "https://twitter.com/WillLeemans" },
+     { "provider": "generic", "url": "https://lmns.fr" }
+   ]
    ```
    One unauthenticated request, stable JSON, no HTML parsing. It does not literally prove the rendered anchor carries `rel="me"` — but #30 already established on the page that GitHub renders social accounts with `rel="nofollow me"`, so presence in this list is the thing that can actually change. A four-line `gh api`/`curl` + `grep` step is the whole implementation.
-3. **It still contradicts T1, and T1 is about *when*, not only *whether*.** `ci.yml`'s comment is not squeamishness about the network; it is a claim about attribution — *"A failure at this step is ours."* A PR check that can red because GitHub is rate-limiting, or because api.github.com is degraded, breaks that claim and teaches people to re-run failed checks without reading them.
+3. **It still contradicts T1, and T1 is about _when_, not only _whether_.** `ci.yml`'s comment is not squeamishness about the network; it is a claim about attribution — _"A failure at this step is ours."_ A PR check that can red because GitHub is rate-limiting, or because api.github.com is degraded, breaks that claim and teaches people to re-run failed checks without reading them.
 
 **The shape that preserves the claim** — laid out, not decided:
 
@@ -321,14 +323,14 @@ Cost: one workflow file, ~10 s a week, and a new failure mode (a rate-limited or
 
 ### Per family
 
-| Family | Tool | Why |
-| --- | --- | --- |
-| (a) accessibility | **`axe-core` + `jsdom`, ~40-line Node script**, fail on `violations.length > 0`, ignore `incomplete` | 1.5 s, no browser, no network; catches #20(i); contrast is structurally incapable of firing (§2.3–2.4) |
-| (a) supplement | **one hand-written assertion**: exactly one `<main>` per page | covers the `landmark-one-main` rule jsdom cannot run |
-| (a) fast-follow | **`html-validate`**, after a `.htmlvalidate.json` disables `no-inline-style`, `no-implicit-button-type`, `no-raw-characters`, `valid-id` and a decision is taken on `wcag/h30` | brings `unique-landmark`, which axe misses; 0.57 s |
-| (b) links | **`lychee --offline --root-dir "$PWD/dist" --include-fragments --exclude '\.netlify/images'`** over `dist/**/*.html` and `dist/**/*.xml` | 9 ms, 0 false positives once the Netlify CDN pattern is excluded, catches in-body prose links and unlinked pages |
-| (c) weight | **a ~50-line Node script**, per-page gzipped HTML + referenced CSS + referenced JS | the only option that can say "shell yes, cover art no" |
-| extra | **`rel="me"` loop: not in this job.** If ever: separate scheduled workflow, `gh api users/Ly4m/social_accounts`, opens an issue rather than failing | §6 |
+| Family            | Tool                                                                                                                                                                           | Why                                                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| (a) accessibility | **`axe-core` + `jsdom`, ~40-line Node script**, fail on `violations.length > 0`, ignore `incomplete`                                                                           | 1.5 s, no browser, no network; catches #20(i); contrast is structurally incapable of firing (§2.3–2.4)           |
+| (a) supplement    | **one hand-written assertion**: exactly one `<main>` per page                                                                                                                  | covers the `landmark-one-main` rule jsdom cannot run                                                             |
+| (a) fast-follow   | **`html-validate`**, after a `.htmlvalidate.json` disables `no-inline-style`, `no-implicit-button-type`, `no-raw-characters`, `valid-id` and a decision is taken on `wcag/h30` | brings `unique-landmark`, which axe misses; 0.57 s                                                               |
+| (b) links         | **`lychee --offline --root-dir "$PWD/dist" --include-fragments --exclude '\.netlify/images'`** over `dist/**/*.html` and `dist/**/*.xml`                                       | 9 ms, 0 false positives once the Netlify CDN pattern is excluded, catches in-body prose links and unlinked pages |
+| (c) weight        | **a ~50-line Node script**, per-page gzipped HTML + referenced CSS + referenced JS                                                                                             | the only option that can say "shell yes, cover art no"                                                           |
+| extra             | **`rel="me"` loop: not in this job.** If ever: separate scheduled workflow, `gh api users/Ly4m/social_accounts`, opens an issue rather than failing                            | §6                                                                                                               |
 
 ### Two things #25's contract must name explicitly
 
@@ -340,21 +342,21 @@ Cost: one workflow file, ~10 s a week, and a new failure mode (a rate-limited or
 Appended to the existing `verify` job (it needs the `dist/` that `pnpm build` already produced, so a second job would mean rebuilding or an artifact hop — not worth it for 15 s):
 
 ```yaml
-      - run: pnpm build
+- run: pnpm build
 
-      # Everything below reads dist/ only. Still fully offline: lychee runs with
-      # --offline, and axe runs in jsdom, not a browser.
-      - run: node scripts/guard-a11y.mjs      # axe-core + jsdom over dist/**/*.html
-      - run: node scripts/guard-weight.mjs    # per-page gzipped shell budget
+# Everything below reads dist/ only. Still fully offline: lychee runs with
+# --offline, and axe runs in jsdom, not a browser.
+- run: node scripts/guard-a11y.mjs # axe-core + jsdom over dist/**/*.html
+- run: node scripts/guard-weight.mjs # per-page gzipped shell budget
 
-      - uses: lycheeverse/lychee-action@v2
-        with:
-          args: >-
-            --offline --no-progress --include-fragments
-            --root-dir ${{ github.workspace }}/dist
-            --exclude '\.netlify/images'
-            'dist/**/*.html' 'dist/**/*.xml'
-          fail: true
+- uses: lycheeverse/lychee-action@v2
+  with:
+    args: >-
+      --offline --no-progress --include-fragments
+      --root-dir ${{ github.workspace }}/dist
+      --exclude '\.netlify/images'
+      'dist/**/*.html' 'dist/**/*.xml'
+    fail: true
 ```
 
 `axe-core` and `jsdom` go into `devDependencies`; nothing else is added. `pnpm install` grows by 34 packages / 28 MB, already inside the `actions/setup-node` pnpm cache.
