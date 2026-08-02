@@ -6,6 +6,7 @@ import TwitterMeta from "../components/meta/TwitterMeta.astro";
 import OpenGraphMeta from "../components/meta/OpenGraphMeta.astro";
 import PlausibleAnalytics from "../components/meta/PlausibleAnalytics.astro";
 import { nav } from "../data/nav.ts";
+import SkipLink from "../components/SkipLink.astro";
 
 type Props = {
   title?: string;
@@ -104,6 +105,8 @@ const ogImageUrl = new URL(ogImage, site).toString();
     </script>
   </head>
   <body class="dark:text-primary-100 h-full min-h-screen antialiased">
+    <SkipLink />
+
     <!-- Dot grid background -->
     <div class="blog-dot-grid" aria-hidden="true"></div>
 
@@ -111,7 +114,7 @@ const ogImageUrl = new URL(ogImage, site).toString();
     <div class="flex min-h-screen">
       <SideNav items={nav} />
 
-      <main class="w-full md:ml-16">
+      <main id="contenu" tabindex="-1" class="w-full md:ml-16">
         <div class="h-14 md:h-0"></div>
         <div
           class="relative mx-auto max-w-4xl px-4 py-8 sm:px-6 md:px-10 md:py-12 lg:py-16"
