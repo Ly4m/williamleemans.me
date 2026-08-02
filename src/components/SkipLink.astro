@@ -1,0 +1,102 @@
+---
+/* Le lien d'évitement. Sur desktop, la barre latérale précède le contenu dans
+   le DOM : quatre liens de nav, quatre liens sociaux et le bouton de thème —
+   neuf arrêts au clavier avant le premier mot, à chaque page. Celui-ci les
+   saute. Il vise le <main> du layout, seul endroit qui le garantit sur les
+   sept pages.
+
+   Traitement retenu (#21) : plutôt qu'une boîte surgissant dans un coin —
+   forme que le site n'utilise nulle part — le lien se lit comme le premier
+   item de la barre latérale, rail laiton compris, et ne se déplie qu'au
+   focus. Rien d'étranger n'apparaît jamais sur la page. */
+---
+
+<a href="#contenu" class="skip-link">Aller au contenu</a>
+
+<style>
+  /* Replié à zéro plutôt que display:none ou visibility:hidden — ces deux-là
+     sortiraient l'élément de l'ordre de tabulation, et le lien n'existerait
+     plus pour personne. */
+  .skip-link {
+    position: fixed;
+    z-index: 50;
+    /* Calé sur la nav : rail à 1.5rem (le pl-6 de l'aside), texte à 2.25rem
+       (+ le px-3 du .nav-link), juste au-dessus d'ACCUEIL qui ouvre à 7.5rem. */
+    top: 5.5rem;
+    left: 0;
+    padding: 0 0.75rem 0 2.25rem;
+    font-size: 0.75rem;
+    line-height: 0;
+    color: var(--color-charcoal);
+    text-decoration: none;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0;
+    transition:
+      line-height 0.2s ease,
+      opacity 0.2s ease;
+    /* Pas d'anneau de focus : le lien n'est à l'écran que parce qu'il a le
+       focus, et l'anneau global ferait doublon avec le rail ci-dessous. */
+    outline: none;
+  }
+
+  :global(.dark) .skip-link {
+    color: var(--color-primary-100);
+  }
+
+  /* Le rail de la nav, à l'identique. */
+  .skip-link::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 1.5rem;
+    width: 3px;
+    background: var(--color-brass-ink);
+    transform: scaleY(0);
+    transition: transform 0.25s ease;
+  }
+
+  /* Même laiton rabattu que .nav-link::before : à pleine force, il serait
+     l'élément le plus bruyant de la page sombre. */
+  :global(.dark) .skip-link::before {
+    background: color-mix(in srgb, var(--color-brass) 65%, #1a1a1a);
+  }
+
+  .skip-link:focus {
+    line-height: 2.6;
+    opacity: 1;
+  }
+
+  .skip-link:focus::before {
+    transform: scaleY(1);
+  }
+
+  /* Sur mobile la barre latérale n'existe pas : le lien se range sous
+     l'en-tête fixe (h-14), sur le fond de la page pour ne pas se poser sur du
+     texte. */
+  @media (max-width: 767px) {
+    .skip-link {
+      top: 3.5rem;
+      padding-left: 1.25rem;
+      background: var(--color-primary-100);
+    }
+
+    :global(.dark) .skip-link {
+      background: #1a1a1a;
+    }
+
+    .skip-link::before {
+      left: 0;
+    }
+  }
+
+  /* Le dépliement porte l'information — le lien apparaît —, donc il reste ;
+     seule la durée tombe. */
+  @media (prefers-reduced-motion: reduce) {
+    .skip-link,
+    .skip-link::before {
+      transition: none;
+    }
+  }
+</style>
