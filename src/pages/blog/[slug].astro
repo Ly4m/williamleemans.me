@@ -44,7 +44,17 @@ export async function getStaticPaths() {
 const { post, readNext } = Astro.props;
 const { Content } = await render(post);
 
-const fmtMeta = (date: Date) => date.toLocaleDateString();
+/**
+ * UTC rather than the build machine's zone: `pubDate` is coerced from a bare
+ * `YYYY-MM-DD`, so it lands on UTC midnight and would slip a day anywhere west.
+ */
+const fmtMeta = (date: Date) =>
+  new Intl.DateTimeFormat("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
 
 const fmtDate = (date: Date) => {
   const y = date.getFullYear();
@@ -137,12 +147,12 @@ const structuredData = JSON.stringify({
     <BlogPostDecoration readingTime={readingTime} dateLabel={dateLabel} />
   </header>
 
-  <main class="text-charcoal dark:text-primary-100 mb-40">
+  <div class="text-charcoal dark:text-primary-100 mb-40">
     <article class="prose prose-longform dark:prose-invert wave-enter-content">
       <Content />
     </article>
     {readNext.length > 0 && <ReadNext posts={readNext} />}
-  </main>
+  </div>
 </BlogLayout>
 
 <script>

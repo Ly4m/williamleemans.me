@@ -11,14 +11,17 @@ const posts = (await getCollection("blog")).sort(
 
 // The year is carried by the group heading, so the row only needs the month.
 const fmtMonth = (date: Date) =>
-  (date.getMonth() + 1).toString().padStart(2, "0");
+  (date.getUTCMonth() + 1).toString().padStart(2, "0");
+
+// `datetime` has to stand alone, so it carries the year the row leaves implicit.
+const isoMonth = (date: Date) => `${date.getUTCFullYear()}-${fmtMonth(date)}`;
 
 const groups = posts.reduce(
   (
     acc: { year: number; posts: CollectionEntry<"blog">[] }[],
     post: CollectionEntry<"blog">,
   ) => {
-    const year = post.data.pubDate.getFullYear();
+    const year = post.data.pubDate.getUTCFullYear();
     const last = acc[acc.length - 1];
     if (last && last.year === year) last.posts.push(post);
     else acc.push({ year, posts: [post] });
@@ -28,8 +31,8 @@ const groups = posts.reduce(
 );
 
 const postCount = `N:${String(posts.length).padStart(2, "0")}`;
-const newestYear = posts[0].data.pubDate.getFullYear();
-const oldestYear = posts[posts.length - 1].data.pubDate.getFullYear();
+const newestYear = posts[0].data.pubDate.getUTCFullYear();
+const oldestYear = posts[posts.length - 1].data.pubDate.getUTCFullYear();
 const yearSpan =
   newestYear === oldestYear
     ? String(newestYear)
@@ -50,7 +53,7 @@ const yearSpan =
       <BlogListDecoration postCount={postCount} yearSpan={yearSpan} />
     </header>
 
-    <main class="text-ash">
+    <div class="text-ash">
       {
         groups.map(({ year, posts: yearPosts }) => (
           <section class="mb-8 last:mb-0">
@@ -64,7 +67,10 @@ const yearSpan =
                     href={`/blog/${post.data.slug}`}
                     class="group flex items-center justify-between gap-1"
                   >
-                    <time class="text-faded group-hover:text-charcoal dark:group-hover:text-primary-100 text-sm tabular-nums transition-colors group-hover:transition-none motion-reduce:transition-none">
+                    <time
+                      datetime={isoMonth(post.data.pubDate)}
+                      class="text-faded group-hover:text-charcoal dark:group-hover:text-primary-100 text-sm tabular-nums transition-colors group-hover:transition-none motion-reduce:transition-none"
+                    >
                       {fmtMonth(post.data.pubDate)}
                     </time>
                     <span
@@ -84,6 +90,6 @@ const yearSpan =
           </section>
         ))
       }
-    </main>
+    </div>
   </div>
 </BlogLayout>
