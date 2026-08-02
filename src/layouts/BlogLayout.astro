@@ -87,11 +87,28 @@ const ogImageUrl = new URL(ogImage, site).toString();
     }
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    {
+      /* Kept in step with the theme by applyTheme() below — the site's theme is
+        a class on <html>, not prefers-color-scheme, so a media-query pair here
+        would ignore the toggle. */
+    }
+    <meta name="theme-color" content="#fafafa" />
     <meta name="generator" content={Astro.generator} />
 
     <ClientRouter />
 
     <script is:inline>
+      // Inlined copy of src/lib/theme-color.ts — this script is `is:inline` so
+      // it runs before the first paint, which means it can't import.
+      function syncThemeColor() {
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (!meta) return;
+        const page = getComputedStyle(document.documentElement)
+          .getPropertyValue("--color-page")
+          .trim();
+        if (page) meta.setAttribute("content", page);
+      }
       function applyTheme() {
         const stored = localStorage.getItem("theme");
         const prefersDark = window.matchMedia(
@@ -99,8 +116,12 @@ const ogImageUrl = new URL(ogImage, site).toString();
         ).matches;
         const dark = stored === "dark" || (!stored && prefersDark);
         document.documentElement.classList.toggle("dark", dark);
+        syncThemeColor();
       }
       applyTheme();
+      // The stylesheet may not have parsed yet on the first run, in which case
+      // --color-page reads empty and the bar keeps its server-rendered value.
+      document.addEventListener("DOMContentLoaded", syncThemeColor);
       document.addEventListener("astro:after-swap", applyTheme);
     </script>
   </head>

@@ -252,6 +252,8 @@ const opensInNewTab = (href: string) => href.startsWith("http");
 </style>
 
 <script>
+  import { syncThemeColor } from "../lib/theme-color";
+
   function initThemeToggle() {
     const buttons = document.querySelectorAll<HTMLButtonElement>(
       "[data-theme-toggle]",
@@ -273,6 +275,7 @@ const opensInNewTab = (href: string) => href.startsWith("http");
       document.documentElement.classList.toggle("dark", !isDark);
       localStorage.setItem("theme", isDark ? "light" : "dark");
       updateIcons();
+      syncThemeColor();
     }
 
     buttons.forEach((btn) => btn.addEventListener("click", toggleTheme));

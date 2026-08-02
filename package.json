@@ -9,6 +9,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "covers": "node --env-file-if-exists=.env scripts/fetch-covers.mjs",
+    "icons": "node scripts/generate-icons.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "astro": "astro"
