@@ -64,13 +64,23 @@
   --ink-circuit-strong: color-mix(in srgb, var(--color-brass) 50%, transparent);
 }
 
-html {
-  background-color: var(--color-primary-100);
-  transition: background-color 0.2s ease;
+/* The page colour, as a token for the same reason as the ink above: two things
+   need it in step. The page paints it, and the mobile browser bar copies it
+   into <meta name="theme-color"> — read from here by the theme script in the
+   layouts, so the bar can't drift from the page it sits above. It's a custom
+   property rather than the background itself because that one transitions:
+   reading it mid-flip would hand the bar an interpolated colour. */
+:root {
+  --color-page: var(--color-primary-100);
 }
 
-html.dark {
-  background-color: #1a1a1a;
+.dark {
+  --color-page: #1a1a1a;
+}
+
+html {
+  background-color: var(--color-page);
+  transition: background-color 0.2s ease;
 }
 
 body {
