@@ -10,6 +10,7 @@
     "check": "astro check",
     "covers": "node --env-file-if-exists=.env scripts/fetch-covers.mjs",
     "icons": "node scripts/generate-icons.mjs",
+    "guard": "node scripts/guard.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "astro": "astro"
@@ -34,6 +35,8 @@
     "@iconify/tailwind4": "^1.0.6",
     "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/typography": "^0.5.16",
+    "axe-core": "^4.12.1",
+    "jsdom": "^30.0.1",
     "prettier": "3.6.2",
     "prettier-plugin-astro": "0.14.1",
     "prettier-plugin-tailwindcss": "^0.7.1",
