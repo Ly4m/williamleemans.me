@@ -2,14 +2,44 @@ import { defineCollection, z } from "astro:content";
 
 import { glob } from "astro/loaders";
 
+/**
+ * `z.coerce.date()` avale `"2025-11-6"` sans broncher — et `Date` traite une
+ * chaîne hors forme ISO comme minuit *local*, pas minuit UTC. Un jour entier
+ * de décalage sur la page, dans le flux et dans le sitemap, avec un build vert
+ * de bout en bout : c'est exactement ce qui est arrivé à `ember-animation.md`,
+ * et rien ne l'a vu (issue #20).
+ *
+ * D'où la forme stricte. Une date YAML non quotée arrive ici en `Date` déjà
+ * construite — YAML l'a parsée, elle est bonne — et passe telle quelle ; c'est
+ * la chaîne quotée, la forme que ce dépôt utilise partout, qui doit être
+ * zéro-padée.
+ *
+ * C'est le versant BLOQUANT du garde-fou : ceci casse `pnpm build`, y compris
+ * en `pnpm dev`, donc une donnée malformée n'atteint jamais `dist/`. Le
+ * versant informatif vit dans `scripts/guard.mjs`.
+ */
+const dateStricte = z
+  .union([
+    z.date(),
+    z
+      .string()
+      .regex(
+        /^\d{4}-\d{2}-\d{2}$/,
+        "doit s'écrire AAAA-MM-JJ, zéros compris (sinon la date est lue en heure locale et glisse d'un jour)",
+      ),
+  ])
+  // Le `Z` est ce qui épingle la date sur minuit UTC, quelle que soit la zone
+  // de la machine qui construit.
+  .transform((v) => (v instanceof Date ? v : new Date(`${v}T00:00:00Z`)));
+
 const blog = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/blog" }),
   schema: z.object({
     slug: z.string(),
     title: z.string(),
     description: z.string(),
-    pubDate: z.coerce.date(),
-    dateModified: z.coerce.date().optional(),
+    pubDate: dateStricte,
+    dateModified: dateStricte.optional(),
     readingTime: z.number(),
     ogImage: z.string().optional(),
     related: z.array(z.string()).max(2).optional(),
@@ -49,7 +79,7 @@ const now = defineCollection({
   schema: z.object({
     slug: z.string(),
     title: z.string(),
-    pubDate: z.coerce.date(),
+    pubDate: dateStricte,
     lang: z.string().optional(),
     booksIntro: z.string().optional(),
     books: z.array(bookSchema).optional(),

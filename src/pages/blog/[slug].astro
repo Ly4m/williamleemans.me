@@ -56,9 +56,11 @@ const fmtMeta = (date: Date) =>
     timeZone: "UTC",
   }).format(date);
 
+/** UTC pour la même raison que `fmtMeta` : les getters locaux reculent d'un
+ * mois sur une date du 1er, dans toute zone à l'ouest de UTC. */
 const fmtDate = (date: Date) => {
-  const y = date.getFullYear();
-  const m = (date.getMonth() + 1).toString().padStart(2, "0");
+  const y = date.getUTCFullYear();
+  const m = (date.getUTCMonth() + 1).toString().padStart(2, "0");
   return `${y}·${m}`;
 };
 
@@ -142,7 +144,10 @@ const structuredData = JSON.stringify({
       {post.data.title}
     </h1>
     <p class="text-faded">
-      {post.data.readingTime} min — {fmtMeta(post.data.pubDate)}
+      {post.data.readingTime} min — <time
+        datetime={post.data.pubDate.toISOString().slice(0, 10)}
+        >{fmtMeta(post.data.pubDate)}</time
+      >
     </p>
     <BlogPostDecoration readingTime={readingTime} dateLabel={dateLabel} />
   </header>
