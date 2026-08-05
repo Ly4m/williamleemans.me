@@ -110,7 +110,11 @@ body {
    focalisable pour que le focus suive vraiment le saut — sans lui, Safari
    déplace la vue mais laisse le focus en haut de page, et la tabulation
    suivante repart dans la nav. L'anneau, lui, encadrerait toute la colonne de
-   contenu : le repère ici, c'est le contenu qui commence. */
+   contenu : le repère ici, c'est le contenu qui commence.
+
+   Délibéré (#21), pas un défaut — l'exception tient au régime : `main` ne
+   reçoit le focus que par le saut, jamais par tabulation. S'il devenait
+   tabulable, l'anneau revient. */
 main:focus {
   outline: none;
 }
