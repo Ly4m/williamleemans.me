@@ -36,7 +36,9 @@
       line-height 0.2s ease,
       opacity 0.2s ease;
     /* Pas d'anneau de focus : le lien n'est à l'écran que parce qu'il a le
-       focus, et l'anneau global ferait doublon avec le rail ci-dessous. */
+       focus, et le rail laiton ci-dessous porte déjà l'état. Délibéré (#21),
+       pas un défaut — mais l'exception tient au rail : s'il disparaît,
+       l'anneau revient. */
     outline: none;
   }
 
