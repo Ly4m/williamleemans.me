@@ -52,8 +52,8 @@
    moving flow field and needs the extra weight to read at all. Don't collapse
    them into one.
 
-   Canvas and satori can't read these (FlowField.ts, og-card.ts) — they carry
-   their own named constants, and those must be changed in step. */
+   Canvas and satori can't read these. They read src/lib/palette.ts, which
+   restates the tokens below for them — the one file to change in step. */
 :root {
   --ink-circuit: rgba(107, 107, 107, 0.65);
   --ink-circuit-strong: rgba(107, 107, 107, 0.85);
