@@ -3,20 +3,16 @@ import path from "node:path";
 import satori from "satori";
 import { Resvg } from "@resvg/resvg-js";
 
-// Template C « framed plate » (issue #9): charcoal plate over a faint dot grid,
+// Satori renders outside the document, so it can't read the CSS custom
+// properties — the tokens come from palette.ts.
+import { BRASS, FADED, PAGE_DARK, PRIMARY_100 } from "./palette";
+
+// Template C « framed plate » (issue #9): dark plate over a faint dot grid,
 // HomeDecoration-style dashed trace across the top, big left-aligned title,
 // hairline-ruled meta strip along the bottom.
 
 const WIDTH = 1200;
 const HEIGHT = 630;
-
-// Satori renders outside the document, so it can't read the CSS custom
-// properties either. These mirror global.css — keep them in step with
-// `--color-primary-100`, `--color-brass` and `--color-faded`.
-const INK = "#fafafa";
-const CHARCOAL = "#1a1a1a";
-const BRASS = "#E4A94D";
-const FADED = "#858585";
 
 const font = (pkgPath: string) =>
   fs.readFileSync(path.join(process.cwd(), "node_modules", pkgPath));
@@ -31,7 +27,7 @@ const plexMono = font(
 // Full-bleed dashed trace with one arc, ticks and a via drop — SVG keeps the
 // arc geometry satori's div model can't express.
 const traceSvg = `<svg width="1200" height="140" viewBox="0 0 1200 140" xmlns="http://www.w3.org/2000/svg">
-  <g stroke="${INK}" stroke-opacity="0.3" fill="none">
+  <g stroke="${PRIMARY_100}" stroke-opacity="0.3" fill="none">
     <path d="M 0 78 L 820 78" stroke-width="1.5" stroke-dasharray="5 10"/>
     <path d="M 820 78 A 30 30 0 0 0 880 78" stroke-width="1.5"/>
     <path d="M 880 78 L 1200 78" stroke-width="1.5" stroke-dasharray="5 10"/>
@@ -39,7 +35,7 @@ const traceSvg = `<svg width="1200" height="140" viewBox="0 0 1200 140" xmlns="h
     <path d="M 1120 71 L 1120 85" stroke-width="1.2"/>
     <path d="M 300 78 L 300 108" stroke-width="1.2"/>
   </g>
-  <g fill="${INK}" fill-opacity="0.3">
+  <g fill="${PRIMARY_100}" fill-opacity="0.3">
     <circle cx="820" cy="78" r="3"/>
     <circle cx="880" cy="78" r="3"/>
     <circle cx="850" cy="48" r="2.5"/>
@@ -73,7 +69,7 @@ export async function renderOgCard({
           height: HEIGHT,
           display: "flex",
           position: "relative",
-          backgroundColor: CHARCOAL,
+          backgroundColor: PAGE_DARK,
           backgroundImage: `radial-gradient(circle, rgba(250, 250, 250, 0.08) 1.5px, transparent 1.5px)`,
           backgroundSize: "24px 24px",
           fontFamily: "IBM Plex Mono",
@@ -115,7 +111,7 @@ export async function renderOgCard({
                 fontSize,
                 lineHeight: 1.18,
                 letterSpacing: 1,
-                color: INK,
+                color: PRIMARY_100,
               },
               children: title,
             },
