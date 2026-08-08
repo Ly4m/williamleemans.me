@@ -159,18 +159,30 @@ const structuredData = JSON.stringify({
 
   :global(.dark) a:hover {
     border-bottom-color: var(--color-primary-100);
-
-    &.orange:hover {
-      border-bottom: 1px solid #ff772c;
-    }
-
-    &.pink:hover {
-      border-bottom: 1px solid #e82483;
-    }
   }
 
   /* Outbound links wear their brand colour; my own surfaces wear brass. Brass
-     stays on the line, never on the text, and needs the darker ink on #fafafa. */
+     stays on the line, never on the text, and needs the darker ink on #fafafa —
+     and the brand hues obey the same constraint: a state line must reach 3:1
+     there. Scanzee's pink clears it as-is (4.0:1); Jetdev's orange manages only
+     2.5:1, so light mode wears the nearest same-hue orange that passes
+     (#fe5a00, 3.0:1) while dark mode keeps the true brand. */
+  a.orange:hover {
+    border-bottom-color: #fe5a00;
+  }
+
+  a.pink:hover {
+    border-bottom-color: #e82483;
+  }
+
+  :global(.dark) a.orange:hover {
+    border-bottom-color: #ff772c;
+  }
+
+  :global(.dark) a.pink:hover {
+    border-bottom-color: #e82483;
+  }
+
   a.mine:hover {
     border-bottom-color: var(--color-brass-ink);
   }

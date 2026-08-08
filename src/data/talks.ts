@@ -33,12 +33,6 @@ export type Talk = {
   occurrences: Occurrence[];
 };
 
-/*
- * ⚠️ PLACEHOLDER DATA — every string below is invented and needs replacing.
- * Kept structurally realistic so the page renders every state it can reach:
- *   - a talk given more than once (multiple occurrences)
- *   - a talk given but not recorded (no video)
- */
 export const talks: Talk[] = [
   {
     title: "Rust en 20 minutes chrono",

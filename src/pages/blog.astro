@@ -65,7 +65,7 @@ const yearSpan =
                 <li>
                   <a
                     href={`/blog/${post.data.slug}`}
-                    class="group flex items-center justify-between gap-1"
+                    class="group flex items-center justify-between gap-1 py-0.5"
                   >
                     <time
                       datetime={isoMonth(post.data.pubDate)}
@@ -75,7 +75,7 @@ const yearSpan =
                     </time>
                     <span
                       aria-hidden="true"
-                      class="text-faded dot-leader group-hover:dot-leader-hover grow leading-none transition-colors group-hover:transition-none motion-reduce:transition-none"
+                      class="text-faded dot-leader grow leading-none transition-colors group-hover:transition-none motion-reduce:transition-none"
                     />
                     <span class="group-hover:text-charcoal dark:group-hover:text-primary-100 text-faded">
                       {post.data.title}

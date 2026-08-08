@@ -62,7 +62,7 @@
   /* Même laiton rabattu que .nav-link::before : à pleine force, il serait
      l'élément le plus bruyant de la page sombre. */
   :global(.dark) .skip-link::before {
-    background: color-mix(in srgb, var(--color-brass) 65%, #1a1a1a);
+    background: color-mix(in srgb, var(--color-brass) 65%, var(--color-page));
   }
 
   .skip-link:focus {
@@ -76,16 +76,12 @@
 
   /* Sur mobile la barre latérale n'existe pas : le lien se range sous
      l'en-tête fixe (h-14), sur le fond de la page pour ne pas se poser sur du
-     texte. */
+     texte — le jeton suit le thème de lui-même, une seule règle suffit. */
   @media (max-width: 767px) {
     .skip-link {
       top: 3.5rem;
       padding-left: 1.25rem;
-      background: var(--color-primary-100);
-    }
-
-    :global(.dark) .skip-link {
-      background: #1a1a1a;
+      background: var(--color-page);
     }
 
     .skip-link::before {

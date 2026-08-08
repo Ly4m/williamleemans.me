@@ -17,13 +17,13 @@ const fmt = (d: Date) =>
     </h2>
     <span class="heading-trace-line" aria-hidden="true"></span>
   </div>
-  <ul class="flex flex-col gap-2">
+  <ul class="flex flex-col gap-1">
     {
       posts.map((p) => (
         <li>
           <a
             href={`/blog/${p.slug}`}
-            class="group flex items-center justify-between gap-1"
+            class="group flex items-center justify-between gap-1 py-0.5"
           >
             <time
               datetime={p.pubDate.toISOString().slice(0, 10)}
@@ -33,7 +33,7 @@ const fmt = (d: Date) =>
             </time>
             <span
               aria-hidden="true"
-              class="text-faded dot-leader group-hover:dot-leader-hover grow leading-none transition-colors group-hover:transition-none motion-reduce:transition-none"
+              class="text-faded dot-leader grow leading-none transition-colors group-hover:transition-none motion-reduce:transition-none"
             />
             <span class="group-hover:text-charcoal dark:group-hover:text-primary-100 text-faded">
               {p.title}
