@@ -50,6 +50,17 @@
     animation-play-state: paused;
   }
 
+  /* Sous reduced-motion, le cycle s'arrête, figé sur l'état replié — les
+     initiales seules, l'état dominant du composant. Le survol continue de
+     déplier le nom : c'est un geste de l'utilisateur, et la règle de base
+     pose déjà l'état replié en statique ; sans transition, la révélation
+     est simplement instantanée. */
+  @media (prefers-reduced-motion: reduce) {
+    .logo-full {
+      animation: none;
+    }
+  }
+
   @keyframes name-expand {
     0%,
     20% {

@@ -7,6 +7,11 @@ export async function GET(context) {
     (a, b) => new Date(b.data.pubDate) - new Date(a.data.pubDate),
   );
 
+  // The feed started in 2025; the span's end tracks the build year, the same
+  // way lastBuildDate below tracks the build itself.
+  const year = new Date().getFullYear();
+  const copyrightSpan = year > 2025 ? `2025–${year}` : "2025";
+
   return rss({
     title: "William Leemans | Blog",
     description: "Le site personnel de William Leemans",
@@ -27,7 +32,7 @@ export async function GET(context) {
       <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
       <generator>Astro</generator>
       <managingEditor>william@lmns.fr (William Leemans)</managingEditor>
-      <copyright>Copyright © 2025 William Leemans</copyright>
+      <copyright>Copyright © ${copyrightSpan} William Leemans</copyright>
       <atom:link href="${context.site}rss.xml" rel="self" type="application/rss+xml" />
     `,
   });

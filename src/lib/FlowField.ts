@@ -42,6 +42,7 @@ export class FlowField {
   private raf = 0;
   private running = false;
   private dark = false;
+  private themeObserver: MutationObserver | null = null;
 
   private w = 0;
   private h = 0;
@@ -183,6 +184,26 @@ export class FlowField {
    * the live steady state, which is the whole point.
    */
   renderStatic() {
+    this.paintStaticFrame();
+
+    /* With no loop running, nothing would ever repaint: `this.resize` alone
+       ends in fillBg() and wipes the streamlines, and a theme flip would leave
+       the old palette frozen on screen. So both events re-run the full static
+       render. The theme flip is watched via the `dark` class the site toggles
+       on <html> (see SideNav.astro). */
+    window.addEventListener("resize", this.repaintStatic);
+    this.themeObserver = new MutationObserver(() => {
+      if (this.isDark() !== this.dark) this.paintStaticFrame();
+    });
+    this.themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+  }
+
+  private repaintStatic = () => this.paintStaticFrame();
+
+  private paintStaticFrame() {
     this.dark = this.isDark();
     this.resize();
     this.initParticles();
@@ -194,12 +215,14 @@ export class FlowField {
       this.step(i * 0.0001);
       this.drawSegments();
     }
-    window.addEventListener("resize", this.resize);
   }
 
   stop() {
     this.running = false;
     cancelAnimationFrame(this.raf);
     window.removeEventListener("resize", this.resize);
+    window.removeEventListener("resize", this.repaintStatic);
+    this.themeObserver?.disconnect();
+    this.themeObserver = null;
   }
 }
