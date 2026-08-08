@@ -31,3 +31,15 @@ pnpm-debug.log*
 .claude/
 
 CONTEXT.md
+
+# Writing backlog: client-permission status and candid distribution notes, in a
+# public repo. Working material, not a decision record — hence here, not docs/.
+WRITING.md
+
+# Impeccable product record: restates the craftomancer border and cadence
+# targets from WRITING.md in full candour, in a public repo. Same reasoning,
+# same fate.
+PRODUCT.md
+
+# Impeccable live-mode config: local agent tooling, same family as .claude/.
+.impeccable/
