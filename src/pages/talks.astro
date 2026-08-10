@@ -53,7 +53,7 @@ const structuredData = JSON.stringify({
               {talk.title}
             </h2>
 
-            <p class="text-faded mt-1 text-sm">{talk.pitch}</p>
+            <p class="text-faded mt-1 max-w-[68ch] text-sm">{talk.pitch}</p>
 
             <ul class="mt-3 space-y-1">
               {talk.occurrences.map((o) => (
@@ -91,7 +91,7 @@ const structuredData = JSON.stringify({
       }
     </ul>
 
-    <p class="text-faded mt-16 text-sm">
+    <p class="text-faded mt-16 max-w-[68ch] text-sm">
       Je donne ces talks en français, depuis Lille, et je me déplace volontiers.
       Si l'un d'eux a sa place dans votre programme, <a
         class="mine"

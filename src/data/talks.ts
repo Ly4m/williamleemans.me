@@ -61,7 +61,7 @@ export const talks: Talk[] = [
   {
     title: "Hype Driven Development : The Good, the bad and the Ugly",
     pitch:
-      "De nouvelles technologies émergent à un rythme effréné dans le monde du développement logiciel. Dans ce talk, William aborde les bons et mauvais côtés de la Hype. À travers son expérience, il nous offre des outils et conseils pour mieux tirer parti des tendances, sans en subir les revers.",
+      "De nouvelles technologies émergent à un rythme effréné dans le monde du développement logiciel. Dans ce talk, j'aborde les bons et mauvais côtés de la Hype et, à travers mon expérience, je partage des outils et des conseils pour mieux tirer parti des tendances, sans en subir les revers.",
     occurrences: [
       {
         event: "JetTalk",
