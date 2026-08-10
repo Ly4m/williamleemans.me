@@ -32,7 +32,13 @@
 
   --color-primary-100: #fafafa;
   --color-charcoal: #252525;
-  --color-faded: #858585;
+
+  /* Secondary text — two values, like brass. The true pencil (#858585) reads
+     4.7:1 on the night sheet but only 3.5:1 on Paper, under the 4.5:1 that
+     dates, subtitles and the /talks closing line need. Light mode inks it
+     down to 5.1:1 — the same grey the in-article SVG diagrams already chose —
+     and `.dark` below restores the pencil. */
+  --color-faded: #6b6b6b;
 
   /* The single accent. Dark mode uses the true brass; light mode needs the
        darker value to clear 3:1 against #fafafa (#E4A94D manages only 1.9:1). */
@@ -76,6 +82,8 @@
 
 .dark {
   --color-page: #1a1a1a;
+  /* The true pencil, back on the night sheet — see --color-faded in @theme. */
+  --color-faded: #858585;
 }
 
 html {

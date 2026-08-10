@@ -25,7 +25,9 @@ export const PAGE_DARK = "#1a1a1a";
 /** `--color-primary-100` — the off-white. Also `--color-page` in light mode. */
 export const PRIMARY_100 = "#fafafa";
 
-/** `--color-faded` — muted text. */
+/** `--color-faded` — muted text, dark-mode value: its only consumer (the OG
+ *  card) draws on the night sheet. Light mode inks it down to #6b6b6b in
+ *  `global.css`. */
 export const FADED = "#858585";
 
 /** `"#RRGGBB"` → `[r, g, b]`, for the canvas, which composes its own alpha. */

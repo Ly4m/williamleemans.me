@@ -113,6 +113,7 @@ const relFor = (s: SocialLink) => {
           <a
             href={href}
             data-active={active ? "true" : undefined}
+            aria-current={active ? "page" : undefined}
             class={[
               "mobile-menu-link flex flex-col items-center gap-2 text-2xl font-medium tracking-wide uppercase transition-all duration-200",
               active
@@ -165,6 +166,7 @@ const relFor = (s: SocialLink) => {
           <a
             href={href}
             data-active={active ? "true" : undefined}
+            aria-current={active ? "page" : undefined}
             class={[
               "nav-link group relative block px-3 py-2 text-sm tracking-wide uppercase transition",
               active ? "font-medium" : "opacity-70 hover:opacity-100",

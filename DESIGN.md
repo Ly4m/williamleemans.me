@@ -5,6 +5,7 @@ colors:
   charcoal: "#252525"
   paper: "#fafafa"
   faded: "#858585"
+  faded-ink: "#6b6b6b"
   night: "#1a1a1a"
   signal: "#E4A94D"
   signal-ink: "#8f6a1a"
@@ -108,7 +109,12 @@ Two inks, a pencil, two sheets, and one brass wire.
 - **Paper** (#fafafa): the light page, and the text ink on dark pages
   (`--color-primary-100`, aliased to `--color-page` in light).
 - **Faded** (#858585): secondary text — dates, reading times, subtitles, the
-  resting state of list rows (`--color-faded`).
+  resting state of list rows (`--color-faded`) — on the night sheet, where it
+  reads 4.7:1.
+- **Faded encré** (#6b6b6b): the same pencil inked down for Paper, where the
+  true pencil manages only 3.5:1 against the 4.5:1 its small text needs. One
+  token, flipped by theme in `global.css`; the in-article SVG diagrams had
+  already chosen this grey for their light-mode annotations.
 - **Night** (#1a1a1a): the dark page (`--color-page` in dark). Deliberately
   not Charcoal: the dark sheet is deeper than the light ink.
 - **Circuit ink** (rgba(107,107,107,0.65) light / brass washes dark): the
@@ -147,9 +153,10 @@ register.
 - **Body** (400, 16px, lh 1.6): all running text, IBM Plex Mono. Prose
   measure is 68ch; long-form articles tighten to 62ch at 1.0625rem, because
   mono flattens word shapes and wants the shorter line.
-- **Label** (400, 0.7rem, lh 1.5): captions, card subtitles and notes —
-  the annotation voice, often uppercase with 0.06em tracking at badge size
-  (0.6rem).
+- **Label** (400, 0.7rem, lh 1.5): captions, card subtitles, notes and
+  badges — the annotation voice, often uppercase with 0.06em tracking. 0.7rem
+  (11.2px) is also the voice's floor: badges once sat at 0.6rem, whose 9.6px
+  stopped being legible annotation.
 - **Nav** (400/500, 0.875rem, uppercase, tracking-wide): the rail's items;
   500 marks the active page.
 
@@ -212,7 +219,7 @@ waking, never as lifting or glowing.
 - **Desktop rail:** uppercase mono items at 0.875rem, resting at 70% opacity;
   hover restores full ink and nudges the label 4px right. The active item
   carries a 3px Signal rail on its left edge; hover on inactive items grows a
-  40%-height stub of the same rail — hover and active differ by *length*, not
+  40%-height stub of the same rail — hover and active differ by _length_, not
   opacity. The rail slides between items across page navigations
   (`view-transition-name: nav-rail`); reduced motion keeps position and
   length, dropping only the travel.
@@ -243,7 +250,7 @@ rows carry only the month.
 
 ### Badges
 
-Uppercase mono at 0.6rem, 2px radius, hairline border. **Done** wears Signal:
+Uppercase mono at 0.7rem, 2px radius, hairline border. **Done** wears Signal:
 an 8% brass wash with Signal encré text in light (exactly 8% — the pair lands
 at 4.51:1 and fails at 12%), a 15% wash with true Signal in dark. **In
 progress** stays neutral: 7% ink wash, Charcoal/Paper text. Brass marks the
@@ -304,8 +311,9 @@ single static frame under reduced motion.
   `--ink-circuit-strong` only over the flow field.
 - **Do** give every container the hairline treatment: 1px border at 0.15/0.1
   opacity, 3px radius, and registration ticks if it frames content.
-- **Do** write annotations in the Label voice: IBM Plex Mono, 0.6–0.7rem,
-  uppercase with tracking when it's a status.
+- **Do** write annotations in the Label voice: IBM Plex Mono, 0.7rem,
+  uppercase with tracking when it's a status — never smaller; 0.7rem is the
+  legibility floor.
 - **Do** pair every animation with its `prefers-reduced-motion: reduce`
   ending: final state visible, information preserved (a rail keeps its
   length; only the travel goes).
