@@ -303,7 +303,8 @@ single static frame under reduced motion.
 
 - `slide-down` (1s, cubic-bezier(0.23,1,0.32,1)): h1 entrance.
 - `wave-enter` (0.7s, overshoot spring cubic-bezier(0.34,1.56,0.64,1), 60ms
-  stagger per child): content columns.
+  stagger, first twelve children only): content columns — everything below
+  the first viewport is simply already there.
 - `circuit-draw` / `circuit-appear`: decorations and heading traces.
 - Hover transitions run 0.2–0.3s ease; syntax colors snap on theme toggle
   rather than transitioning.
