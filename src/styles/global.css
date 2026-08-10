@@ -173,6 +173,13 @@ article {
   font-size: 1.0625rem;
 }
 
+/* Wide tables scroll inside their wrapper (src/lib/rehype-table-scroll.mjs)
+   instead of panning the whole page on mobile — the treatment <pre> already
+   has. */
+.table-scroll {
+  overflow-x: auto;
+}
+
 .prose {
   max-width: 68ch;
 

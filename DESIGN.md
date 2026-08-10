@@ -35,6 +35,11 @@ typography:
     fontSize: "0.7rem"
     fontWeight: 400
     lineHeight: 1.5
+  note:
+    fontFamily: "IBM Plex Mono, monospace"
+    fontSize: "0.75rem"
+    fontWeight: 400
+    lineHeight: 1.5
 rounded:
   hairline: "2px"
   card: "3px"
@@ -157,6 +162,9 @@ register.
   badges — the annotation voice, often uppercase with 0.06em tracking. 0.7rem
   (11.2px) is also the voice's floor: badges once sat at 0.6rem, whose 9.6px
   stopped being legible annotation.
+- **Note** (400, 0.75rem, lh 1.5): multi-line running text at card scale —
+  the MediaCard note and the skip link. Sentences get the 12px reading floor;
+  0.7rem stays reserved for one-line labels.
 - **Nav** (400/500, 0.875rem, uppercase, tracking-wide): the rail's items;
   500 marks the active page.
 
@@ -233,9 +241,10 @@ waking, never as lifting or glowing.
 ### List Rows (blog index)
 
 The dot-leader row: month (tabular-nums, Faded) — a 2px-dot leader line
-filling the gap — title — reading time. The whole row rests in Faded and
-inks up to Charcoal/Paper on hover, leader included; the transition eases in
-but snaps off (`group-hover:transition-none`). Years are group headings, so
+filling the gap — title — reading time. The title rests in full ink
+(Charcoal/Paper) so the list leads with what it lists; month, leader and
+reading time rest in Faded and ink up to match on hover, easing in but
+snapping off (`group-hover:transition-none`). Years are group headings, so
 rows carry only the month.
 
 ### Cards (MediaCard — books & games)
@@ -245,8 +254,9 @@ rows carry only the month.
 - **Hover:** the border wakes (0.15 → 0.35 opacity); nothing lifts.
 - **Cover:** aspect-locked (2/3 books, 16/9 games), object-fit cover, inset
   at 2px radius.
-- **Body:** 0.65–0.75rem padding; badge, then Title, then Label-voice
-  subtitle and note.
+- **Body:** 0.65–0.75rem padding; badge, then Title, then a Label-voice
+  subtitle; the note is running text in the Note voice (0.75rem) — sentences
+  don't wear annotation size.
 
 ### Badges
 

@@ -215,7 +215,9 @@ const sizing =
 
   .card-note {
     font-family: "IBM Plex Mono", monospace;
-    font-size: 0.7rem;
+    /* Running text, not a label: multi-line sentences need the 12px reading
+       floor; 0.7rem is for the one-line annotation voice (subtitle, badge). */
+    font-size: 0.75rem;
     color: #555;
     line-height: 1.5;
     margin: 0;
