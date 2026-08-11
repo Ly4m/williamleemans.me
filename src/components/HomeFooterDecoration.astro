@@ -12,7 +12,46 @@
                                  apex(370)
   y=20  ──|─────────|──────────╮─────────╰──────────|─────────|──
          tick(60) tick(220)  arc(350→390)          tick(520) tick(680)
+--><!--
+  Mobile: same reduction discipline as the header — the smallest legible unit.
+  Here that is the center arc with its two junction dots, the callback to the
+  opening motif, so the mobile page closes on a rule instead of ending mid-air.
+
+  y=2               ╭────╮
+  y=10  ───────────╯      ╰───────────
+              dot(58)    dot(74)
 -->
+<div class="mt-6 md:hidden" aria-hidden="true">
+  <svg
+    width="132"
+    height="12"
+    viewBox="0 0 132 12"
+    fill="none"
+    class="decoration"
+  >
+    <path
+      d="M 0 10 L 58 10"
+      stroke="currentColor"
+      stroke-width="1"
+      class="circuit-trace"></path>
+    <path
+      d="M 74 10 L 132 10"
+      stroke="currentColor"
+      stroke-width="1"
+      class="circuit-trace"></path>
+    <path
+      d="M 58 10 A 8 8 0 0 1 74 10"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      class="circuit-trace"></path>
+    <circle cx="58" cy="10" r="2" fill="currentColor" class="circuit-dot"
+    ></circle>
+    <circle cx="74" cy="10" r="2" fill="currentColor" class="circuit-dot"
+    ></circle>
+  </svg>
+</div>
+
 <div class="mt-6 hidden overflow-visible md:block" aria-hidden="true">
   <svg
     width="100%"

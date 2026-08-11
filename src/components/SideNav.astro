@@ -66,6 +66,13 @@ const opensInNewTab = (href: string) => href.startsWith("http");
    deux noms distincts. */
 const NAV_LABEL = "Navigation principale";
 
+/* Une nouvelle fenêtre s'annonce : l'icône seule ne dit pas qu'on quitte le
+   site, et le changement de contexte arrive sans prévenir au lecteur d'écran.
+   Le suffixe va sur `aria-label` (le nom), pas sur `title` (l'infobulle
+   souris), qui n'a pas besoin de le répéter à qui voit déjà l'onglet s'ouvrir. */
+const nameFor = (s: SocialLink) =>
+  opensInNewTab(s.href) ? `${s.label} (nouvelle fenêtre)` : s.label;
+
 /* Both renders below draw their rel from here, so the two can't drift. */
 const relFor = (s: SocialLink) => {
   const tokens = [
@@ -84,18 +91,18 @@ const relFor = (s: SocialLink) => {
   <button
     id="mobile-menu-toggle"
     class="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-md text-gray-600 hover:bg-gray-100 hover:text-black dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
-    aria-label="Menu"
+    aria-label="Ouvrir le menu"
     aria-expanded="false"
     aria-controls="mobile-menu"
   >
     <span
-      class="hamburger-line h-0.5 w-5 bg-current transition-all duration-300"
+      class="hamburger-line h-0.5 w-5 bg-current transition-[transform,opacity] duration-300"
     ></span>
     <span
-      class="hamburger-line h-0.5 w-5 bg-current transition-all duration-300"
+      class="hamburger-line h-0.5 w-5 bg-current transition-[transform,opacity] duration-300"
     ></span>
     <span
-      class="hamburger-line h-0.5 w-5 bg-current transition-all duration-300"
+      class="hamburger-line h-0.5 w-5 bg-current transition-[transform,opacity] duration-300"
     ></span>
   </button>
 </header>
@@ -137,7 +144,7 @@ const relFor = (s: SocialLink) => {
           rel={relFor(s)}
           target={opensInNewTab(s.href) ? "_blank" : undefined}
           class="flex h-12 w-12 items-center justify-center rounded-md text-gray-600 transition hover:bg-gray-100 hover:text-black dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
-          aria-label={s.label}
+          aria-label={nameFor(s)}
           title={s.label}
         >
           <i class={["text-2xl", s.icon].join(" ")} aria-hidden="true" />
@@ -181,6 +188,17 @@ const relFor = (s: SocialLink) => {
     }
   </nav>
 
+  {
+    /* Oui, l'accueil redit GitHub, LinkedIn et l'e-mail dans ses lignes de
+       contact — et le rail les garde quand même. Ailleurs (blog, talks, now)
+       le rail est le seul accès : les retirer ici les retirerait partout, et
+       n'en faire un cas particulier que sur l'accueil ferait clignoter un
+       chrome persistant d'une page à l'autre. Le coût, quatre tabulations
+       redondantes, ne se paie que si l'on refuse le lien d'évitement, qui est
+       premier dans l'ordre du clavier et saute tout le rail. Réexaminé le
+       2026-08-11 ; à rouvrir seulement si le rail cesse d'être le seul accès
+       hors accueil. */
+  }
   <div class="absolute bottom-6 flex gap-2 pl-6">
     {
       socialLinks.map((s) => (
@@ -189,7 +207,7 @@ const relFor = (s: SocialLink) => {
           rel={relFor(s)}
           target={opensInNewTab(s.href) ? "_blank" : undefined}
           class="flex h-8 w-8 items-center justify-center rounded-md text-gray-600 hover:bg-gray-100 hover:text-black dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
-          aria-label={s.label}
+          aria-label={nameFor(s)}
           title={s.label}
         >
           <i class={["text-lg", s.icon].join(" ")} aria-hidden="true" />
@@ -269,16 +287,29 @@ const relFor = (s: SocialLink) => {
     }
   }
 
-  .menu-open #mobile-menu-toggle .hamburger-line:nth-child(1) {
+  /* `.menu-open` lives on <body>, which the layout renders — so it never carries
+     this component's scope attribute. Written bare, Astro scoped all three rules
+     to a selector that could never match and the burger silently stayed a burger
+     with the menu open. `:global()` on that one part is what makes the X appear;
+     the rest stays scoped. Falsifier: open the menu and read the computed
+     transform of `.hamburger-line` — `none` means this regressed. */
+  :global(.menu-open) #mobile-menu-toggle .hamburger-line:nth-child(1) {
     transform: rotate(45deg) translate(6px, 6px);
   }
 
-  .menu-open #mobile-menu-toggle .hamburger-line:nth-child(2) {
+  :global(.menu-open) #mobile-menu-toggle .hamburger-line:nth-child(2) {
     opacity: 0;
   }
 
-  .menu-open #mobile-menu-toggle .hamburger-line:nth-child(3) {
+  :global(.menu-open) #mobile-menu-toggle .hamburger-line:nth-child(3) {
     transform: rotate(-45deg) translate(6px, -6px);
+  }
+
+  /* The X carries the state, so it stays; only the travel goes. */
+  @media (prefers-reduced-motion: reduce) {
+    .hamburger-line {
+      transition: none;
+    }
   }
 </style>
 
@@ -290,27 +321,37 @@ const relFor = (s: SocialLink) => {
       "[data-theme-toggle]",
     );
 
-    function updateIcons() {
+    function updateToggles() {
       const isDark = document.documentElement.classList.contains("dark");
       document
         .querySelectorAll<HTMLElement>("[data-theme-icon]")
         .forEach((icon) => {
-          icon.className = isDark
-            ? "icon-[tabler--moon] text-lg"
-            : "icon-[tabler--sun] text-lg";
+          /* classList, pas className : les deux rendus portent des tailles
+             différentes (text-lg au rail, text-2xl au menu) qu'une réécriture
+             complète écrasait. */
+          icon.classList.toggle("icon-[tabler--moon]", isDark);
+          icon.classList.toggle("icon-[tabler--sun]", !isDark);
         });
+      /* Le libellé porte l'état : l'icône seule change en silence pour un
+         lecteur d'écran, et « Changer de thème » ne disait pas où l'on est.
+         Le libellé statique du HTML reste le repli sans JS. */
+      const label = isDark ? "Passer au thème clair" : "Passer au thème sombre";
+      buttons.forEach((btn) => {
+        btn.setAttribute("aria-label", label);
+        btn.setAttribute("title", label);
+      });
     }
 
     function toggleTheme() {
       const isDark = document.documentElement.classList.contains("dark");
       document.documentElement.classList.toggle("dark", !isDark);
       localStorage.setItem("theme", isDark ? "light" : "dark");
-      updateIcons();
+      updateToggles();
       syncThemeColor();
     }
 
     buttons.forEach((btn) => btn.addEventListener("click", toggleTheme));
-    updateIcons();
+    updateToggles();
 
     return () =>
       buttons.forEach((btn) => btn.removeEventListener("click", toggleTheme));
@@ -332,12 +373,17 @@ const relFor = (s: SocialLink) => {
        takes it out of the tab order and the accessibility tree at once —
        `aria-hidden` alone claimed it was gone while its links stayed
        focusable. */
+    /* Le libellé porte l'état en plus d'`aria-expanded`, comme le bouton de
+       thème : le bouton ouvert est aussi le seul moyen de refermer, et « Ouvrir
+       le menu » sur le bouton qui ferme envoyait dans le mauvais sens. Le
+       libellé statique du HTML reste le repli sans JS. */
     function closeMenu() {
       // Focus can't stay inside an inert subtree; hand it back to the toggle.
       const hadFocus = menu.contains(document.activeElement);
       menu.classList.add("translate-x-full");
       menu.inert = true;
       toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", "Ouvrir le menu");
       document.body.classList.remove("menu-open");
       document.body.style.overflow = "";
       if (hadFocus) toggle.focus();
@@ -347,6 +393,7 @@ const relFor = (s: SocialLink) => {
       menu.classList.remove("translate-x-full");
       menu.inert = false;
       toggle.setAttribute("aria-expanded", "true");
+      toggle.setAttribute("aria-label", "Fermer le menu");
       document.body.classList.add("menu-open");
       document.body.style.overflow = "hidden";
     }

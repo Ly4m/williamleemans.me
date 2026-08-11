@@ -1,4 +1,11 @@
-<a href="/" class="logo">
+---
+/* Sur la home, le h1 juste sous la barre dit déjà « William Leemans » — le
+   cycle du logo empilait le nom deux fois. Épinglé sur les initiales là, et
+   là seulement ; le survol déplie toujours, c'est le geste du visiteur. */
+const onHome = Astro.url.pathname === "/";
+---
+
+<a href="/" class:list={["logo", onHome && "logo-pinned"]}>
   <span class="logo-initials">W</span>
   <span class="logo-full">illiam</span>
   <span class="logo-initials">&nbsp;L</span>
@@ -59,6 +66,10 @@
     .logo-full {
       animation: none;
     }
+  }
+
+  .logo-pinned .logo-full {
+    animation: none;
   }
 
   @keyframes name-expand {

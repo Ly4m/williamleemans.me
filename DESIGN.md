@@ -9,6 +9,10 @@ colors:
   night: "#1a1a1a"
   signal: "#E4A94D"
   signal-ink: "#8f6a1a"
+  # Guest inks — borrowed brand hues, hover-only, on the underline, never state.
+  jetdev: "#ff772c"
+  jetdev-ink: "#fe5a00"
+  scanzee: "#e82483"
 typography:
   headline:
     fontFamily: "Space Grotesk, sans-serif"
@@ -72,15 +76,23 @@ corners, and — on the Now pages — a flow field of drifting streamlines, the
 same ink still wet. The atmosphere is **organique, mécanique, étrange**:
 mechanical vocabulary (circuits, traces, annotations) rendered by a hand, and
 allowed to be slightly eerie rather than merely tasteful. The strangeness of
-the flow field sets the tone; the constrained pages hold it in reserve.
+the flow field sets the tone — and since 2026-08 the constrained pages no
+longer hold it in reserve: **la machine respire**. The sheet is never
+perfectly still. A few grid intersections swell and fade like signals
+testing the paper, pulse runs cross the graph, circuit traces lift off and
+re-ink themselves as if a hand came back to correct a line, a dot of ink
+walks a visible wire, and the reading hairline never quite dries. The
+reserve was spent on the owner's decision, at the owner's volume
+("unmistakably alive"), in the incumbent vocabulary only.
 
 The palette is monochrome plus one conductor. Charcoal ink on paper (light),
 paper ink on the night sheet (dark), a faded pencil grey for secondary text —
 and a single brass wire, **Signal**, that carries every live state: the active
 nav rail, the focus ring, the finished-state badge, a caption's tick. Signal
-never colors running text; it rides on lines. Motion is entrance and
-draw-on — headings slide down, content waves in with a staggered spring,
-circuit traces draw themselves — and every one of these defers completely to
+never colors running text; it rides on lines. Motion is entrance, draw-on,
+and breath — headings slide down, content waves in with a staggered spring,
+circuit traces draw themselves, and the ambient respire layer keeps the
+drawing alive afterward — and every one of these defers completely to
 `prefers-reduced-motion: reduce`.
 
 **Key Characteristics:**
@@ -90,7 +102,8 @@ circuit traces draw themselves — and every one of these defers completely to
 - Monochrome plus one brass Signal, on lines and state only.
 - Hairline construction: 1px borders, 3px rails, 6px corner ticks, 2px dots.
 - Monospace body under grotesk headings; captions read as annotations.
-- Motion draws the page like ink; reduced-motion shows the finished drawing.
+- Motion draws the page like ink, then keeps it breathing (la machine
+  respire); reduced-motion shows the finished drawing, perfectly still.
 
 ## Colors
 
@@ -100,8 +113,8 @@ Two inks, a pencil, two sheets, and one brass wire.
 
 - **Signal** (#E4A94D): the site's single accent, in its true brass — dark
   mode only, where it reads against the night sheet. It marks state: the
-  active nav rail, focus rings, the "done" badge, figcaption ticks, and the
-  WL mark. Decorations knock it back to 28–50% washes (`--ink-circuit`); the
+  active nav rail, focus rings, the "done" badge, figcaption ticks, the home
+  invitation's tick, and the WL mark. Decorations knock it back to 28–50% washes (`--ink-circuit`); the
   nav rail mixes it 65% toward the page to avoid glare.
 - **Signal encré** (#8f6a1a): the same wire in light mode, inked down to clear
   3:1 on Paper — true brass manages only 1.9:1 there. Everything Signal does
@@ -126,6 +139,19 @@ Two inks, a pencil, two sheets, and one brass wire.
   decoration ink, always via `--ink-circuit` / `--ink-circuit-strong` — never
   hard-coded. The strong variant exists only for decoration over the moving
   flow field.
+
+### Guest Inks
+
+Two brands pass through the home page's prose and hover in their own colour —
+on the underline, never the text, obeying the same ≥3:1 line rule as Signal.
+**Jetdev orange** hovers its true brand #ff772c on Night, but #fe5a00 on
+Paper, the nearest same-hue orange that clears 3:1 (the true brand manages
+2.5:1 there). **Scanzee pink** (#e82483) clears 3:1 on both sheets as-is.
+Guest inks are borrowed, not part of the palette: hover-only, never state,
+never running text — the One Signal Rule still holds. The contact rows'
+GitHub and LinkedIn deliberately do **not** wear their brands: GitHub's brand
+is black and LinkedIn's blue fails on Night, so both hover in neutral ink;
+only Jetdev and Scanzee, in the prose, are guests.
 
 ### Named Rules
 
@@ -277,8 +303,13 @@ controls always carry `aria-label` (and `title` as tooltip).
 
 In-text links are hairline-underlined (1px, rgba(125,125,125,0.3)), inking to
 Charcoal/Paper on hover over 0.3s. The home page's outbound links hover in
-their brand's color (contrast-corrected to ≥3:1 on Paper); the owner's own
-surfaces hover in Signal — brass on the line, never the text.
+their brand's color (the Guest Inks, contrast-corrected to ≥3:1 on Paper);
+the owner's own surfaces hover in Signal — brass on the line, never the text.
+The exception is recorded, not an oversight: the contact rows (GitHub,
+LinkedIn) hover in neutral ink — see Guest Inks. The invitation line above
+those rows carries the figcaption tick, promoted: a 1px Signal border-left —
+the page's one address to the visitor wears the site's one wire (decided
+2026-08-10 over keeping home brass-silent).
 
 ### Signature: Circuit Decorations
 
@@ -306,6 +337,14 @@ single static frame under reduced motion.
   stagger, first twelve children only): content columns — everything below
   the first viewport is simply already there.
 - `circuit-draw` / `circuit-appear`: decorations and heading traces.
+- **La machine respire** (`src/scripts/respire.ts`): the always-on ambient
+  layer, four instruments in the decoration ink — six breathing grid dots
+  (6–12s cycles, 2–10s dormancy) with a four-dot pulse run every 20–35s;
+  a visible trace re-inking every 12–26s (sometimes the whole plate, in
+  entrance stagger; the beat is skipped, never spent off-screen); a walking
+  signal traversing a visible trace every 18–36s (dynamic SMIL); and the
+  reading hairline's 7s ink breath. Every instrument pauses in hidden tabs
+  and the whole layer is absent under reduced motion.
 - Hover transitions run 0.2–0.3s ease; syntax colors snap on theme toggle
   rather than transitioning.
 - **Everything above yields to `prefers-reduced-motion: reduce`** — final

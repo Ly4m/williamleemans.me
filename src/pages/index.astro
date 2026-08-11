@@ -44,8 +44,13 @@ const structuredData = JSON.stringify({
       >
         William Leemans
       </h1>
+      {
+        /* Les deux espaces insécables tiennent le tiret par ses deux bouts :
+           sans celle de gauche, la ligne casse avant lui et le mobile ouvre sa
+           deuxième ligne sur « — Lille ». Délibéré — ne pas « nettoyer ». */
+      }
       <p class="text-faded mt-2 text-sm">
-        architecte logiciel &amp; CTO chez Jetdev — Lille
+        architecte logiciel &amp; CTO chez Jetdev&nbsp;—&nbsp;Lille
       </p>
       <HomeDecoration />
     </header>
@@ -55,19 +60,26 @@ const structuredData = JSON.stringify({
         class="text-charcoal dark:text-primary-100 prose dark:prose-invert wave-enter-content min-w-0"
       >
         <p>Italo-belge, entrepreneur, passionné de systèmes et de code.</p>
+        {
+          /* « cofondé » au masculin : Jetdev est pensé comme un nom de marque
+            (genre par défaut), pas comme « la société Jetdev ». Décision
+            délibérée, pas un accord oublié — ne pas « corriger ». */
+        }
         <p>
           Avec <a
             target="_blank"
             rel="noopener noreferrer"
             class="orange"
-            href="https://www.jetdev.fr">Jetdev</a
+            href="https://www.jetdev.fr"
+            >Jetdev<span class="sr-only"> (nouvelle fenêtre)</span></a
           >, que j'ai cofondé, je conçois des systèmes pour des clients comme
           Kiabi, Exotec ou Decathlon, et je donne vie à nos propres produits,
           <a
             rel="noopener noreferrer"
             target="_blank"
             class="pink"
-            href="https://www.scanzee.app/">Scanzee</a
+            href="https://www.scanzee.app/"
+            >Scanzee<span class="sr-only"> (nouvelle fenêtre)</span></a
           >
           et Distract.
         </p>
@@ -87,12 +99,12 @@ const structuredData = JSON.stringify({
           projets, tient sur ma page <a class="mine" href="/now">Now</a>.
         </p>
         <nav aria-label="Contact et réseaux" class="not-prose mt-8">
-          <p class="mb-3">Envie de dire bonjour ou de discuter tech ?</p>
-          <ul class="space-y-1.5">
+          <p class="invite mb-3">Envie de dire bonjour ou de discuter tech ?</p>
+          <ul class="space-y-0 md:space-y-1.5">
             <li>
               <a
                 href="mailto:william@lmns.fr"
-                class="row mine flex items-center gap-3"
+                class="row mine flex items-center gap-3 py-2.5 md:py-0"
               >
                 <span
                   class="icon-[tabler--mail] shrink-0 text-lg"
@@ -108,7 +120,7 @@ const structuredData = JSON.stringify({
                 target="_blank"
                 href="https://github.com/Ly4m"
                 rel="me noopener noreferrer"
-                class="row flex items-center gap-3"
+                class="row flex items-center gap-3 py-2.5 md:py-0"
               >
                 <span
                   class="icon-[tabler--brand-github] shrink-0 text-lg"
@@ -117,6 +129,7 @@ const structuredData = JSON.stringify({
                   ><span class="label">GitHub</span></span
                 >
                 <span class="text-faded text-sm">@Ly4m</span>
+                <span class="sr-only">(nouvelle fenêtre)</span>
               </a>
             </li>
             <li>
@@ -124,7 +137,7 @@ const structuredData = JSON.stringify({
                 target="_blank"
                 href="https://www.linkedin.com/in/wleemans"
                 rel="me noopener noreferrer"
-                class="row flex items-center gap-3"
+                class="row flex items-center gap-3 py-2.5 md:py-0"
               >
                 <span
                   class="icon-[tabler--brand-linkedin] shrink-0 text-lg"
@@ -133,6 +146,7 @@ const structuredData = JSON.stringify({
                   ><span class="label">LinkedIn</span></span
                 >
                 <span class="text-faded text-sm">wleemans</span>
+                <span class="sr-only">(nouvelle fenêtre)</span>
               </a>
             </li>
           </ul>
@@ -189,6 +203,18 @@ const structuredData = JSON.stringify({
 
   :global(.dark) a.mine:hover {
     border-bottom-color: var(--color-brass);
+  }
+
+  /* The page's one address to the visitor carries the site's one wire: the
+     figcaption tick promoted to the invitation — brass on a line, never on
+     the text. Decided 2026-08-10 over keeping home brass-silent. */
+  .invite {
+    border-left: 1px solid var(--color-brass-ink);
+    padding-left: 0.6rem;
+  }
+
+  :global(.dark) .invite {
+    border-left-color: var(--color-brass);
   }
 
   /* Contact rows: the whole row is the target, but only the label carries the rule. */
