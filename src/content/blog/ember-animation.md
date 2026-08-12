@@ -3,8 +3,13 @@ slug: "animation-de-particules"
 title: "Animation de particules"
 description: "Comment j’ai créé une animation de particules simple avec l’API Canvas pour le fond de mon site."
 pubDate: "2025-11-06"
+dateModified: "2026-08-12"
 readingTime: 1
 ---
+
+> **Note d'août 2026** — ce fond n'existe plus : les particules ont été
+> remplacées par un champ de flux, visible sur les pages [Now](/now). Ce qui
+> suit décrit le code de l'époque, et reste vrai de lui.
 
 La semaine dernière, en terminant [mon article précédent sur l’historique Git](/blog/garder-un-historique-git-propre), je me suis rendu compte que même si j’aimais bien le design minimaliste en noir et blanc, il manquait un peu de vie.
 
