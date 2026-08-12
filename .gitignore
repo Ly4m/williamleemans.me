@@ -41,5 +41,10 @@ WRITING.md
 # same fate.
 PRODUCT.md
 
+# Strategy review over WRITING.md: same cadence targets, same candour about
+# them, same public repo. Same fate. Fold it into WRITING.md and delete it if
+# it earns its keep.
+STRATEGY.md
+
 # Impeccable live-mode config: local agent tooling, same family as .claude/.
 .impeccable/
