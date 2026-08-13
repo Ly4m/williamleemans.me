@@ -1085,3 +1085,70 @@ pre code {
     animation: none !important;
   }
 }
+
+/* L'APPEL DE COURANT — the theme switch does not flash.
+
+   The new sheet is revealed by a front expanding from the button itself. That
+   button is the last item in the rail, bottom-left, so the change crosses the
+   page diagonally toward the top-right: the current starts at the switch you
+   just closed. The circle is animated in JS, where the button's position is
+   known; this file only clears the way for it.
+
+   That animation is written in PERCENTAGES, and the reason is a bug that only
+   some machines can see: `::view-transition-new(root)` is not guaranteed to
+   sit in the CSS pixel scale — browser zoom and display scaling put its box in
+   a larger space — so a centre written in `px` lands at a fraction of its
+   intended position. The circle then opened from the middle of the left edge
+   instead of the button. A 1:1 machine never reproduces it.
+
+   A straight 45° front sweeping corner to corner was built and rejected by the
+   owner (2026-08-13). It is the more legible geometry — the button sits 200px
+   in from the edge, so the circle's corner phase lasts under 100ms — but it
+   has no origin, and the origin is the part that means something. Don't
+   "fix" this toward the diagonal a second time.
+
+   `.theme-wipe` scoping is the whole point, not tidiness. ClientRouter drives
+   every page navigation through these same pseudo-elements, and an unscoped
+   `animation: none` here would silently strip the cross-fade off every link on
+   the site — a defect nothing would report. The class is added for the length
+   of the toggle and removed when it settles.
+
+   The new sheet always arrives on top and always grows, in both directions, so
+   the gesture reads the same going dark as going light: one sheet laid over
+   another, never one draining away. */
+/* The wipe IS the colour change, so nothing underneath may run its own.
+
+   `html` fades its background over 0.2s and `body` its text colour, and the
+   nav links carry Tailwind transitions of their own — that fade is the flash
+   this gesture exists to replace. It also silently wrecked the gesture: a view
+   transition captures the new page as a still, and the still was being taken
+   while those 0.2s fades were mid-flight, so the front revealed a half-blended
+   grey sheet instead of the new one. The result read as a soft cross-fade with
+   a circular edge, which is neither of the two things it could have been.
+
+   Blanket, `!important`, and universal on purpose: the point is that no
+   descendant gets to fade its own colours while the front is crossing. It
+   holds for the ~600ms the class is on, and `animation` is untouched — the
+   entrance and the respire layer keep theirs. The fades below stay for the
+   fallback path (reduced motion, no view-transition API), where an instant
+   flip would be harsher than a fade. */
+html.theme-wipe,
+html.theme-wipe *,
+html.theme-wipe *::before,
+html.theme-wipe *::after {
+  transition: none !important;
+}
+
+html.theme-wipe::view-transition-old(root),
+html.theme-wipe::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html.theme-wipe::view-transition-old(root) {
+  z-index: 0;
+}
+
+html.theme-wipe::view-transition-new(root) {
+  z-index: 1;
+}

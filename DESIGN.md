@@ -552,6 +552,59 @@ single static frame under reduced motion.
   signal traversing a visible trace every 18–36s (dynamic SMIL); and the
   reading hairline's 7s ink breath. Every instrument pauses in hidden tabs
   and the whole layer is absent under reduced motion.
+- **L'appel de courant** (`toggleTheme` in `SideNav.astro`, `.theme-wipe` in
+  `global.css`): the site's one gesture that answers the visitor rather than
+  the clock — everything above runs on its own schedule, indifferent to
+  whoever is reading. **The theme switch does not flash.** The new sheet is
+  revealed by a hard-edged front expanding from the button itself, 600ms on
+  `cubic-bezier(0.4, 0, 0.2, 1)` — the curve the circuit traces already draw
+  themselves with. The toggle is the last item in the rail, bottom-left, so
+  the change crosses the page diagonally toward the top-right: the current
+  starts at the switch you just closed. It is a view transition, with the
+  circle animated in JS where the button's position is known — **in
+  percentages, never px**: `::view-transition-new(root)` is not guaranteed to
+  sit in the CSS pixel scale (browser zoom and display scaling put its box in a
+  larger space), so a centre written in `px` lands at a fraction of its
+  intended position and the circle opens from the middle of the left edge
+  instead of the button. It was written in px first, and a 1:1 machine never
+  reproduced it — it took the owner's screenshot to see. The new sheet
+  always arrives on top and always grows, in both directions, so the gesture
+  reads the same going dark as going light — one sheet laid over another,
+  never one draining away. It costs no markup and no new metaphor, so it
+  holds on every page including `/now`, where the front reveals the flow
+  field's brass streamlines against its charcoal ones, and on a phone, where
+  it expands from the toggle inside the overlay menu.
+
+  **The straight diagonal was built and rejected — this is a decision, not an
+  oversight.** A 45° front sweeping corner to corner is the more legible
+  geometry, and it answers a real measurement: the toggle is the fifth icon of
+  a row that overflows the 96px rail, so its centre sits 200px from the left
+  edge and the circle's corner phase lasts under 100ms. The owner chose the
+  circle anyway (2026-08-13), on the ground that the diagonal has no origin and
+  the origin is the part that carries meaning — the current leaves the switch
+  you just closed. Don't re-derive the diagonal from the 200px offset; it has
+  already been derived, seen, and declined.
+
+  **Two rules keep it from breaking things it can't see.** The CSS is scoped
+  to `.theme-wipe`, added for the length of the toggle only, because
+  ClientRouter drives every page navigation through the same
+  `::view-transition-*` pseudo-elements — an unscoped `animation: none` there
+  would silently strip the cross-fade off every link on the site. And that
+  same scope suppresses every `transition` beneath it: `html` fades its
+  background over 0.2s and `body` its text colour, which is the flash this
+  gesture replaces, and leaving them running wrecked it outright — a view
+  transition captures the new page as a still, and the still was being taken
+  mid-fade, so the front revealed a half-blended grey sheet. Those fades stay
+  in the stylesheet for the fallback path (reduced motion, or a browser
+  without the API), where the theme flips instantly and a fade is the kinder
+  ending.
+
+  **This is why the ambient layer has no fifth instrument.** A dot surge across
+  the grid was built first and removed: a view transition renders static
+  snapshots for its whole duration, so nothing in `respire.ts` can play
+  underneath one. The two could never have run together, and the wipe carries
+  the same story with the entire page as its payload.
+
 - Hover transitions run 0.2–0.3s ease; syntax colors snap on theme toggle
   rather than transitioning.
 - **Everything above yields to `prefers-reduced-motion: reduce`** — final
