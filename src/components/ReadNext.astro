@@ -10,11 +10,7 @@ const fmt = (d: Date) =>
 
 <nav aria-label="À lire ensuite" class="mt-20 max-w-[68ch]">
   <div class="mb-6 flex items-center gap-3">
-    <h2
-      class="text-faded shrink-0 font-sans text-xs tracking-[0.08em] uppercase"
-    >
-      À lire ensuite
-    </h2>
+    <h2 class="text-faded register-ident shrink-0 text-xs">À lire ensuite</h2>
     <span class="heading-trace-line" aria-hidden="true"></span>
   </div>
   <ul class="flex flex-col gap-1">
@@ -27,7 +23,7 @@ const fmt = (d: Date) =>
           >
             <time
               datetime={p.pubDate.toISOString().slice(0, 10)}
-              class="text-faded group-hover:text-charcoal dark:group-hover:text-primary-100 text-sm tabular-nums transition-colors group-hover:transition-none motion-reduce:transition-none"
+              class="text-faded register-notation group-hover:text-charcoal dark:group-hover:text-primary-100 text-sm transition-colors group-hover:transition-none motion-reduce:transition-none"
             >
               {fmt(p.pubDate)}
             </time>

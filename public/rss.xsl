@@ -10,9 +10,17 @@
                 <title><xsl:value-of select="channel/title"/> - RSS Feed</title>
                 <meta charset="UTF-8"/>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-                <link rel="preconnect" href="https://fonts.googleapis.com"/>
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin"/>
-                <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Space+Grotesk:wght@400;700&amp;display=swap" rel="stylesheet"/>
+                <!-- Pas de police tierce ici, et c'est la raison d'etre de ce
+                     bloc. Cette page chargeait IBM Plex Mono et Space Grotesk
+                     depuis Google Fonts : deux familles que le site ne sert
+                     plus, sur la seule surface publique que le garde-fou
+                     (qui ne lit que dist/*.html) ne voit jamais passer.
+
+                     Un XSL statique ne peut pas atteindre les .woff2 d'Astro,
+                     dont le nom porte un hash de build. Il declare donc les
+                     memes piles que les tokens du site et retombe sur Georgia :
+                     le bon registre, aucune requete sortante, et rien a tenir
+                     en phase avec global.css a part le nom des familles. -->
                 <style>
                     * {
                     margin: 0;
@@ -21,12 +29,12 @@
                     }
 
                     body {
-                    font-family: 'IBM Plex Mono', monospace;
+                    font-family: Alegreya, Georgia, serif;
                     line-height: 1.6;
                     color: #252525;
                     background: #fafafa;
                     padding: 2rem 1rem;
-                    font-size: 16px;
+                    font-size: 20px;
                     }
 
                     .container {
@@ -41,16 +49,17 @@
                     }
 
                     .header h1 {
-                    font-family: 'Space Grotesk', sans-serif;
-                    font-size: 2rem;
+                    font-family: Alegreya, Georgia, serif;
+                    font-size: 2.25rem;
                     font-weight: 700;
-                    letter-spacing: 0.03em;
+                    letter-spacing: 0;
                     margin-bottom: 0.5rem;
                     color: #252525;
                     }
 
                     .header p {
                     color: #6b6b6b;
+                    font-style: italic;
                     margin-bottom: 1rem;
                     }
 
@@ -58,9 +67,10 @@
                     background: #252525;
                     color: #fafafa;
                     padding: 1rem;
-                    border-radius: 4px;
+                    border-radius: 3px;
                     margin-top: 1rem;
                     font-size: 0.9rem;
+                    font-style: italic;
                     }
 
                     .content {
@@ -77,10 +87,10 @@
                     }
 
                     .item h2 {
-                    font-family: 'Space Grotesk', sans-serif;
+                    font-family: Alegreya, Georgia, serif;
                     font-size: 1.5rem;
                     font-weight: 700;
-                    letter-spacing: 0.03em;
+                    letter-spacing: 0;
                     margin-bottom: 0.5rem;
                     }
 
@@ -97,14 +107,17 @@
                     }
 
                     .item .meta {
+                    font-family: ui-monospace, monospace;
+                    font-variant-numeric: tabular-nums;
                     color: #6b6b6b;
-                    font-size: 0.9rem;
+                    font-size: 0.8rem;
                     margin-bottom: 0.5rem;
                     }
 
                     .item .description {
                     color: #252525;
                     line-height: 1.7;
+                    max-width: 55ch;
                     }
 
                     @media (max-width: 768px) {
@@ -117,7 +130,7 @@
                     }
 
                     .header h1 {
-                    font-size: 1.5rem;
+                    font-size: 1.875rem;
                     }
 
                     .item h2 {
@@ -132,7 +145,7 @@
                         <h1><xsl:value-of select="channel/title"/></h1>
                         <p><xsl:value-of select="channel/description"/></p>
                         <div class="info">
-                            📰 Ceci est un flux RSS. Abonnez vous en copiant-collant l'URL dans votre lecteur RSS.
+                            Ceci est un flux RSS. Abonnez-vous en copiant-collant l'URL dans votre lecteur RSS.
                         </div>
                     </div>
 
@@ -148,7 +161,7 @@
                                     </a>
                                 </h2>
                                 <div class="meta">
-                                    📅 <xsl:value-of select="substring(pubDate, 0, 17)"/>
+                                    <xsl:value-of select="substring(pubDate, 0, 17)"/>
                                 </div>
                                 <div class="description">
                                     <xsl:value-of select="description"/>

@@ -15,35 +15,71 @@ colors:
   scanzee: "#e82483"
 typography:
   headline:
-    fontFamily: "Space Grotesk, sans-serif"
-    fontSize: "1.5rem"
+    fontFamily: "Alegreya, Georgia, serif"
+    fontSize: "1.875rem"
     fontWeight: 700
-    letterSpacing: "0.03em"
+    lineHeight: 1.25
+    letterSpacing: "0"
+  headline-md:
+    fontFamily: "Alegreya, Georgia, serif"
+    fontSize: "2.25rem"
+    fontWeight: 700
+    lineHeight: 1.2
+    letterSpacing: "0"
+  subhead:
+    fontFamily: "Alegreya, Georgia, serif"
+    fontSize: "1.125rem"
+    fontWeight: 700
+    lineHeight: 1.4
   title:
-    fontFamily: "Space Grotesk, sans-serif"
-    fontSize: "0.85rem"
+    fontFamily: "Alegreya, Georgia, serif"
+    fontSize: "1.05rem"
     fontWeight: 700
     lineHeight: 1.3
   body:
-    fontFamily: "IBM Plex Mono, monospace"
-    fontSize: "16px"
+    fontFamily: "Alegreya, Georgia, serif"
+    fontSize: "1.25rem"
     fontWeight: 400
     lineHeight: 1.6
   longform:
-    fontFamily: "IBM Plex Mono, monospace"
-    fontSize: "1.0625rem"
+    fontFamily: "Alegreya, Georgia, serif"
+    fontSize: "1.375rem"
     fontWeight: 400
-    lineHeight: 1.6
-  label:
-    fontFamily: "IBM Plex Mono, monospace"
-    fontSize: "0.7rem"
+    lineHeight: 1.7
+  longform-sm:
+    fontFamily: "Alegreya, Georgia, serif"
+    fontSize: "1.1875rem"
+    fontWeight: 400
+    lineHeight: 1.7
+  ident:
+    fontFamily: "Alegreya, Georgia, serif"
+    fontSize: "0.8125rem"
+    fontWeight: 500
+    lineHeight: 1.4
+    letterSpacing: "0.11em"
+  expression:
+    fontFamily: "Alegreya, Georgia, serif"
+    fontSize: "0.875rem"
+    fontWeight: 400
+    lineHeight: 1.55
+  note:
+    fontFamily: "Alegreya, Georgia, serif"
+    fontSize: "0.875rem"
     fontWeight: 400
     lineHeight: 1.5
-  note:
-    fontFamily: "IBM Plex Mono, monospace"
+  notation:
+    fontFamily: "Azeret Mono, ui-monospace, monospace"
+    fontSize: "0.875rem"
+    fontWeight: 400
+    lineHeight: 1.5
+    letterSpacing: "0"
+    fontFeature: "tabular-nums"
+  figure:
+    fontFamily: "Azeret Mono, ui-monospace, monospace"
     fontSize: "0.75rem"
     fontWeight: 400
-    lineHeight: 1.5
+    lineHeight: 1.4
+    fontFeature: "tabular-nums"
 rounded:
   hairline: "2px"
   card: "3px"
@@ -54,10 +90,12 @@ components:
     rounded: "{rounded.card}"
     padding: "0.65rem 0.75rem 0.75rem"
   badge-done:
+    typography: "{typography.ident}"
     textColor: "{colors.signal-ink}"
     rounded: "{rounded.hairline}"
     padding: "0.1rem 0.35rem"
   badge-progress:
+    typography: "{typography.ident}"
     textColor: "{colors.charcoal}"
     rounded: "{rounded.hairline}"
     padding: "0.1rem 0.35rem"
@@ -95,13 +133,20 @@ circuit traces draw themselves, and the ambient respire layer keeps the
 drawing alive afterward — and every one of these defers completely to
 `prefers-reduced-motion: reduce`.
 
+The type is the drawing's other instrument: **la partition**, a graphic score.
+Since 2026-08 the site sets two families in three registers — a roman voice
+that both speaks and reads, its italic as the expression register, and a
+monospace kept for notation and measurement. Type is assigned here by job,
+not by size.
+
 **Key Characteristics:**
 
 - One sheet, two registers: flowing (Now, flow field) and constrained
   (everything else, dot grid) — the same thin-line primitive, never a third.
 - Monochrome plus one brass Signal, on lines and state only.
 - Hairline construction: 1px borders, 3px rails, 6px corner ticks, 2px dots.
-- Monospace body under grotesk headings; captions read as annotations.
+- One roman voice for headings and prose, its italic for annotation, a
+  monospace for figures alone — two families, three registers.
 - Motion draws the page like ink, then keeps it breathing (la machine
   respire); reduced-motion shows the finished drawing, perfectly still.
 
@@ -123,7 +168,8 @@ Two inks, a pencil, two sheets, and one brass wire.
 ### Neutral
 
 - **Charcoal** (#252525): the text ink on light pages; also the inline-code
-  chip's ground in both themes (`--color-charcoal`).
+  chip's ground in both themes (`--color-charcoal`), and the light-mode
+  selection ground.
 - **Paper** (#fafafa): the light page, and the text ink on dark pages
   (`--color-primary-100`, aliased to `--color-page` in light).
 - **Faded** (#858585): secondary text — dates, reading times, subtitles, the
@@ -165,41 +211,192 @@ Paper. Light mode never wears true brass — it fails contrast on #fafafa — an
 the two are tokens (`--color-brass`, `--color-brass-ink`), mirrored for
 non-CSS surfaces only in `src/lib/palette.ts`.
 
+**The Inverted Selection Rule.** Dragged text takes ink and paper, inverted
+per theme (`::selection`), never brass — a selection is not a live control,
+and the platform blue is the one surface that gives an undesigned page away.
+
 ## Typography
 
-**Heading Font:** Space Grotesk (400, 700)
-**Body Font:** IBM Plex Mono (400, 400-italic, 500, 600, 700)
+**Voice (headings and prose):** Alegreya — roman 400 / 500 / 700, italic 400
+(`--font-voice`, with Georgia then a generic serif behind it)
+**Notation:** Azeret Mono 400 (`--font-notation`, with `ui-monospace` behind it)
 
-**Character:** A grotesk voice over a monospace hand — the headings speak,
-the body annotates. The mono body makes every paragraph read like a note on a
-schematic; letter-spaced uppercase mono labels are the system's annotation
-register.
+Exactly two families, self-hosted via @fontsource, five real font files. The
+count is enforced, not merely intended: `scripts/guard/weight.mjs` asserts two
+families per page. Tokens are named for the **role**, never for the face — a
+register may change its face, a face may not change its job. The old
+`--font-space` / `--font-sans` are gone, and `--font-sans` is the cautionary
+tale: it was bound to a monospace, which is how a mono ended up setting every
+paragraph on the site. `--default-font-family` and `--default-mono-font-family`
+now name the default explicitly so that cannot recur.
+
+**Character:** A score, not a UI kit. The roman speaks and reads with the same
+voice — a monograph sets a heading, it does not shout one — its italic
+annotates in the margin the way an expression mark does, and the mono is kept
+back for what it is genuinely better at: figures, dates, code. Nothing is
+synthesised.
 
 ### Hierarchy
 
-- **Headline** (700, 1.5rem → 1.875rem at `md`, tracking 0.03em): page
-  titles (h1), in Space Grotesk; h1 enters with `slide-down`.
-- **Title** (700, 0.85rem, lh 1.3): card titles — Space Grotesk shrunk to
-  labeling size.
-- **Body** (400, 16px, lh 1.6): all running text, IBM Plex Mono. Prose
-  measure is 68ch; long-form articles tighten to 62ch at 1.0625rem, because
-  mono flattens word shapes and wants the shorter line.
-- **Label** (400, 0.7rem, lh 1.5): captions, card subtitles, notes and
-  badges — the annotation voice, often uppercase with 0.06em tracking. 0.7rem
-  (11.2px) is also the voice's floor: badges once sat at 0.6rem, whose 9.6px
-  stopped being legible annotation.
-- **Note** (400, 0.75rem, lh 1.5): multi-line running text at card scale —
-  the MediaCard note and the skip link. Sentences get the 12px reading floor;
-  0.7rem stays reserved for one-line labels.
-- **Nav** (400/500, 0.875rem, uppercase, tracking-wide): the rail's items;
-  500 marks the active page.
+- **Headline** (Alegreya 700, 1.875rem → 2.25rem at `md`, tracking 0): page
+  titles (h1), across all seven page files. At 36px over a 20px body that is
+  1.8× — monograph reading scale, not display scale. The grotesk's 0.03em
+  tracking is gone, because positive tracking on a seriffed bold breaks word
+  shapes apart. h1 still enters with `slide-down`.
+- **Subhead** (Alegreya 700, 1.5rem): section headings inside a page — the
+  Now entries' h3 ("Lecture", "Gaming"). 24px, because they introduce a 20px
+  body: at the old 1.125rem they sat _below_ the text they were heading.
+- **Title** (Alegreya 700, 1.05rem, lh 1.3): list-row titles (AlbumRow) and
+  MediaCard titles — one step, not two.
+- **Body** (Alegreya 400, 1.25rem, lh 1.6): all running text, unclassed —
+  the voice is the page default, which is why there is deliberately no
+  `.register-voice`. 20px, arrived at in two corrections; see the x-height
+  rule below. **`.prose` sets 20px explicitly** (lh 1.65) — left at
+  Typography's own 1rem it rendered every non-article prose block at 16px,
+  7.30px of x-height, below the 8.26px the old 16px monospace drew. The ramp
+  is 20 / 20 / 22 (body / prose / article), never 20 / 16 / 22.
+- **Longform** (Alegreya 400, 1.375rem, lh 1.7, dropping to 1.1875rem under
+  768px): article prose (`.prose-longform`) — the surface the whole change
+  exists for, so it carries the clearest step of the ramp. The measure lives
+  on `.prose` and is inherited; this rule sets only the size. On a phone the
+  viewport binds the line rather than the `ch` measure, so size alone decides
+  how many characters fit.
+- **Article heads** (`.prose-longform` h2 1.3em / h3 1.1em): 28.6px and
+  24.2px against a 36px h1 and a 22px body — steps of 1.26× / 1.18× / 1.10×.
+  Typography's 1.5em/1.25em defaults put h2 at 33px, **1.09× under the h1**
+  (1.05× on mobile) in the same family, weight, colour and tracking, so a
+  reader scanning for the next section got no landmark. The heads come down
+  rather than the title going up: 36px over a 20px body is already the
+  monograph scale this file argues for. The second axis is the
+  `.heading-trace-line` hairline, never a weight — Typography asks `strong`
+  for a 600 Alegreya does not ship, which resolves to the same 700 the heads
+  wear, so `.prose strong` names 700 outright.
+- **Ident** (`.register-ident` — Alegreya 500, roman caps, tracking 0.11em):
+  what names rather than speaks — nav items (0.875rem in the rail, 1.5rem in
+  the mobile overlay), section labels ("À lire ensuite", 0.75rem), badges
+  (0.8125rem). Caps get the tracking caps always need.
+- **Expression** (`.register-expression` — Alegreya **italic** 400, 0.875rem
+  typical, lh 1.55): captions, subtitles, notes, asides — the voice
+  annotating itself, which is what an italic means on a score. It replaces
+  the tracked uppercase mono the site used to label with, and it is the one
+  register that must stay consistent or it stops reading as a system.
+  `.prose figcaption`, `blockquote cite` and `blockquote footer` take it
+  inside articles; typography's own italic already sets article blockquotes.
+- **Note** (Alegreya roman 400, 0.875rem, lh 1.5): running text at card
+  scale — the MediaCard note, the AlbumRow note. Sentences stay roman; only
+  what annotates goes italic.
+- **Notation** (`.register-notation` — Azeret Mono 400, 0.875rem typical,
+  `tabular-nums`, tracking 0, **`font-size-adjust: var(--notation-aspect)`**):
+  code, dates, reading times, figure and track numbers, the 404's number.
+  Track numbers and the row arrow drop to 0.75rem — the row arrow was snapped
+  onto that step rather than keeping a size of its own. The circuit plates'
+  SVG annotations take the same face via `.circuit-label`, and are the one
+  mono surface _without_ the adjustment: they never sit beside roman text, so
+  there is no mismatch to correct and shrinking them would only cost
+  legibility.
+- **Year mark** (`.year-mark`, tracking 0.18em on notation): the blog index's
+  year heading — a rehearsal mark. Its hierarchy comes from tracking plus the
+  `.heading-trace-line` hairline, never from a weight.
+
+**X-height sets the floor; rendered comparison sets the size.** Perceived size
+tracks x-height, and Alegreya's is 0.456em against IBM Plex Mono's ~0.516em,
+so a face swap at equal px ships a smaller page: 16px mono drew 8.26px of
+x-height, a first pass at 17px Alegreya only 7.75px, while claiming to improve
+readability. A second pass computed the floor back and set 19px (8.66px) —
+right arithmetic, and the owner still called it small. Parity with a page that
+was already hard to read is not the target; it is only the floor. The shipped
+20px body and 22px article (x-height 10.03px, against the old 17px mono's
+8.77px) were chosen from rendered comparisons at 19/20, 20/22 and 21/24. Both
+corrections belong in the reasoning: the arithmetic was right twice and landed
+short twice.
+
+**The measure is 55ch, and it must be counted on FILLED LINES.** One value on
+`.prose`, inherited by the article, because `ch` scales with the font: 55ch
+lands ~70 characters at 20px _and_ at 22px, so both surfaces read at the same
+width in characters while set at different sizes.
+
+Counting the tail line of each paragraph is what made the earlier numbers
+wrong. Every paragraph contributes one artificially short last line, so a
+tail-included average under-reports by 12–20 characters — and it is wrong on
+every post, which is why sampling more of them never caught it. Measured both
+ways over four articles at the old 65ch: tail-included gave 64.0 / 66.3 /
+71.9 / 71.1 (which is what got written down here), filled-lines-only gave
+medians of **83 / 86 / 83 / 84**. The line had been running past the 65–75
+band this file claims and past the 80 of WCAG 2.1 SC 1.4.8, and because the
+constraint is expressed in `ch`, zoom could not rescue it: the character count
+is invariant under zoom. At 55ch the same four articles measure **70 / 72 /
+68 / 68**.
+
+The per-post caveat survives, but it was guarding the wrong thing:
+`garder-un-historique-git-propre` runs short paragraphs around its code blocks
+and its _mean_ sits 7–13 characters below its own median — its median is not
+an outlier at all. Count medians, on filled lines, over more than one article.
+
+On a phone the viewport binds the line: **44–45 characters at 390px**,
+deliberately under the 45 floor, because glyph size and character count cannot
+both be satisfied there and the glyph wins — that is what the reader actually
+complains about. (The "~41" previously recorded here was the same
+tail-contaminated average.) The old 62ch was a concession to the mono and is
+gone.
+
+**Figures are lining, as a recorded decision.** The roman wants old-style
+figures, and the rule was written — then measured: `0123456789` in Alegreya at
+100px gives an identical 447.10 × 160 box under `normal` and `oldstyle-nums`,
+because @fontsource's Alegreya ships no `onum` feature. The declaration would
+have been a comment claiming a decision the page never made. Register
+separation therefore rests on family and tracking. The falsifier is written
+into `global.css`: re-run that measurement after a font bump, and if the boxes
+ever differ, the rule goes back in.
 
 ### Named Rules
 
 **The Real Cuts Rule.** Every weight and style the site sets is a real font
 file (@fontsource, unicode-range gated); nothing is browser-synthesized. A new
-weight means a new import in `global.css`, not a `font-weight` that smears
-400 outlines.
+weight means a new import in `global.css`, not a `font-weight` that smears 400
+outlines. The rule has teeth now: `.register-notation` **pins**
+`font-weight: 400`, so a notation element nested inside a rule that sets 700 —
+the blog index's year sits under `h1,h2,h3` — cannot synthesise a bold the
+site does not ship. The same trap was live on `p code`, which shared
+`--font-notation` with the register but not the class: Typography's
+`.prose code { font-weight: 600 }` landed on a face that ships 400 alone and
+smeared a bold across 12 inline chips, plus an oblique on a `<code>` nested in
+an `<em>`. It pins weight _and_ style now. Two more declarations asked for
+cuts that do not exist and quietly resolved to a neighbour — blockquote's
+italic 500 (Alegreya ships italic 400 only) and `strong`'s 600 (resolving to
+700). Nothing was synthesised by those two, but a declaration that names a
+weight the site does not ship is a lie the next reader will believe, so both
+name the real cut.
+
+**The Optical Size Rule.** `14px` does not mean one size on this site unless
+it is made to. Azeret Mono's x-height is **0.550em** against Alegreya's
+**0.456em**, so equal `px` renders the mono 20.6% larger — which is why the
+dates outsized the labels beside them and the code outsized the prose around
+it. `--notation-aspect` (0.456, the site's optical unit) is declared once and
+applied with `font-size-adjust` wherever mono meets roman: the register keeps
+its consumers' own sizes and the browser solves for the size at which Azeret
+draws the x-height Alegreya would have. Inline code takes it at a literal
+`1em` — the same size as the sentence it sits in.
+
+Two exceptions, both measured rather than assumed. **`.circuit-label`** never
+sits beside roman text, so there is nothing to match. **Fenced blocks** are
+the interesting one: they take a direct `0.72em` (x-height 87% of the prose,
+near the 88% the old pairing ran at, chosen from rendered candidates at
+0.93 / 0.80 / 0.72 / 0.65) because a block is judged as an object rather than
+as something inside a line — at x-height parity a wide, heavy mono still
+carries far more ink per line than the prose. And because `font-size-adjust`
+shrinks the glyphs but **not the box**: leading and padding resolve against
+the _declared_ size, so 0.93em+adjust gave 35.07px of leading around 16.96px
+glyphs, an effective 2.07 line-height that nothing in the CSS said out loud.
+Keep the adjustment off anything that establishes its own line box.
+
+**The Two Families Rule.** Two families, three registers, and the guard counts
+them. Real small caps were **refused** for the identification register because
+they would be a third family; roman caps with 0.11em tracking do that job
+instead. This is a decision with a reason, not an omission.
+
+**The Notation-Only Rule.** The mono sets code, data and measurement — never a
+sentence, and never a costume for "technical". If it is being read rather than
+counted, it is the voice's job.
 
 ## Layout
 
@@ -207,10 +404,13 @@ A fixed left rail and one centered column on the sheet. Desktop: the nav is a
 sticky 6rem rail (`w-24`) with the content offset `md:ml-16`; content lives in
 a `max-w-4xl` column with `px-4 / sm:px-6 / md:px-10` gutters and
 `py-8 / md:py-12 / lg:py-16` vertical rhythm. Reading surfaces narrow further:
-`max-w-2xl` for the blog index, 68ch/62ch prose measures for articles. Mobile
-(`< md`, 768px — the single layout hinge): the rail becomes a fixed 3.5rem
-top bar with the animated WL logo and a hamburger opening a full-screen
-overlay menu (slide-in, `inert` while closed).
+`max-w-2xl` for the blog index and a single 55ch measure on `.prose`,
+inherited by the article (68–72 characters on filled lines at 1440px, counted
+across four posts; 44–45 at 390px); the long-form step also drops a size under
+768px, the one place type is responsive. Mobile (`< md`, 768px — the
+single layout hinge): the rail becomes a fixed 3.5rem top bar with the
+animated WL logo and a hamburger opening a full-screen overlay menu (slide-in,
+`inert` while closed).
 
 The ground is part of the layout: a fixed full-page dot grid (1px dots on a
 20px cell, 13% ink light / 6% dark) on constrained pages, the flow-field
@@ -244,34 +444,36 @@ Signal; underlines are 1px hairlines that ride 1px below text, never
 ## Components
 
 The components are **schémas annotés** — annotated schematics. Each one reads
-like a figure in a technical drawing: registration ticks for corners, mono
-captions for annotations, and state changes drawn as lines growing or borders
-waking, never as lifting or glowing.
+like a figure in a technical drawing: registration ticks for corners, italic
+captions for annotations, mono for anything counted, and state changes drawn
+as lines growing or borders waking, never as lifting or glowing.
 
 ### Navigation
 
-- **Desktop rail:** uppercase mono items at 0.875rem, resting at 70% opacity;
-  hover restores full ink and nudges the label 4px right. The active item
-  carries a 3px Signal rail on its left edge; hover on inactive items grows a
-  40%-height stub of the same rail — hover and active differ by _length_, not
-  opacity. The rail slides between items across page navigations
-  (`view-transition-name: nav-rail`); reduced motion keeps position and
-  length, dropping only the travel.
-- **Mobile:** full-screen overlay, 1.5rem uppercase items with the same rail
-  laid on its side (3px underline, `scaleX` 0→1); no hover half-state — it's
-  touch-only. Social links and theme toggle sit at the bottom.
+- **Desktop rail:** the identification register — roman caps at 0.875rem with
+  0.11em tracking — the score's margin of instrument names — resting at 70%
+  opacity; hover restores full ink and nudges the label 4px right. The active
+  item carries a 3px Signal rail on its left edge and steps to weight 500;
+  hover on inactive items grows a 40%-height stub of the same rail — hover and
+  active differ by _length_, not opacity. The rail slides between items across
+  page navigations (`view-transition-name: nav-rail`); reduced motion keeps
+  position and length, dropping only the travel.
+- **Mobile:** full-screen overlay, 1.5rem caps with the same rail laid on its
+  side (3px underline, `scaleX` 0→1); no hover half-state — it's touch-only.
+  Social links and theme toggle sit at the bottom.
 - **Dark-mode rail:** Signal mixed 65% toward the page (full brass is the
   loudest thing on a dark page; 65% lands at 4.3:1, above the 3:1 a state
   indicator needs).
 
 ### List Rows (blog index)
 
-The dot-leader row: month (tabular-nums, Faded) — a 2px-dot leader line
-filling the gap — title — reading time. The title rests in full ink
+The dot-leader row: month (notation, tabular-nums, Faded) — a 2px-dot leader
+line filling the gap — title — reading time. The title rests in full ink
 (Charcoal/Paper) so the list leads with what it lists; month, leader and
 reading time rest in Faded and ink up to match on hover, easing in but
-snapping off (`group-hover:transition-none`). Years are group headings, so
-rows carry only the month.
+snapping off (`group-hover:transition-none`). Years are group headings — the
+year mark, tracked 0.18em with a hairline trace — so rows carry only the
+month.
 
 ### Cards (MediaCard — books & games)
 
@@ -280,17 +482,19 @@ rows carry only the month.
 - **Hover:** the border wakes (0.15 → 0.35 opacity); nothing lifts.
 - **Cover:** aspect-locked (2/3 books, 16/9 games), object-fit cover, inset
   at 2px radius.
-- **Body:** 0.65–0.75rem padding; badge, then Title, then a Label-voice
-  subtitle; the note is running text in the Note voice (0.75rem) — sentences
-  don't wear annotation size.
+- **Body:** 0.65–0.75rem padding; badge (ident, 0.8125rem), then Title (roman
+  700, 1.05rem), then an italic subtitle in the expression register — the
+  subtitle annotates the title, so it slopes; the note below it is running
+  text and stays roman at 0.875rem.
 
 ### Badges
 
-Uppercase mono at 0.7rem, 2px radius, hairline border. **Done** wears Signal:
-an 8% brass wash with Signal encré text in light (exactly 8% — the pair lands
-at 4.51:1 and fails at 12%), a 15% wash with true Signal in dark. **In
-progress** stays neutral: 7% ink wash, Charcoal/Paper text. Brass marks the
-finished state because state is brass's whole job.
+Roman caps in the identification register at 0.8125rem, 0.11em tracking, 2px
+radius, hairline border. **Done** wears Signal: an 8% brass wash with Signal
+encré text in light (exactly 8% — the pair lands at 4.51:1 and fails at 12%),
+a 15% wash with true Signal in dark. **In progress** stays neutral: 7% ink
+wash, Charcoal/Paper text. Brass marks the finished state because state is
+brass's whole job.
 
 ### Icon Controls
 
@@ -307,9 +511,9 @@ their brand's color (the Guest Inks, contrast-corrected to ≥3:1 on Paper);
 the owner's own surfaces hover in Signal — brass on the line, never the text.
 The exception is recorded, not an oversight: the contact rows (GitHub,
 LinkedIn) hover in neutral ink — see Guest Inks. The invitation line above
-those rows carries the figcaption tick, promoted: a 1px Signal border-left —
-the page's one address to the visitor wears the site's one wire (decided
-2026-08-10 over keeping home brass-silent).
+those rows is set in the expression register and carries the figcaption tick,
+promoted: a 1px Signal border-left — the page's one address to the visitor
+wears the site's one wire (decided 2026-08-10 over keeping home brass-silent).
 
 ### Signature: Circuit Decorations
 
@@ -317,10 +521,13 @@ Hand-drawn SVG circuit fragments (traces, dots, pads, labels) that draw
 themselves on page entry (`circuit-draw` via stroke-dashoffset, then
 `circuit-appear`). Ink comes only from `--ink-circuit`
 (`--ink-circuit-strong` solely for NowDecoration over the moving flow field).
-Each page family has its own plate: Home (header, margin, footer), blog list,
-blog post, Talks, Now. Blog posts also inject heading traces — a 1px line
-drawing itself after each h2 — and a 2px reading-progress hairline at the
-viewport top (hidden entirely under reduced motion).
+Their annotations — post counts, year spans, reading times — are measurement,
+so they take the notation face through one shared `.circuit-label` rule rather
+than a family literal per decoration. Each page family has its own plate: Home
+(header, margin, footer), blog list, blog post, Talks, Now. Blog posts also
+inject heading traces — a 1px line drawing itself after each h2 — and a 2px
+reading-progress hairline at the viewport top (hidden entirely under reduced
+motion).
 
 ### Signature: The Flow Field
 
@@ -361,9 +568,17 @@ single static frame under reduced motion.
   `--ink-circuit-strong` only over the flow field.
 - **Do** give every container the hairline treatment: 1px border at 0.15/0.1
   opacity, 3px radius, and registration ticks if it frames content.
-- **Do** write annotations in the Label voice: IBM Plex Mono, 0.7rem,
-  uppercase with tracking when it's a status — never smaller; 0.7rem is the
-  legibility floor.
+- **Do** pick a register by the job, not by the size: `.register-ident` for
+  what names (nav, labels, badges), `.register-expression` for what annotates
+  (captions, subtitles, asides), `.register-notation` for what is counted
+  (code, dates, reading times, figure numbers). Running text needs no class —
+  the voice is the default.
+- **Do** take x-height as the floor for a new step (0.456em for Alegreya) and
+  then settle the size by rendering the candidates side by side; count a new
+  measure on more than one article.
+- **Do** buy hierarchy with size, tracking or a hairline. The mono ships at
+  400 and only 400; a bolder notation is a synthesised weight, which the
+  system forbids.
 - **Do** pair every animation with its `prefers-reduced-motion: reduce`
   ending: final state visible, information preserved (a rail keeps its
   length; only the travel goes).
@@ -377,6 +592,14 @@ single static frame under reduced motion.
   only one, and it was removed for carrying state — brass's job.
 - **Don't** put brass on running text, or true brass (#E4A94D) on Paper —
   it reads at 1.9:1.
+- **Don't** add a third family. Two are counted by the guard, and a small-caps
+  cut was already declined on exactly this ground — the identification
+  register is roman caps with tracking.
+- **Don't** set a sentence in the mono. It is notation and measurement; using
+  it as a costume for "technical" is what made the long articles hard to read.
+- **Don't** name a font token after its face. Tokens are roles
+  (`--font-voice`, `--font-notation`); the last face-named token,
+  `--font-sans`, silently pointed at a monospace for years.
 - **Don't** add a third background metaphor. Flowing (flow field) and
   constrained (dot grid) are the same primitive in two registers; a new page
   picks one.

@@ -46,7 +46,7 @@ const yearSpan =
   <div class="max-w-2xl">
     <header class="py-12">
       <h1
-        class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl"
+        class="font-voice text-charcoal dark:text-primary-100 text-3xl md:text-4xl"
       >
         Le blog
       </h1>
@@ -57,9 +57,12 @@ const yearSpan =
       {
         groups.map(({ year, posts: yearPosts }) => (
           <section class="mb-8 last:mb-0">
-            <h2 class="text-faded font-space mb-2 text-sm tabular-nums">
-              {year}
-            </h2>
+            <div class="mb-2 flex items-center gap-3">
+              <h2 class="text-faded register-notation year-mark shrink-0 text-sm">
+                {year}
+              </h2>
+              <span class="heading-trace-line" aria-hidden="true" />
+            </div>
             <ul>
               {yearPosts.map((post: CollectionEntry<"blog">) => (
                 <li>
@@ -69,7 +72,7 @@ const yearSpan =
                   >
                     <time
                       datetime={isoMonth(post.data.pubDate)}
-                      class="text-faded group-hover:text-charcoal dark:group-hover:text-primary-100 text-sm tabular-nums transition-colors group-hover:transition-none motion-reduce:transition-none"
+                      class="text-faded register-notation group-hover:text-charcoal dark:group-hover:text-primary-100 text-sm transition-colors group-hover:transition-none motion-reduce:transition-none"
                     >
                       {fmtMonth(post.data.pubDate)}
                     </time>
@@ -80,7 +83,7 @@ const yearSpan =
                     <span class="text-charcoal dark:text-primary-100">
                       {post.data.title}
                     </span>
-                    <span class="text-faded ml-3 w-12 shrink-0 text-right text-sm tabular-nums">
+                    <span class="text-faded register-notation ml-3 w-12 shrink-0 text-right text-sm">
                       {post.data.readingTime} min
                     </span>
                   </a>

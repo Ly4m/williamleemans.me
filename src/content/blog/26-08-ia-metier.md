@@ -43,8 +43,8 @@ Aujourd'hui, la transcription est accélérée. Ce qui reste, c'est formuler l'i
     .svg-ia1 .axis  { stroke: var(--stroke); stroke-width: 1.5; }
     .svg-ia1 .guide { stroke: var(--sub); stroke-width: 1; stroke-dasharray: 4 4; }
     .svg-ia1 .dot   { fill: var(--stroke); }
-    .svg-ia1 .row   { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; fill: var(--text); }
-    .svg-ia1 .step  { font-family: 'IBM Plex Mono', monospace; font-size: 11px; fill: var(--sub); }
+    .svg-ia1 .row   { font-family: var(--font-voice); font-size: 12px; font-weight: 600; fill: var(--text); }
+    .svg-ia1 .step  { font-family: var(--font-notation); font-size: 11px; fill: var(--sub); }
   </style>
   <line class="guide" x1="135" y1="30" x2="135" y2="145"/>
   <line class="guide" x1="265" y1="30" x2="265" y2="145"/>

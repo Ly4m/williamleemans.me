@@ -21,7 +21,7 @@ const num = String(index + 1).padStart(2, "0");
     <p class="row-artist">{artist}</p>
     {note && <p class="row-note">{note}</p>}
   </div>
-  <span class="badge badge-neutral">{statusLabel}</span>
+  <span class="badge register-ident badge-neutral">{statusLabel}</span>
 </li>
 
 <style>
@@ -38,16 +38,19 @@ const num = String(index + 1).padStart(2, "0");
     border-bottom-color: rgba(250, 250, 250, 0.1);
   }
 
+  /* A track number is a bar number: notation, and the one place the mono is
+     doing exactly the job it was kept for. */
   .row-index {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.7rem;
+    font-family: var(--font-notation);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.75rem;
     color: var(--color-faded);
     padding-top: 0.15rem;
   }
 
   .row-title {
-    font-family: "Space Grotesk", sans-serif;
-    font-size: 0.9rem;
+    font-family: var(--font-voice);
+    font-size: 1.05rem;
     font-weight: 700;
     line-height: 1.3;
     color: var(--color-charcoal);
@@ -63,22 +66,28 @@ const num = String(index + 1).padStart(2, "0");
     text-underline-offset: 3px;
   }
 
+  /* Snapped to the track-number step rather than keeping its own 0.7rem.
+     The old value was the mono-era annotation floor and outlived it: with
+     the ramp lifted it was the one size in this file belonging to no step,
+     which is a system with a hole in it rather than a considered exception. */
   .row-arrow {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     color: var(--color-faded);
     margin-left: 0.3rem;
   }
 
   .row-artist,
   .row-note {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.7rem;
+    font-size: 0.875rem;
     color: #555;
-    line-height: 1.5;
+    line-height: 1.55;
     margin: 0;
   }
 
+  /* The artist annotates the title, so it takes the expression register; the
+     note below it is running text and stays roman. Two lines, two jobs. */
   .row-artist {
+    font-style: italic;
     margin-top: 0.15rem;
   }
 
@@ -91,16 +100,14 @@ const num = String(index + 1).padStart(2, "0");
     color: #aaa;
   }
 
+  /* Identification register — same badge as MediaCard, same reasoning. */
   .badge {
     display: inline-block;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.06em;
+    font-size: 0.8125rem;
     padding: 0.1rem 0.35rem;
     border-radius: 2px;
     width: fit-content;
     white-space: nowrap;
-    text-transform: uppercase;
     margin-top: 0.15rem;
   }
 
