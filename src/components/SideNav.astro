@@ -122,7 +122,7 @@ const relFor = (s: SocialLink) => {
             data-active={active ? "true" : undefined}
             aria-current={active ? "page" : undefined}
             class={[
-              "mobile-menu-link flex flex-col items-center gap-2 text-2xl font-medium tracking-wide uppercase transition-all duration-200",
+              "mobile-menu-link register-ident flex flex-col items-center gap-2 text-2xl transition-all duration-200",
               active
                 ? "text-black dark:text-white"
                 : "text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white",
@@ -175,8 +175,8 @@ const relFor = (s: SocialLink) => {
             data-active={active ? "true" : undefined}
             aria-current={active ? "page" : undefined}
             class={[
-              "nav-link group relative block px-3 py-2 text-sm tracking-wide uppercase transition",
-              active ? "font-medium" : "opacity-70 hover:opacity-100",
+              "nav-link register-ident group relative block px-3 py-2 text-sm transition",
+              active ? "" : "opacity-70 hover:opacity-100",
             ].join(" ")}
           >
             <span class="inline-block translate-x-0 transition group-hover:translate-x-1">
@@ -243,6 +243,14 @@ const relFor = (s: SocialLink) => {
 
   .nav-link:not([data-active]):hover::before {
     transform: scaleY(0.4);
+  }
+
+  /* The register's weight is 500; the rail buys its active step by dropping
+     inactive items back to 400. It has to be declared here rather than with a
+     `font-normal` utility: `.register-ident` is unlayered and beats any
+     Tailwind layer, so the utility silently lost and every item sat at 500. */
+  .nav-link:not([data-active]) {
+    font-weight: 400;
   }
 
   .nav-link[data-active]::before {

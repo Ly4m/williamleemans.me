@@ -20,12 +20,12 @@ importers:
       '@astrojs/svelte':
         specifier: ^8.0.5
         version: 8.0.5(@types/node@24.12.2)(astro@6.1.9(@netlify/blobs@10.7.4)(@types/node@24.12.2)(jiti@2.5.1)(lightningcss@1.30.1)(rollup@4.46.2)(typescript@5.9.3)(yaml@2.9.0))(jiti@2.5.1)(lightningcss@1.30.1)(svelte@5.43.3)(typescript@5.9.3)(yaml@2.9.0)
-      '@fontsource/ibm-plex-mono':
-        specifier: ^5.2.6
-        version: 5.2.7
-      '@fontsource/space-grotesk':
-        specifier: ^5.2.6
-        version: 5.2.8
+      '@fontsource/alegreya':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/azeret-mono':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@tailwindcss/vite':
         specifier: ^4.1.11
         version: 4.1.11(vite@7.3.2(@types/node@24.12.2)(jiti@2.5.1)(lightningcss@1.30.1)(yaml@2.9.0))
@@ -623,11 +623,11 @@ packages:
   '@fastify/busboy@3.1.1':
     resolution: {integrity: sha512-5DGmA8FTdB2XbDeEwc/5ZXBl6UbBAyBOOLlPuBnZ/N1SwdH9Ii+cOX3tBROlDgcTXxjOYnLMVoKk9+FXAw0CJw==}
 
-  '@fontsource/ibm-plex-mono@5.2.7':
-    resolution: {integrity: sha512-MKAb8qV+CaiMQn2B0dIi1OV3565NYzp3WN5b4oT6LTkk+F0jR6j0ZN+5BKJiIhffDC3rtBULsYZE65+0018z9w==}
+  '@fontsource/alegreya@5.3.0':
+    resolution: {integrity: sha512-YCsp9dHYfMNdggXxinMMS0nkGlZkzs2MvPL7qPVjSO4DM1uJ29hmKEdTC/fBP+2K4Aa+4Z44JuOQz05eDcvNJA==}
 
-  '@fontsource/space-grotesk@5.2.8':
-    resolution: {integrity: sha512-8rlIzpX+lo36y0g77OlwjeBj2DPo9XOwrzqKRLHYZcWcsj73SlkVI6UdXxDCZGLO7oQti1q9QPXzMBYbzSz60w==}
+  '@fontsource/azeret-mono@5.3.0':
+    resolution: {integrity: sha512-Ag/+gN67fUry7i1yLlTnk16Rr1nnTQI2YefA/G7tYcCSr/+TC/ayMrE8Km7O0OKRgI/B5Mfel46Gq9IGY50Uaw==}
 
   '@humanwhocodes/momoa@2.0.4':
     resolution: {integrity: sha512-RE815I4arJFtt+FVeU1Tgp9/Xvecacji8w/V6XtXsWWH/wz/eNkNbhb+ny/+PlVZjV0rxQpRSQKNKE3lcktHEA==}
@@ -5154,9 +5154,9 @@ snapshots:
 
   '@fastify/busboy@3.1.1': {}
 
-  '@fontsource/ibm-plex-mono@5.2.7': {}
+  '@fontsource/alegreya@5.3.0': {}
 
-  '@fontsource/space-grotesk@5.2.8': {}
+  '@fontsource/azeret-mono@5.3.0': {}
 
   '@humanwhocodes/momoa@2.0.4': {}
 

@@ -1,25 +1,37 @@
 @import "tailwindcss";
 
-/* Every weight the site actually sets, and nothing else. A bare
-   `@fontsource/<family>` import ships weight 400 only, which left every bold
-   heading, every `<strong>` and every italic to be synthesised by the browser —
-   smeared or slanted 400 outlines instead of the real cuts.
+/* La partition — two families, three registers.
 
-   Space Grotesk carries the headings (400 and 700). IBM Plex Mono carries
-   everything else: 400 body, 400-italic for `<em>`, 500 for the nav's active
-   item, 600 for `<strong>` and the logo, 700 for markdown headings inside
-   `.prose` — those inherit the body family, not `--font-space`.
+   A score has always assigned its type by job rather than by size, and the
+   site now does the same. Alegreya ROMAN is the voice: headings and running
+   prose, one family doing both, the way a monograph sets a heading rather
+   than the way a magazine shouts one. Alegreya ITALIC is the expression
+   register — captions, notes, the annotation voice — because that is what an
+   italic means on a score (`dolce`, `sostenuto`), and it is the register the
+   site used to write in tracked uppercase mono. Azeret Mono is NOTATION and
+   MEASUREMENT only: code, dates, reading times, figure numbers. It no longer
+   sets a single sentence.
 
-   Subsets are unicode-range gated: the cyrillic and vietnamese files are built
-   but never downloaded for French. src/lib/og-card.ts reads the 700 and 400
+   The demotion is the point. A monospace body was why long articles here
+   needed a 62ch measure to stay readable; the roman takes that constraint
+   away, and the mono keeps the two jobs it is genuinely better at.
+
+   Every weight below is a real font file — the site synthesises nothing. A
+   new weight means a new import here, not a `font-weight` that smears 400
+   outlines. Five files replace the seven the grotesk/mono pairing needed.
+
+   Two families exactly, which is what scripts/guard/weight.mjs counts
+   (FAMILLES_ATTENDUES): small caps would have been a third, so the
+   identification register is roman caps with tracking instead.
+
+   Subsets are unicode-range gated: the cyrillic and vietnamese files are
+   built but never downloaded for French. src/lib/og-card.ts reads the woff
    files straight out of these packages — keep them installed. */
-@import "@fontsource/space-grotesk/400.css";
-@import "@fontsource/space-grotesk/700.css";
-@import "@fontsource/ibm-plex-mono/400.css";
-@import "@fontsource/ibm-plex-mono/400-italic.css";
-@import "@fontsource/ibm-plex-mono/500.css";
-@import "@fontsource/ibm-plex-mono/600.css";
-@import "@fontsource/ibm-plex-mono/700.css";
+@import "@fontsource/alegreya/400.css";
+@import "@fontsource/alegreya/400-italic.css";
+@import "@fontsource/alegreya/500.css";
+@import "@fontsource/alegreya/700.css";
+@import "@fontsource/azeret-mono/400.css";
 
 @plugin "@iconify/tailwind4";
 @plugin "@tailwindcss/typography";
@@ -27,8 +39,28 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-space: "Space Grotesk", "sans-serif";
-  --font-sans: "IBM Plex Mono", sans-serif;
+  /* Role names, not family names. The old tokens were `--font-space` and
+     `--font-sans`, and the second one was a lie for as long as it existed:
+     it was bound to a monospace. A register can change its face; a face
+     can't change its job. */
+
+  /* Voice — headings and running prose. */
+  --font-voice: "Alegreya", Georgia, serif;
+
+  /* Notation & measurement — code, dates, reading times, figure numbers.
+     Never a sentence. */
+  --font-notation: "Azeret Mono", ui-monospace, monospace;
+
+  /* The expression register has no token: it is `--font-voice` in italic,
+     because that is exactly what it is on a score. Giving it a token would
+     invite someone to point it at a different family. */
+
+  /* Tailwind reads these for the unclassed default and for `<code>`/`<pre>`.
+     The body carried no font class and inherited `--font-sans` — which is
+     how a monospace ended up setting every paragraph on the site. Naming the
+     default explicitly is what stops that from happening again. */
+  --default-font-family: var(--font-voice);
+  --default-mono-font-family: var(--font-notation);
 
   --color-primary-100: #fafafa;
   --color-charcoal: #252525;
@@ -63,6 +95,14 @@
 :root {
   --ink-circuit: rgba(107, 107, 107, 0.65);
   --ink-circuit-strong: rgba(107, 107, 107, 0.85);
+
+  /* The site's optical unit: Alegreya's x-height as a fraction of its em,
+     measured in the browser on the shipped cut. Every mono surface that sits
+     next to the voice is adjusted to it, so `14px` means one apparent size on
+     this site rather than two. Azeret Mono's own aspect is 0.550 — 20.6%
+     higher — which is why equal `px` never looked equal. Re-measure this if
+     the voice ever changes face; nothing else needs touching. */
+  --notation-aspect: 0.456;
 }
 
 .dark {
@@ -91,7 +131,42 @@ html {
   transition: background-color 0.2s ease;
 }
 
+/* The selection is part of the drawing. Left to the browser it arrives as the
+   platform's blue — the one surface where a page that was assembled rather
+   than designed gives itself away, and the more obvious the more the type is
+   doing. Ink and paper, inverted; never brass, which marks state and would
+   make a dragged mouse look like a live control. */
+::selection {
+  background-color: var(--color-charcoal);
+  color: var(--color-primary-100);
+}
+
+.dark ::selection {
+  background-color: var(--color-primary-100);
+  color: var(--color-charcoal);
+}
+
 body {
+  /* 20px, arrived at in two corrections.
+
+     Perceived text size tracks x-height, not em size. Measured in the
+     browser: Alegreya's x-height is 0.456em against IBM Plex Mono's ~0.516.
+     The old 16px mono body therefore drew an x-height of 8.26px; a first
+     pass at 17px Alegreya drew 7.75px — a face swap that made the page
+     SMALLER while claiming to make it more readable, which is exactly the
+     complaint it earned.
+
+     A first correction to 19px (x-height 8.66px) cleared the old mono but
+     still read small to the owner, twice. Parity with what was there was
+     only ever a floor, not the target: the point of the change was that the
+     old page was hard to read, so matching it is not success. 20px was
+     chosen from rendered comparisons at 19/20, 20/22 and 21/24 rather than
+     from arithmetic — the arithmetic had already been right and still landed
+     short.
+
+     The `rem`-based steps (`text-sm`, `text-xs`) don't move with this; the
+     explicit small steps below were lifted to match. */
+  font-size: 1.25rem;
   line-height: 1.6;
   transition: color 0.2s ease;
   /*animation: fadeIn 1s ease-out;*/
@@ -140,11 +215,117 @@ main:focus {
   }
 }
 
+/* Headings are the body face, one weight up — a monograph sets a heading,
+   it doesn't shout one. The 0.03em tracking the grotesk wanted comes off
+   entirely: a serif at 700 already has the colour, and positive tracking on
+   a seriffed bold just breaks the word shapes apart. */
 h1,
 h2,
 h3 {
+  font-family: var(--font-voice);
   font-weight: 700;
-  letter-spacing: 0.03em;
+  letter-spacing: 0;
+}
+
+/* The identification register: instrument names in a score's margin, and
+   everything on the site that names rather than speaks — nav items, section
+   labels, the badge that says a book is finished. Roman caps with the
+   tracking caps always need, never small caps: real small caps would be a
+   third family, and this site counts families. */
+.register-ident {
+  font-family: var(--font-voice);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+}
+
+/* Five surfaces used to re-declare the four lines above by hand — the desktop
+   rail, the mobile overlay, the two badges and the skip link — at 0.05, 0.11,
+   0.11, 0.11 and 0.12em. The register was legible in this file and nowhere
+   else, and the mobile nav in particular had drifted to less than half the
+   rail's tracking while DESIGN.md documented both at 0.11em. They all carry
+   the class now.
+
+   ONE deviation survives, and it is bought, not inherited: the desktop rail
+   sets `font-normal` on inactive items so that the active item's 500 — the
+   register's own weight — reads as the step it is meant to be. Take the
+   deviation off and the rail loses a state indicator; take it anywhere else
+   and the register stops meaning anything. */
+
+/* The expression register: what an italic means on a score. Captions,
+   subtitles, notes, asides — the voice annotating itself. It replaces the
+   tracked uppercase mono the site used to label with, and it is the one
+   register that must stay consistent or it stops reading as a system. */
+.register-expression {
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* Notation & measurement. Figures get `tnum` so dates and reading times line
+   up in a column the way bar numbers do; the mono is here for the numerals
+   as much as for the code. */
+/* The weight is pinned, not inherited. Azeret Mono ships here at 400 and only
+   400, so a notation element landing inside a rule that sets 700 — the blog
+   index's year sits in `h1,h2,h3` — asked the browser to smear a bold out of
+   the 400 outlines, which is exactly what the Real Cuts note above forbids.
+   Pinning it is structural: the register can't synthesise a weight the site
+   doesn't ship, whatever it is nested in. */
+/* And the SIZE is adjusted, not declared, because `14px` does not mean the
+   same thing in the two families. Azeret Mono's x-height is 0.550em against
+   Alegreya's 0.456 — measured in the browser, both faces, the shipped cuts —
+   so a 14px date beside a 14px roman label drew 7.70px of x-height against
+   6.38px and read 21% larger than the thing it annotates. Notation is meant
+   to be legible, not louder than the voice.
+
+   `font-size-adjust` is the right tool here rather than a computed size,
+   because this register is applied at five different sizes by its consumers
+   (0.75rem track numbers, 0.875rem dates and reading times, the year mark,
+   the 404's number). Declaring the ASPECT once makes every one of those sizes
+   mean what it says: the browser solves for the size at which Azeret draws
+   the x-height Alegreya would have drawn. Consumers keep their `text-sm` and
+   never have to know the ratio.
+
+   `--notation-aspect` is Alegreya's aspect, i.e. the site's optical unit —
+   the same number the code rules use. If either face is ever swapped,
+   re-measure it once here rather than adjusting sizes in a dozen places.
+   Where `font-size-adjust` is unsupported the declared size applies unchanged,
+   which is exactly today's behaviour: this degrades to the old defect, never
+   past it. */
+.register-notation {
+  font-family: var(--font-notation);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  font-size-adjust: var(--notation-aspect);
+}
+
+/* The year on the blog index is the score's rehearsal mark: the reader has to
+   see where a section starts without the year competing with the month
+   figures in the rows beneath it, which are the same face at the same size.
+
+   It used to get that separation from a synthesised bold — hierarchy bought
+   dishonestly, and removing it (see the pinned weight above) left the year
+   and its rows distinguishable by nothing but position. So the separation is
+   redrawn in the vocabulary the site already owns: a tracking step, and the
+   same `.heading-trace-line` hairline that runs off the article headings and
+   the "À lire ensuite" label, carrying the eye from the year to the column
+   edge. Never a weight — the mono ships at 400 and only 400.
+
+   Defined after `.register-notation` on purpose: both are unlayered, so the
+   later rule takes the tracking. */
+.year-mark {
+  letter-spacing: 0.18em;
+}
+
+/* The circuit plates' annotations — post counts, year spans, reading times,
+   dates — are measurement, so they are notation too. Set here rather than as
+   an SVG presentation attribute: `var()` is not reliable in a presentation
+   attribute, and each of the four decorations was carrying its own hard-coded
+   family literal. One rule replaces six. */
+.circuit-label {
+  font-family: var(--font-notation);
+  font-variant-numeric: tabular-nums;
 }
 
 h1 {
@@ -168,13 +349,40 @@ article {
   border-bottom-color: var(--color-primary-100);
 }
 
-/* Long-form measure. Monospace flattens word shapes, so sustained reading wants
-   a shorter line and slightly more size than the site's default prose. `ch` is a
-   literal character count here, and Plex Mono's 0.6em advance makes 68ch a long
-   line — 62ch lands where proportional prose would sit at ~70. */
+/* The article used to run at 17px mono — an x-height of 8.77px. 22px of
+   Alegreya draws 10.03px, comfortably past it rather than level with it.
+   Long-form is the surface this whole change exists for, so it carries the
+   clearest step of the ramp and sits one step above the body.
+
+   The measure lives on `.prose` below, in `ch`, which is why this rule sets
+   only the size: 55ch tracks whatever size it lands on, so the 20px and the
+   22px surface both come out at the same character count. */
 .prose.prose-longform {
-  max-width: 62ch;
-  font-size: 1.0625rem;
+  font-size: 1.375rem;
+  line-height: 1.7;
+}
+
+/* On a phone the viewport binds the line, not the 55ch measure — the column
+   is whatever the screen leaves, so size alone decides how many characters
+   fit, and the two constraints cannot both be satisfied. The glyph wins,
+   because that is the thing a reader actually complains about, as it did here
+   twice.
+
+   19px on a 390px screen measures at a median of 44–45 characters on filled
+   lines (four articles), just under the 45 floor and accepted. The "~41" this
+   comment used to claim came from the same tail-contaminated average as the
+   desktop number above — see `.prose`. Counted correctly the mobile line is
+   in better shape than the desktop one ever was.
+
+   What is NOT fixed by size: 19px Alegreya draws an x-height of 8.66px against
+   the 17px monospace's 8.77px, so mobile long-form is fractionally SMALLER
+   than what it replaced. The 45-character line is what forbids going further
+   here. It is the one surface where the ramp pays a real price, and it is
+   recorded rather than hidden. */
+@media (max-width: 767px) {
+  .prose.prose-longform {
+    font-size: 1.1875rem;
+  }
 }
 
 /* Wide tables scroll inside their wrapper (src/lib/rehype-table-scroll.mjs)
@@ -208,8 +416,109 @@ article {
   --scroll-hint-ink: rgba(250, 250, 250, 0.12);
 }
 
+/* Every annotation inside an article, in the expression register. Without
+   this the promise only held on `/` and `/talks`: a `.prose figcaption` and a
+   quote's attribution inherited the roman, so inside the long articles the
+   annotation voice was indistinguishable from the body it annotates — which
+   is the one surface the register exists for. `.photo-portrait figcaption`
+   sets its own size and colour below; this gives every other one the slope. */
+.prose figcaption,
+.prose blockquote cite,
+.prose blockquote footer {
+  font-family: var(--font-voice);
+  font-style: italic;
+}
+
+/* And the blockquote itself is NOT annotation, which is the line the register
+   had been crossing. Typography sets every blockquote italic and 500; the
+   attribution above is what annotates, the quote is what is being said. On the
+   CAP article that default put 198 unbroken characters of 22px italic in the
+   middle of a section — a full gear change for a substantive caveat, and the
+   single hardest block on the site to read.
+
+   Roman, and the hairline carries the quote instead. That is the site's own
+   grammar: structure is drawn with lines, and `.astro-code` two rules down
+   already marks a block exactly this way. The 500 goes with it — Alegreya
+   ships no italic 500, so the declaration was asking for a cut that does not
+   exist and quietly resolving to 400. Nothing was synthesised, but the next
+   person to read it would have believed it. */
+.prose blockquote {
+  font-style: normal;
+  font-weight: 400;
+}
+
+/* Figures: lining, and that is a decision rather than a default.
+
+   The roman wants old-style figures — they sit on the x-height instead of
+   standing cap-height above French lowercase, so a date inside a sentence
+   stops reading as notation leaking into the voice. The rule was written, and
+   then measured in the browser: rendering `0123456789` in Alegreya at 100px
+   under `font-variant-numeric: normal` and `oldstyle-nums` gives the same box
+   to the hundredth of a pixel (447.10 × 160 both ways). @fontsource's
+   Alegreya ships no `onum` feature, so the declaration was a comment claiming
+   a decision the page never made — worse than no decision, because the next
+   person would trust it.
+
+   So the prose keeps lining figures, knowingly, and the register separation
+   rests on family and tracking rather than on figure style. The falsifier is
+   cheap: re-run that measurement after a font bump, and if the boxes ever
+   differ, this paragraph is wrong and the rule goes back in.
+
+   ── The measure, and how it has to be counted ──────────────────────────────
+
+   One measure for both prose surfaces, in `ch`, because `ch` scales with the
+   font: 55ch lands on ~70 characters at 20px AND at 22px, so the short pages
+   and the articles read at the same width in characters even though they are
+   set at different sizes. The 62ch here was a concession to the monospace and
+   the 65/68ch that replaced it was too wide; see below for why nobody noticed.
+
+   COUNT FILLED LINES ONLY. The earlier number here (65ch "at ~72 characters")
+   came from averaging every rendered line in a paragraph, and every paragraph
+   contributes one artificially short last line. That method under-reports by
+   12–20 characters and it is wrong on every post, so sampling more posts does
+   not fix it — the previous comment's warning ("do not measure this on one
+   post") was guarding against the wrong error. Measured both ways over four
+   articles at 65ch: tail-included gave 64.0 / 66.3 / 71.9 / 71.1, which is
+   what got written down; filled-lines-only gave medians of 83 / 86 / 83 / 84.
+   The line was running 8–11 characters past the 65–75 band this file claims,
+   and past the 80 of WCAG 2.1 SC 1.4.8. Because the constraint is expressed
+   in `ch`, zoom could not rescue it either: the character count is invariant
+   under zoom.
+
+   The per-post caveat still holds and is still worth keeping —
+   `garder-un-historique-git-propre` runs short paragraphs around its code
+   blocks, and its MEAN sits 7–13 characters below its own median. Its median
+   does not deviate from the other three at all. Count medians, over more than
+   one article, on filled lines. */
 .prose {
-  max-width: 68ch;
+  max-width: 55ch;
+
+  /* 20px: the site body, so a Now entry or the home page's prose reads at the
+     size the page is set in. Left at Tailwind Typography's 1rem, every `.prose`
+     block that was not an article rendered at 16px — an x-height of 7.30px,
+     BELOW the 8.26px the old 16px monospace drew, on the one metric this whole
+     change exists to defend. The ramp is 20 / 20 / 22 (body / prose / article),
+     not 20 / 16 / 22. Leading sits between the body's 1.6 and long-form's 1.7
+     rather than at Typography's 1.75, which made the shortest surface the
+     airiest one. */
+  font-size: 1.25rem;
+  line-height: 1.65;
+
+  /* The ink, which the monochrome rule had never actually reached here.
+     Typography ships its own palette, and `--tw-prose-body` is a blue-tinted
+     slate — oklch(0.373 0.034 259.733), hue 259, measurably not grey. Every
+     article on the site has been set in it: the wrapper's `text-charcoal` is
+     overridden by Typography's own `:where(p)`. `prose-invert` swaps in a
+     second tinted set, so both halves have to be named. Charcoal on Paper,
+     Paper on Night — the two inks the palette actually has. */
+  --tw-prose-body: var(--color-charcoal);
+  --tw-prose-headings: var(--color-charcoal);
+  --tw-prose-bold: var(--color-charcoal);
+  --tw-prose-quotes: var(--color-charcoal);
+  --tw-prose-lead: var(--color-charcoal);
+  --tw-prose-counters: var(--color-faded);
+  --tw-prose-bullets: var(--color-faded);
+  --tw-prose-captions: var(--color-faded);
 
   :where(code):not(
       :where([class~="not-prose"], [class~="not-prose"] *)
@@ -225,6 +534,63 @@ article {
     )::before {
     content: none;
   }
+}
+
+/* The heading step inside an article, which one family has to carry alone.
+
+   Typography's defaults put h2 at 1.5em and h3 at 1.25em, which on a 22px
+   article is 33px and 27.5px against a 36px h1 — a step of 1.09× between the
+   page title and a section head, both Alegreya 700, both charcoal, both at
+   tracking 0. On a phone it was 30px against 28.5px: 1.05×. A reader scanning
+   for the next section got no landmark, and neither did a reader coming back
+   to a half-read article.
+
+   Made worse by the one thing a single-family system cannot avoid: Typography
+   sets `strong` at 600, Alegreya ships no 600, so CSS matching selects 700 —
+   a bold run-in inside a paragraph is the same family, weight and colour as
+   the h2 under it. Size is therefore the ONLY axis left, and 3px of it is not
+   an axis. So the heads come down rather than the title going up (36px over a
+   20px body is already the monograph scale this file argues for, and a display
+   h1 would buy the step by breaking that):
+
+     h1 36 · h2 28.6 · h3 24.2 · body 22   →  1.26× / 1.18× / 1.10×
+
+   The second axis is the hairline, not a weight: `src/scripts/blog-post.ts`
+   already draws a trace off every h2 and h3, in the same ink as the circuit
+   plates. That is what carries the scan; the size step only has to be big
+   enough to be seen before the trace draws. */
+.prose.prose-longform :where(h2) {
+  font-size: 1.3em;
+}
+
+.prose.prose-longform :where(h3) {
+  font-size: 1.1em;
+}
+
+/* The night half of the same override, and it has to be its own rule rather
+   than the `--tw-prose-invert-*` set: `dark:prose-invert` is a Tailwind
+   utility and therefore layered, while the block above is unlayered and beats
+   any layer. Setting the light values alone silently killed dark mode for
+   every article — charcoal text on the night sheet — which is the exact class
+   of defect this override existed to fix, in the other direction. Restating
+   the pair here keeps both themes honest in one place. */
+.dark .prose {
+  --tw-prose-body: var(--color-primary-100);
+  --tw-prose-headings: var(--color-primary-100);
+  --tw-prose-bold: var(--color-primary-100);
+  --tw-prose-quotes: var(--color-primary-100);
+  --tw-prose-lead: var(--color-primary-100);
+  --tw-prose-counters: var(--color-faded);
+  --tw-prose-bullets: var(--color-faded);
+  --tw-prose-captions: var(--color-faded);
+}
+
+/* Alegreya ships 400 / 500 / 700, and Typography asks `strong` for 600 — a cut
+   that does not exist, resolved by CSS matching to 700. Nothing is
+   synthesised, but the declaration claims a weight the site does not ship,
+   which is the same trap the blockquote's italic 500 was. Name the real cut. */
+.prose :where(strong) {
+  font-weight: 700;
 }
 
 /* A portrait photo set into running prose. Vertical shots read best floated —
@@ -292,11 +658,15 @@ article {
   border-radius: 2px;
 }
 
-/* Brass earns its place here: a single hairline tick, on a line, not on text. */
+/* Brass earns its place here: a single hairline tick, on a line, not on text.
+   The caption itself is the expression register — a figure's annotation, set
+   the way a score sets `dolce`, not the way a UI sets a label. The size can
+   come up from 0.7rem now that it is no longer fighting uppercase tracking. */
 .photo-portrait figcaption {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
-  line-height: 1.5;
+  font-family: var(--font-voice);
+  font-style: italic;
+  font-size: 0.875rem;
+  line-height: 1.55;
   color: #555;
   margin: 0.65rem 0.75rem 0.75rem;
   padding-left: 0.6rem;
@@ -335,24 +705,22 @@ article {
   }
 }
 
+/* The heading trace is a decoration, so it draws in the decoration ink —
+   `--ink-circuit`, like every circuit plate on the site. It was carrying its
+   own literals, and the dark one was plain white at 28% rather than the
+   knocked-back brass the token holds, so the one hairline that runs across an
+   article was the only decoration on the night sheet with no brass in it.
+   This is the token the file already forbids hard-coding. */
 .heading-trace {
-  color: rgba(107, 107, 107, 0.65);
+  color: var(--ink-circuit);
   flex-shrink: 0;
   margin-left: 12px;
-}
-
-.dark .heading-trace {
-  color: rgba(250, 250, 250, 0.28);
 }
 
 .heading-trace-line {
   flex: 1;
   height: 1px;
-  background-color: rgba(107, 107, 107, 0.65);
-}
-
-.dark .heading-trace-line {
-  background-color: rgba(250, 250, 250, 0.28);
+  background-color: var(--ink-circuit);
 }
 
 @keyframes heading-trace-draw {
@@ -448,22 +816,102 @@ article {
   }
 }
 
+/* Inline code. Notation, so it takes the notation face — and the weight and
+   the slope have to be PINNED here, not just the family.
+
+   This rule is where the Real Cuts Rule was actually being broken, three
+   declarations after the comment that argues for it. Tailwind Typography sets
+   `.prose code { font-weight: 600 }`; Azeret Mono ships 400 and only 400, so
+   every inline `code` in an article asked the browser to smear a bold out of
+   the 400 outlines — 12 of them across two posts, verified by rasterising the
+   glyphs and comparing against the shipped cuts. A `<code>` nested in an
+   `<em>` got a synthesised oblique the same way. The old page did not have
+   this defect: its inline code fell through to the system monospace, which
+   has real cuts. The face swap introduced it.
+
+   `.register-notation` pins the weight for exactly this reason and says so;
+   this rule shares `--font-notation` with it but not the class, which is how
+   the leak survived. Pin both here rather than reaching for the class, since
+   the size and the ground below are article-specific.
+
+   The treatment follows the fenced blocks rather than fighting them. Reversed
+   white-on-charcoal was mono-on-mono on the old page: a highlight in the same
+   texture as the paragraph around it. Against a serif it is a black slab
+   dropped into a 37px line box, and it made inline code the LOUDEST thing in
+   an article whose fenced blocks — flush ground, hairline edge — are the
+   quietest. Two volumes for one register, with the wrong one shouting. So:
+   the same faint wash and the same hairline the `.astro-code` block wears,
+   no radius, and — the part that matters most — `--notation-aspect`, so the
+   size means what it says.
+
+   THE MONO IS NOT SMALLER JUST BECAUSE ITS `em` IS SMALLER. At 0.9em inside a
+   22px article the chip drew 10.89px of x-height against the prose's 10.03 —
+   8.6% BIGGER than the text it sits inside, which is exactly what it looked
+   like. The 0.85em before it was 10.29px, also bigger. The discount was never
+   going to be right, because it was being set against the wrong quantity.
+
+   `1em` with the aspect adjustment resolves to 18.24px and 10.03px of
+   x-height: parity with the prose, so the code sits IN the line rather than on
+   top of it. The literal `1em` is the point — inline code is the same size as
+   the sentence around it, and the browser works out what that costs in a face
+   with a taller x-height. */
 p code,
 li code,
 span code {
-  background-color: var(--color-charcoal);
-  color: var(--color-primary-100);
-  padding: 0.2em 0.4em;
-  border-radius: 4px;
-  font-size: 0.9em;
-  font-family: monospace;
+  font-family: var(--font-notation);
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1em;
+  font-size-adjust: var(--notation-aspect);
+  background-color: rgba(37, 37, 37, 0.06);
+  border-left: 1px solid rgba(37, 37, 37, 0.15);
+  padding: 0.1em 0.3em;
+  border-radius: 0;
 }
 
 .dark p code,
 .dark li code,
 .dark span code {
-  background-color: #404040;
-  color: var(--color-primary-100);
+  background-color: rgba(250, 250, 250, 0.07);
+  border-left-color: rgba(250, 250, 250, 0.1);
+}
+
+/* The fenced block is the ONE mono surface that does not take the adjustment,
+   and the reason is worth writing down, because the obvious move was wrong
+   twice.
+
+   Typography ships `pre` at 0.875em — 19.25px of Azeret on a 22px article,
+   10.59px of x-height against the prose's 10.03, so the block read LARGER than
+   the article it interrupts while claiming to be smaller. The first correction
+   put it on `--notation-aspect` at 0.93em, which lands 9.33px, a measured 93%
+   of the prose. It still read too big, and both of those are true at once:
+
+   1. X-HEIGHT PARITY IS NOT SIZE PARITY FOR A BLOCK. Inside a sentence,
+      matching the x-height is exactly right — the chip has to sit on the same
+      baseline as the words around it. A block is judged as an object, and its
+      mass is glyph area × line count. Azeret is a wide, heavy mono: at 93%
+      x-height its advance still exceeds Alegreya's average, so a 20-line block
+      carries far more ink than 20 lines of prose and reads as the bigger
+      thing.
+   2. `font-size-adjust` SHRINKS THE GLYPHS AND NOT THE BOX. `line-height`,
+      padding and margins all resolve against the DECLARED size, not the used
+      one. At 0.93em the declared size was 20.46px, so Typography's 1.714
+      leading computed to 35.07px around glyphs actually set at 16.96px — an
+      effective 2.07 line-height. The block was airy in a way nothing in the
+      CSS said out loud. That interaction is invisible and it will catch the
+      next person; keeping the adjustment off `pre` keeps the box and the
+      glyphs on the same number.
+
+   So: a direct 0.72em (15.84px, x-height 8.71px = 87% of the prose), chosen
+   from rendered candidates at 0.93/0.80/0.72/0.65 against a real paragraph
+   rather than from arithmetic — 0.80 still competed with the prose, 0.65 went
+   cramped. 87% is also very close to the 88% the old grotesk/mono pairing ran
+   at, which nobody ever complained about. Leading comes down to 1.6: code is
+   scanned rather than read in runs, so it wants less air than the 1.7 prose,
+   and now the ratio means what it says. */
+.prose pre {
+  font-size: 0.72em;
+  line-height: 1.6;
 }
 
 pre code {

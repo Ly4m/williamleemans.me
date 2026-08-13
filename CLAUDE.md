@@ -71,8 +71,46 @@ Old file-id blog URLs (`/blog/26-01-rss`, etc.) 301-redirect to their slug URLs 
 
 ### Fonts
 
-- `@fontsource/space-grotesk` — headings
-- `@fontsource/ibm-plex-mono` — body and code
+**Two families, three registers — « la partition ».** A score assigns type by
+job, not by size, and so does the site. Don't reach for a face here; reach for
+a register.
+
+- `@fontsource/alegreya` (400, 400-italic, 500, 700) — **voice** and
+  **expression**. Roman sets headings _and_ running prose, one family doing
+  both; italic is the expression register (captions, subtitles, notes, the
+  home page's own annotation of its title). The italic is a register, not
+  emphasis — it stops meaning anything the moment it is used for stress.
+- `@fontsource/azeret-mono` (400) — **notation and measurement only**: code,
+  dates, reading times, figure numbers, the circuit plates' labels. It no
+  longer sets a single sentence, and putting it back on prose is the
+  regression this whole change exists to undo.
+
+Consume them through the role tokens in `global.css` — `--font-voice` and
+`--font-notation` (and their `font-voice` / `font-notation` utilities), plus
+the three register classes: `.register-ident` (roman caps + 0.11em tracking,
+for nav items, badges and section labels), `.register-expression` (the
+italic) and `.register-notation` (mono + `tabular-nums`). Never name a family
+in a component. There is deliberately no `.register-voice`: the voice is the
+page default, set once via `--default-font-family`, and a class for it would
+only invite someone to re-declare what already holds. The
+old tokens were `--font-space` and `--font-sans`, and the second was a lie for
+its whole life: it pointed at a monospace, which is how every paragraph on the
+site ended up set in one.
+
+Three constraints bind any future change here:
+
+- **Exactly two families.** `scripts/guard/weight.mjs` asserts
+  `FAMILLES_ATTENDUES = 2` and a third is "la régression qui vaut d'être vue".
+  Real small caps for the identification register would have been that third
+  family, which is why nav items and badges are roman caps with 0.11em
+  tracking instead.
+- **Real cuts only.** Every weight the site sets is a real font file; nothing
+  is browser-synthesised. A new weight is a new `@import` in `global.css`, not
+  a `font-weight` that smears 400 outlines.
+- **`src/lib/og-card.ts` reads the `.woff` files straight out of these
+  packages** and satori has no fallback chain — a face missing from its
+  `fonts` array renders as tofu, not as a substitute. Keep both installed, and
+  add a register there whenever you add one here.
 
 ### Markdown / Syntax Highlighting
 

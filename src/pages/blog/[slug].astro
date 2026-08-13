@@ -139,11 +139,11 @@ const structuredData = JSON.stringify({
 
   <header class="py-12">
     <h1
-      class="font-space text-charcoal dark:text-primary-100 text-2xl tracking-tight md:text-3xl"
+      class="font-voice text-charcoal dark:text-primary-100 text-3xl md:text-4xl"
     >
       {post.data.title}
     </h1>
-    <p class="text-faded">
+    <p class="text-faded register-notation text-sm">
       {post.data.readingTime} min — <time
         datetime={post.data.pubDate.toISOString().slice(0, 10)}
         >{fmtMeta(post.data.pubDate)}</time

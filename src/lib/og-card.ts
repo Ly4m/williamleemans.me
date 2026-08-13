@@ -17,11 +17,18 @@ const HEIGHT = 630;
 const font = (pkgPath: string) =>
   fs.readFileSync(path.join(process.cwd(), "node_modules", pkgPath));
 
-const spaceGrotesk = font(
-  "@fontsource/space-grotesk/files/space-grotesk-latin-700-normal.woff",
+// The same two families the stylesheet loads, in the same registers: the
+// roman speaks, the mono measures. Satori resolves faces by name from the
+// array below, so every register used in the card has to be loaded here —
+// there is no fallback chain to catch a missing one, just tofu.
+const alegreya = font(
+  "@fontsource/alegreya/files/alegreya-latin-400-normal.woff",
 );
-const plexMono = font(
-  "@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff",
+const alegreyaBold = font(
+  "@fontsource/alegreya/files/alegreya-latin-700-normal.woff",
+);
+const azeretMono = font(
+  "@fontsource/azeret-mono/files/azeret-mono-latin-400-normal.woff",
 );
 
 // Full-bleed dashed trace with one arc, ticks and a via drop — SVG keeps the
@@ -72,7 +79,7 @@ export async function renderOgCard({
           backgroundColor: PAGE_DARK,
           backgroundImage: `radial-gradient(circle, rgba(250, 250, 250, 0.08) 1.5px, transparent 1.5px)`,
           backgroundSize: "24px 24px",
-          fontFamily: "IBM Plex Mono",
+          fontFamily: "Alegreya",
         },
         children: [
           {
@@ -106,11 +113,11 @@ export async function renderOgCard({
                 top: 232,
                 width: 1040,
                 display: "flex",
-                fontFamily: "Space Grotesk",
+                fontFamily: "Alegreya",
                 fontWeight: 700,
                 fontSize,
                 lineHeight: 1.18,
-                letterSpacing: 1,
+                letterSpacing: 0,
                 color: PRIMARY_100,
               },
               children: title,
@@ -196,8 +203,13 @@ export async function renderOgCard({
                       right: 80,
                       top: 538,
                       display: "flex",
-                      fontSize: 23,
-                      letterSpacing: 2,
+                      // A date and a reading time: notation, so it wears the
+                      // mono here exactly as it does on the page. The mono
+                      // already carries its own rhythm, so the +2 tracking
+                      // the grotesk needed comes off.
+                      fontFamily: "Azeret Mono",
+                      fontSize: 21,
+                      letterSpacing: 0,
                       color: FADED,
                     },
                     children: metaRight,
@@ -212,13 +224,14 @@ export async function renderOgCard({
       width: WIDTH,
       height: HEIGHT,
       fonts: [
+        { name: "Alegreya", data: alegreya, weight: 400, style: "normal" },
+        { name: "Alegreya", data: alegreyaBold, weight: 700, style: "normal" },
         {
-          name: "Space Grotesk",
-          data: spaceGrotesk,
-          weight: 700,
+          name: "Azeret Mono",
+          data: azeretMono,
+          weight: 400,
           style: "normal",
         },
-        { name: "IBM Plex Mono", data: plexMono, weight: 400, style: "normal" },
       ],
     },
   );
