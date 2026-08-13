@@ -350,12 +350,114 @@ const relFor = (s: SocialLink) => {
       });
     }
 
-    function toggleTheme() {
-      const isDark = document.documentElement.classList.contains("dark");
-      document.documentElement.classList.toggle("dark", !isDark);
-      localStorage.setItem("theme", isDark ? "light" : "dark");
-      updateToggles();
-      syncThemeColor();
+    /* L'appel de courant : la bascule ne clignote pas. La nouvelle feuille est
+       révélée par un front qui part du bouton lui-même — dernier élément du
+       rail, en bas à gauche — et traverse la page en diagonale vers le haut à
+       droite. Le courant part de l'interrupteur qu'on vient de fermer ; c'est
+       le geste, pas un effet posé par-dessus.
+
+       Un front rectiligne à 45° traversant d'un coin à l'autre a été essayé, et
+       écarté par le propriétaire (2026-08-13) : géométriquement plus lisible,
+       mais il perd l'origine, et c'est l'origine qui raconte quelque chose. La
+       version au bouton est la bonne — ne pas la « corriger » vers la
+       diagonale une seconde fois.
+
+       Le dégagement CSS est dans global.css, sous `.theme-wipe`. Ici on ne
+       calcule que ce que lui ne peut pas savoir : où est le bouton, et jusqu'où
+       le front doit aller. */
+    const WIPE_MS = 600;
+
+    function toggleTheme(event: Event) {
+      const root = document.documentElement;
+      const isDark = root.classList.contains("dark");
+
+      const apply = () => {
+        root.classList.toggle("dark", !isDark);
+        localStorage.setItem("theme", isDark ? "light" : "dark");
+        updateToggles();
+      };
+
+      /* Repli sec — exactement l'ancien comportement — partout où le geste n'a
+         pas lieu d'être : mouvement réduit, navigateur sans l'API, ou un appel
+         qui ne vient pas d'un bouton (donc sans origine à donner au front). */
+      const btn = event.currentTarget as HTMLElement | null;
+      if (
+        !btn ||
+        !document.startViewTransition ||
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        apply();
+        syncThemeColor();
+        return;
+      }
+
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const box = btn.getBoundingClientRect();
+      const x = box.left + box.width / 2;
+      const y = box.top + box.height / 2;
+      // Le front doit atteindre le coin le plus éloigné de l'interrupteur.
+      const reach = Math.hypot(Math.max(x, w - x), Math.max(y, h - y));
+
+      /* TOUT EN POURCENTAGES, ET C'EST LA CORRECTION D'UN VRAI BUG.
+
+         `::view-transition-new(root)` n'est pas garanti d'être à l'échelle du
+         pixel CSS : selon le zoom du navigateur et l'échelle de l'écran, sa
+         boîte vit dans un espace plus grand. Écrit en `px`, le centre partait
+         alors à une fraction de sa position — le cercle naissait au milieu du
+         bord gauche au lieu du bouton, ce qui a été vu et signalé, et ce que
+         cette machine (à 1:1) ne reproduit jamais.
+
+         Les pourcentages, eux, se résolvent contre cette boîte quelle qu'en
+         soit l'échelle, donc le centre atterrit au bon endroit partout. Le
+         rayon en % a sa propre référence, `√(w²+h²)/√2` — d'où la conversion
+         plutôt qu'un 150% fourre-tout, qui ferait grandir le cercle au-delà de
+         l'écran pendant une partie de l'animation.
+
+         Ne pas repasser en `px` : ça marchera sur la machine où c'est réécrit. */
+      const pctRef = Math.hypot(w, h) / Math.SQRT2;
+      const at = `${((x / w) * 100).toFixed(3)}% ${((y / h) * 100).toFixed(3)}%`;
+      const reachPct = ((reach / pctRef) * 100).toFixed(3);
+
+      root.classList.add("theme-wipe");
+      const transition = document.startViewTransition(apply);
+
+      transition.ready.then(
+        () => {
+          root.animate(
+            {
+              clipPath: [
+                `circle(0% at ${at})`,
+                `circle(${reachPct}% at ${at})`,
+              ],
+            },
+            {
+              duration: WIPE_MS,
+              /* La courbe avec laquelle les traces se dessinent déjà
+                 (`circuit-draw`) : un seul tracé sur tout le site. */
+              easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+              pseudoElement: "::view-transition-new(root)",
+            },
+          );
+        },
+        /* `ready` REJETTE quand la transition est abandonnée, et ça arrive pour
+           de vrai : onglet quitté pendant la bascule, fenêtre entièrement
+           masquée (le navigateur refuse alors la transition), ou une seconde
+           bascule par-dessus la première. Le thème est déjà appliqué dans tous
+           ces cas — le callback a tourné — et `finished` nettoie la classe.
+           Il n'y a donc rien à réparer ici, seulement un rejet à absorber :
+           sans ce bras, chaque abandon écrivait une unhandled rejection dans
+           la console pour un geste qui, lui, s'est bien passé. */
+        () => {},
+      );
+
+      /* La barre du navigateur mobile suit la feuille au lieu de la précéder :
+         elle vit hors du wipe, donc la changer tout de suite afficherait la
+         couleur d'arrivée au-dessus d'une page encore à moitié partie. */
+      transition.finished.finally(() => {
+        root.classList.remove("theme-wipe");
+        syncThemeColor();
+      });
     }
 
     buttons.forEach((btn) => btn.addEventListener("click", toggleTheme));

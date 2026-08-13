@@ -30,6 +30,13 @@
  *   current in the wire. All pages.
  * — Wet ink: the reading hairline never quite dries (CSS, global.css).
  *
+ * The layer answers the clock and nothing else. The one gesture that answers
+ * the VISITOR is l'appel de courant — the theme switch revealing the new sheet
+ * from the button outward — and it deliberately does not live here: it is a
+ * view transition, which renders static snapshots for its whole duration, so
+ * no instrument in this file could play underneath it anyway. See
+ * `toggleTheme` in SideNav.astro and `.theme-wipe` in global.css.
+ *
  * The whole layer is skipped under prefers-reduced-motion (the finished
  * drawing, already the reduced-motion ending of every other animation), and
  * every instrument pauses while the tab is hidden.
