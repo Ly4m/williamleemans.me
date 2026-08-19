@@ -6,6 +6,15 @@
  * The heading traces injected into blog prose have their own, faster tuning in
  * blog-post.ts — a different register, deliberately not shared.
  *
+ * `svg[data-draw-once]` is skipped here entirely, and that is the whole point
+ * of the attribute: the navigation rail is CHROME, identical from one page to
+ * the next, so redrawing it on every `astro:page-load` made the same wire
+ * re-ink itself behind every click. Its first (and only) draw is owned by
+ * SideNav.astro, which keeps the state this file cannot — the plates are
+ * replaced on each navigation, so "already drawn" has to live in a module, not
+ * on an element. The plates of the PAGE keep redrawing: they belong to the
+ * page, and the page did change.
+ *
  * Note that the draw-on works by commandeering stroke-dasharray: it sets the
  * dash to the path's own length and animates the offset to zero. Any
  * stroke-dasharray in a decoration's markup is therefore overwritten before it
@@ -16,6 +25,7 @@ function initCircuitAnimations() {
   // Animate each SVG independently so all decorations start at the same time.
   // Within each SVG, traces draw in DOM order with a small fixed stagger.
   document.querySelectorAll("svg").forEach((svg) => {
+    if (svg.hasAttribute("data-draw-once")) return;
     const traces = svg.querySelectorAll<SVGPathElement>(".circuit-trace");
     if (!traces.length) return;
 

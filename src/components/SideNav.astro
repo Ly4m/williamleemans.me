@@ -81,6 +81,165 @@ const relFor = (s: SocialLink) => {
   ].filter(Boolean);
   return tokens.length ? tokens.join(" ") : undefined;
 };
+
+/* ---------------------------------------------------------------------------
+   LE RAIL EST UNE DÉRIVATION.
+
+   Avant : un filet brass de 3px collé au bord gauche de l'item actif, et un
+   moignon de 40% au survol. Un `border-left` coloré — soit exactement le
+   défaut de catégorie, et le seul endroit du site où le brass était une barre
+   plutôt qu'un fil.
+
+   Maintenant : le rail est un schéma, dans le vocabulaire des plaques. Un BUS
+   vertical court sur toute la hauteur de la plaque, encadré de deux repères.
+   Une BRANCHE s'en détache en S au-dessus du premier item, longe la colonne,
+   porte un PLOT par item, puis rejoint le bus en biais sous le dernier. L'item
+   actif allume son plot en brass et pousse une AMORCE jusqu'à son libellé ;
+   le survol allume le plot en encre et pousse une amorce plus courte. D'après
+   un croquis du propriétaire (2026-08-19).
+
+   Trois choses à ne pas « harmoniser » :
+
+   1. Survol et actif diffèrent par la LONGUEUR (amorce 7px contre 14px) ET
+      par l'encre (encre contre brass). L'ancienne règle ne retenait que la
+      longueur parce que les deux états portaient le même brass ; un plot est
+      plus ponctuel qu'une barre, et un plot brass au survol se lit « page
+      courante » là où une barre courte se lisait « pas encore ». La longueur
+      reste, l'encre s'y ajoute — et la Règle du Signal unique s'en trouve
+      resserrée : le brass ne marque plus que l'état vivant.
+
+   2. La géométrie n'est mesurée nulle part. Les positions des plots sortent
+      des mêmes constantes que le tracé SVG (`trace()` ci-dessous) et la mise
+      en page les impose (hauteur d'item fixe, gouttière fixe) : le fil et les
+      plots ne peuvent pas dériver, sans une ligne de JS de mesure. Le SVG est
+      posé en pixels 1:1 sur la boîte du <nav> — ne pas lui mettre de
+      `preserveAspectRatio` ni de largeur en %, ça casserait l'accord.
+
+   3. Les tracés portent `.circuit-trace` exprès : ils héritent du dessin à
+      l'entrée (`src/scripts/circuit.ts`) et entrent dans le tirage de la
+      couche ambiante (`respire.ts`) — le rail se fait corriger et parcourir
+      comme n'importe quelle plaque. C'est voulu : le rail est une plaque.
+--------------------------------------------------------------------------- */
+type TraceCfg = {
+  busX: number;
+  branchX: number;
+  labelX: number;
+  itemH: number;
+  gap: number;
+  headroom: number;
+  tailroom: number;
+  padR: number;
+  padActiveR: number;
+  spur: number;
+  spurHover: number;
+};
+
+const RAIL: TraceCfg = {
+  busX: 8,
+  branchX: 22,
+  labelX: 48,
+  itemH: 36,
+  gap: 12,
+  headroom: 66,
+  tailroom: 76,
+  padR: 2,
+  padActiveR: 3.5,
+  spur: 18,
+  spurHover: 9,
+};
+
+const OVERLAY: TraceCfg = {
+  busX: 12,
+  branchX: 30,
+  labelX: 66,
+  itemH: 48,
+  gap: 24,
+  headroom: 60,
+  tailroom: 72,
+  padR: 2.5,
+  padActiveR: 4.5,
+  spur: 24,
+  spurHover: 0,
+};
+
+/* `mirror` retourne la plaque : le fil passe à DROITE des libellés au lieu
+   d'à gauche. Le repère du SVG, lui, reste toujours à origine gauche — c'est
+   la seule chose qu'on ne peut pas retourner — donc les abscisses sont prises
+   depuis le bord opposé. `busX`/`branchX` de la config restent, dans les deux
+   cas, des distances au bord LE PLUS PROCHE : c'est ce qui permet aux mêmes
+   variables CSS de servir les deux plaques sans condition. */
+function trace(cfg: TraceCfg, n: number, withBus: boolean, mirror = false) {
+  const busX = mirror ? cfg.labelX - cfg.busX : cfg.busX;
+  const branchX = mirror ? cfg.labelX - cfg.branchX : cfg.branchX;
+  const pitch = cfg.itemH + cfg.gap;
+  const listH = n * cfg.itemH + Math.max(0, n - 1) * cfg.gap;
+  const plateH = cfg.headroom + listH + cfg.tailroom;
+  const nodeY = (i: number) => cfg.headroom + cfg.itemH / 2 + i * pitch;
+  const first = nodeY(0);
+  const last = nodeY(n - 1);
+  /* La branche quitte le bus 42px au-dessus du premier plot et se redresse
+     20px avant lui ; elle le rejoint en biais 40px sous le dernier. Les deux
+     jonctions sont marquées d'un point, comme sur les plaques. */
+  const junctionOut = first - 42;
+  const straightFrom = first - 20;
+  const straightTo = last + 18;
+  const junctionIn = last + 40;
+  const busTop = 6;
+  const busBottom = plateH - 6;
+
+  return {
+    plateH,
+    busX,
+    branchX,
+    nodes: Array.from({ length: n }, (_, i) => nodeY(i)),
+    /* Le rail n'a pas de bus dans sa plaque : le sien traverse toute la
+       hauteur de l'écran et vit dans l'<aside>, hors de cette boîte. Le menu
+       mobile, lui, est un panneau qui va et vient — son bus s'arrête avec lui,
+       et porte donc ses deux repères de fin. */
+    busD: withBus ? `M ${busX} ${busTop} L ${busX} ${busBottom}` : null,
+    tickTopD: withBus
+      ? `M ${busX - 4} ${busTop} L ${busX + 4} ${busTop}`
+      : null,
+    tickBottomD: withBus
+      ? `M ${busX - 4} ${busBottom} L ${busX + 4} ${busBottom}`
+      : null,
+    branchD: [
+      `M ${busX} ${junctionOut}`,
+      `C ${busX} ${junctionOut + 11}, ${branchX} ${straightFrom - 11}, ${branchX} ${straightFrom}`,
+      `L ${branchX} ${straightTo}`,
+      `L ${busX} ${junctionIn}`,
+    ].join(" "),
+    junctions: [junctionOut, junctionIn],
+  };
+}
+
+/* Les constantes partent en variables CSS : une seule source pour le tracé
+   (au-dessus) et pour les plots/amorces (feuille de style plus bas). */
+const plateVars = (cfg: TraceCfg, mirror = false) =>
+  [
+    `--branch-x:${cfg.branchX}px`,
+    /* L'abscisse de la branche DANS LE SVG (origine toujours à gauche), et le
+       sens dans lequel l'amorce pousse. Le script en a besoin pour poser la
+       pièce en voyage : `--branch-x` lui, est une distance au bord proche, et
+       ne suffirait pas sur une plaque retournée. */
+    `--wire-x:${mirror ? cfg.labelX - cfg.branchX : cfg.branchX}px`,
+    `--spur-dir:${mirror ? -1 : 1}`,
+    `--label-x:${cfg.labelX}px`,
+    `--item-h:${cfg.itemH}px`,
+    `--gap:${cfg.gap}px`,
+    `--headroom:${cfg.headroom}px`,
+    `--pad-r:${cfg.padR}px`,
+    `--pad-active-r:${cfg.padActiveR}px`,
+    `--spur:${cfg.spur}px`,
+    `--spur-hover:${cfg.spurHover}px`,
+  ].join(";");
+
+const railTrace = trace(RAIL, items.length, false);
+/* Le menu mobile est aligné à DROITE : c'est le pouce qui l'atteint, et c'est
+   aussi le coin d'où il s'ouvre — le hamburger est en haut à droite, le
+   panneau entre par la droite. Le rail de bureau, lui, EST la marge gauche de
+   la feuille et ne bouge pas. */
+const overlayTrace = trace(OVERLAY, items.length, true, true);
 ---
 
 <header
@@ -109,10 +268,64 @@ const relFor = (s: SocialLink) => {
 
 <div
   id="mobile-menu"
-  class="fixed inset-0 z-40 flex translate-x-full flex-col items-center justify-center bg-(--color-page) transition-transform duration-300 md:hidden"
+  class="fixed inset-0 z-40 flex translate-x-full flex-col items-end justify-center bg-(--color-page) pr-6 transition-transform duration-300 md:hidden"
   inert
 >
-  <nav class="flex flex-col items-center gap-8" aria-label={NAV_LABEL}>
+  <nav
+    class="nav-plate text-charcoal dark:text-primary-100"
+    style={`${plateVars(OVERLAY, true)};height:${overlayTrace.plateH}px`}
+    data-plate="overlay"
+    data-side="right"
+    aria-label={NAV_LABEL}
+  >
+    <svg
+      class="nav-trace"
+      width={OVERLAY.labelX}
+      height={overlayTrace.plateH}
+      viewBox={`0 0 ${OVERLAY.labelX} ${overlayTrace.plateH}`}
+      fill="none"
+      data-draw-once="overlay"
+      aria-hidden="true"
+    >
+      {
+        /* L'ordre du DOM est l'ordre du dessin (stagger de 0,12 s dans
+           `drawNavPlates`) : le bus d'abord, ses repères ensuite, la branche
+           en dernier — c'est elle qui amène les libellés. */
+      }
+      <path
+        d={overlayTrace.busD}
+        stroke="currentColor"
+        stroke-width="1"
+        class="circuit-trace"></path>
+      <path
+        d={overlayTrace.tickTopD}
+        stroke="currentColor"
+        stroke-width="0.75"
+        class="circuit-trace"></path>
+      <path
+        d={overlayTrace.tickBottomD}
+        stroke="currentColor"
+        stroke-width="0.75"
+        class="circuit-trace"></path>
+      <path
+        d={overlayTrace.branchD}
+        stroke="currentColor"
+        stroke-width="1"
+        class="circuit-trace"
+        data-nav-branch></path>
+      {
+        overlayTrace.junctions.map((y) => (
+          <circle
+            cx={overlayTrace.busX}
+            cy={y}
+            r="2.5"
+            fill="currentColor"
+            class="circuit-dot"
+          />
+        ))
+      }
+    </svg>
+
     {
       items.map(({ label, href, icon }) => {
         const active = isActive(href, current);
@@ -121,15 +334,10 @@ const relFor = (s: SocialLink) => {
             href={href}
             data-active={active ? "true" : undefined}
             aria-current={active ? "page" : undefined}
-            class={[
-              "mobile-menu-link register-ident flex flex-col items-center gap-2 text-2xl transition-all duration-200",
-              active
-                ? "text-black dark:text-white"
-                : "text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white",
-            ].join(" ")}
+            class="mobile-menu-link nav-link register-ident text-2xl"
           >
-            {icon && <i class={`${icon} text-3xl`} />}
-            <span class="mobile-nav-label relative inline-block">{label}</span>
+            {icon && <i class={`${icon} nav-icon text-3xl`} />}
+            <span class="nav-label">{label}</span>
           </a>
         );
       })
@@ -162,10 +370,93 @@ const relFor = (s: SocialLink) => {
   </div>
 </div>
 
+{
+  /* TOUT LE RAIL EST EN BAS. Le bus traverse l'écran entier ; la branche
+     agglutinée dans le premier tiers laissait deux tiers de fil nu en dessous,
+     c'est-à-dire un RESTE. Descendue, la même longueur devient une APPROCHE —
+     le rail se lit comme une ligne qui descend vers son bloc de composants — et
+     le coin haut-gauche revient au h1, qui est le coin qu'on regarde en
+     premier et qui appartient au contenu, pas au chrome.
+
+     Les icônes restent sous la nav, sur le fil. Deux raisons, aucune de goût :
+     posées dans un coin libre elles ne pendraient plus d'aucune ligne, alors
+     que tout ce que ce site dessine pend du bus ; et la bascule de thème est
+     l'ORIGINE de l'appel de courant — DESIGN.md acte (2026-08-13) que le front
+     part d'en bas à gauche et traverse en diagonale vers le haut à droite.
+     La déplacer retourne cette diagonale vers un coin où il n'y a rien.
+
+     `mt-auto` plutôt qu'un positionnement absolu : sur un écran court, la
+     marge se rétracte d'elle-même et rien ne sort par le haut. */
+}
 <aside
-  class="text-charcoal dark:text-primary-100 sticky top-0 z-40 hidden h-screen w-24 pt-24 md:block lg:block"
+  class="text-charcoal dark:text-primary-100 sticky top-0 z-40 hidden h-screen w-24 flex-col pt-8 md:flex"
 >
-  <nav class="space-y-2 py-6 pl-6" aria-label={NAV_LABEL}>
+  {
+    /* LE BUS TRAVERSE TOUTE LA FEUILLE. Il n'appartient pas à la nav — c'est
+       la nav qui s'y branche. Il court donc du haut de l'écran au bas, à la
+       marge, et passe devant le lien d'évitement (qui s'y branche en amont)
+       comme devant les icônes du bas. Il n'a plus de repères de fin : un
+       repère marque une fin, et celui-ci n'en a pas à l'écran.
+
+       Sa longueur est la seule géométrie de ce composant qui soit MESURÉE, et
+       elle doit l'être : elle dépend de la hauteur du viewport, que le rendu
+       ne connaît pas. Le `d` est posé par le script, à l'arrivée et à chaque
+       redimensionnement. Le reste — branche, plots, amorces — reste calculé.
+
+       Le `d` servi ici est volontairement dégénéré (longueur nulle) : un
+       tracé long affiché avant que le script ne passe déborderait la page. */
+  }
+  <svg
+    class="nav-trace nav-bus"
+    width={RAIL.busX * 2}
+    height="100%"
+    fill="none"
+    data-draw-once="bus"
+    data-draw-dur="0.85"
+    aria-hidden="true"
+  >
+    <path
+      d={`M ${RAIL.busX} 0 L ${RAIL.busX} 0`}
+      stroke="currentColor"
+      stroke-width="1"
+      class="circuit-trace"
+      data-nav-bus={RAIL.busX}></path>
+  </svg>
+  <nav
+    class="nav-plate mt-auto"
+    style={`${plateVars(RAIL)};height:${railTrace.plateH}px`}
+    data-plate="rail"
+    aria-label={NAV_LABEL}
+  >
+    <svg
+      class="nav-trace"
+      width={RAIL.labelX}
+      height={railTrace.plateH}
+      viewBox={`0 0 ${RAIL.labelX} ${railTrace.plateH}`}
+      fill="none"
+      data-draw-once="rail"
+      data-draw-delay="bus"
+      aria-hidden="true"
+    >
+      <path
+        d={railTrace.branchD}
+        stroke="currentColor"
+        stroke-width="1"
+        class="circuit-trace"
+        data-nav-branch></path>
+      {
+        railTrace.junctions.map((y) => (
+          <circle
+            cx={railTrace.busX}
+            cy={y}
+            r="2"
+            fill="currentColor"
+            class="circuit-dot"
+          />
+        ))
+      }
+    </svg>
+
     {
       items.map(({ label, href }) => {
         const active = isActive(href, current);
@@ -174,14 +465,9 @@ const relFor = (s: SocialLink) => {
             href={href}
             data-active={active ? "true" : undefined}
             aria-current={active ? "page" : undefined}
-            class={[
-              "nav-link register-ident group relative block px-3 py-2 text-sm transition",
-              active ? "" : "opacity-70 hover:opacity-100",
-            ].join(" ")}
+            class="nav-link register-ident text-sm"
           >
-            <span class="inline-block translate-x-0 transition group-hover:translate-x-1">
-              {label}
-            </span>
+            <span class="nav-label">{label}</span>
           </a>
         );
       })
@@ -199,7 +485,15 @@ const relFor = (s: SocialLink) => {
        2026-08-11 ; à rouvrir seulement si le rail cesse d'être le seul accès
        hors accueil. */
   }
-  <div class="absolute bottom-6 flex gap-2 pl-6">
+  {
+    /* `w-max` : la rangée déborde les 96px du rail depuis toujours (cinq
+       boutons de 32px et leurs gouttières font 192px), et c'est assumé —
+       DESIGN.md compte même sur ce débordement pour placer l'origine de
+       l'appel de courant. En item de flex étirable elle se laissait comprimer
+       à la largeur du rail et les icônes se tassaient les unes sur les
+       autres ; en absolu, avant, la question ne se posait pas. */
+  }
+  <div class="mb-6 flex w-max shrink-0 gap-2 pl-6">
     {
       socialLinks.map((s) => (
         <a
@@ -226,71 +520,339 @@ const relFor = (s: SocialLink) => {
 </aside>
 
 <style>
-  /* The active rail. Hover and active differ by length, not opacity — a stub
-     that grows to full height — so the two states stay tellable apart at a
-     glance in either theme. */
+  /* LA PLAQUE. Le <nav> est la boîte de référence du SVG : posé en inset-0,
+     en pixels 1:1, sa hauteur est celle que `trace()` a calculée. La liste
+     n'a ni marge ni interligne propre — la gouttière et la hauteur d'item
+     sortent des mêmes constantes que le tracé, sinon les plots quitteraient
+     le fil. */
+  .nav-plate {
+    position: relative;
+    display: flex;
+    width: max-content;
+    flex-direction: column;
+    gap: var(--gap);
+    padding-top: var(--headroom);
+
+    /* Les deux seuls décalages qui portent un SENS. Ils sont ici en jetons
+       plutôt que dans leurs règles, parce qu'ils doivent s'inverser d'un bloc
+       avec la plaque, et qu'un `translateX` oublié se voit tout de suite. */
+    --enter-shift: -10px;
+    --hover-shift: 4px;
+  }
+
+  /* LA PLAQUE RETOURNÉE — le fil à droite des libellés.
+     Tout ce qui suit se lit comme la même plaque vue dans un miroir : la
+     géométrie du tracé est déjà retournée dans le rendu (`trace(…, mirror)`),
+     il ne reste ici que ce que le CSS ancre à un bord. `--branch-x` et
+     `--label-x` ne changent PAS de valeur : ce sont des distances au bord le
+     plus proche, et c'est tout l'intérêt. */
+  .nav-plate[data-side="right"] {
+    --enter-shift: 10px;
+    --hover-shift: -4px;
+  }
+
+  .nav-plate[data-side="right"] .nav-trace {
+    right: 0;
+    left: auto;
+  }
+
+  .nav-plate[data-side="right"] .nav-link {
+    justify-content: flex-end;
+    padding-right: var(--label-x);
+    padding-left: 0;
+  }
+
+  .nav-plate[data-side="right"] .nav-link::before,
+  .nav-plate[data-side="right"] .nav-link::after {
+    right: var(--branch-x);
+    left: auto;
+  }
+
+  .nav-plate[data-side="right"] .nav-link::before {
+    margin-right: calc(var(--pad-r) * -1);
+    margin-left: 0;
+  }
+
+  .nav-plate[data-side="right"] .nav-link[data-active]::before {
+    margin-right: calc(var(--pad-active-r) * -1);
+    margin-left: 0;
+  }
+
+  .nav-plate[data-side="right"] .nav-link:not([data-active]):hover::before {
+    margin-right: calc(var(--pad-r) * -1 - 1px);
+    margin-left: 0;
+  }
+
+  .nav-plate[data-side="right"] .nav-link::after {
+    transform-origin: right center;
+  }
+
+  /* `max-content` ci-dessus n'est pas cosmétique : le rail vit dans un aside
+     de 96px et les libellés le débordent depuis toujours (ACCUEIL ouvre à 48px
+     et mesure ~66px). En largeur héritée, la boîte cliquable s'arrêtait au
+     bord de l'aside et la moitié du mot n'était pas un lien. */
+
+  .nav-trace {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: var(--ink-circuit);
+    pointer-events: none;
+  }
+
+  .nav-link {
+    position: relative;
+    display: flex;
+    height: var(--item-h);
+    align-items: center;
+    gap: 0.5rem;
+    padding-left: var(--label-x);
+  }
+
+  /* Le libellé porte seul l'atténuation : posée sur le lien, elle emportait
+     aussi le plot et l'amorce, et l'état serait redevenu une affaire
+     d'opacité — ce que la géométrie ci-dessous existe pour éviter. */
+  .nav-label {
+    display: inline-block;
+    opacity: 0.7;
+    transition:
+      opacity 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  .nav-link[data-active] .nav-label {
+    opacity: 1;
+  }
+
+  /* LE PLOT. Au repos, un point d'encre de décoration posé sur la branche —
+     à peine plus large que le fil. Actif, un plot brass. */
   .nav-link::before {
     content: "";
     position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 3px;
-    background: var(--color-brass-ink);
-    transform: scaleY(0);
+    top: 50%;
+    left: var(--branch-x);
+    width: calc(var(--pad-r) * 2);
+    height: calc(var(--pad-r) * 2);
+    margin-top: calc(var(--pad-r) * -1);
+    margin-left: calc(var(--pad-r) * -1);
+    border-radius: 50%;
+    background: var(--ink-circuit);
+    transition:
+      width 0.25s ease,
+      height 0.25s ease,
+      margin 0.25s ease,
+      background 0.25s ease;
+  }
+
+  /* L'AMORCE : le brin qui relie le plot à son libellé. Sa longueur est fixée
+     par la variable, son apparition par un scaleX depuis le plot — le brin
+     pousse hors du plot, il n'apparaît pas d'un bloc. */
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: var(--branch-x);
+    width: var(--spur-hover);
+    height: 1px;
+    margin-top: -0.5px;
+    background: var(--ink-circuit);
+    transform: scaleX(0);
+    transform-origin: left center;
     transition: transform 0.25s ease;
   }
 
-  .nav-link:not([data-active]):hover::before {
-    transform: scaleY(0.4);
+  /* Le survol allume le plot à pleine encre et pousse une amorce courte.
+     `hover: hover` : sur un écran tactile, l'état resterait collé après le
+     tap et deux items paraîtraient allumés. */
+  @media (hover: hover) {
+    .nav-link:not([data-active]):hover .nav-label {
+      opacity: 1;
+      transform: translateX(var(--hover-shift));
+    }
+
+    /* L'encre de décoration à pleine force, pas l'encre du texte : à
+       `currentColor` le plot survolé pesait plus lourd que le plot brass de
+       l'item actif, et le survol prenait le dessus sur l'état. Le fil se
+       réveille sous le doigt, il ne s'allume pas. */
+    .nav-link:not([data-active]):hover::before {
+      width: calc(var(--pad-r) * 2 + 2px);
+      height: calc(var(--pad-r) * 2 + 2px);
+      margin-top: calc(var(--pad-r) * -1 - 1px);
+      margin-left: calc(var(--pad-r) * -1 - 1px);
+      background: var(--ink-circuit-strong);
+    }
+
+    .nav-link:not([data-active]):hover::after {
+      transform: scaleX(1);
+    }
   }
 
-  /* The register's weight is 500; the rail buys its active step by dropping
-     inactive items back to 400. It has to be declared here rather than with a
-     `font-normal` utility: `.register-ident` is unlayered and beats any
-     Tailwind layer, so the utility silently lost and every item sat at 500. */
+  /* L'ÉTAT. Plot brass plein, amorce brass longue. Pas de
+     `view-transition-name` ici, et c'est une décision : une transition de vue
+     ferait GLISSER le plot d'un item à l'autre par-dessus la page, alors que
+     le geste veut qu'il quitte son siège et parcoure le FIL. Voir
+     `travelNavSignal()` dans le script. */
+  .nav-link[data-active]::before {
+    width: calc(var(--pad-active-r) * 2);
+    height: calc(var(--pad-active-r) * 2);
+    margin-top: calc(var(--pad-active-r) * -1);
+    margin-left: calc(var(--pad-active-r) * -1);
+    background: var(--nav-signal);
+  }
+
+  .nav-link[data-active]::after {
+    width: var(--spur);
+    background: var(--nav-signal);
+    transform: scaleX(1);
+  }
+
+  /* Pendant le trajet, le plot et l'amorce en CSS s'effacent d'un coup : c'est
+     la pièce SVG qui prend le relais, posée au même pixel. Sans transition —
+     les deux se relaient, elles ne se croisent pas. La classe vit sur <html>,
+     que le swap d'Astro remet à neuf : elle se retire donc toute seule à
+     l'arrivée, exactement quand le vrai plot doit reparaître. */
+  :global(html.nav-travelling) .nav-link[data-active]::before {
+    transform: scale(0);
+  }
+
+  :global(html.nav-travelling) .nav-link[data-active]::after {
+    transform: scaleX(0);
+  }
+
+  /* L'ANNEAU DE FOCUS ENCADRE LE MOT, PAS LA LIGNE. Le lien s'étend depuis
+     x=0 — il doit couvrir son libellé, qui déborde l'aside de 96px — donc
+     l'anneau global, posé sur la boîte du lien, sortait de l'écran par la
+     gauche et venait se poser sur le bus. C'est la raison déjà écrite dans
+     global.css (« l'offset garde l'anneau à l'écart des filets que les liens
+     portent déjà »), appliquée ici au fil. */
+  .nav-link:focus-visible {
+    outline: none;
+  }
+
+  .nav-link:focus-visible .nav-label {
+    border-radius: 2px;
+    outline: 2px solid var(--color-brass-ink);
+    outline-offset: 3px;
+  }
+
+  :global(.dark) .nav-link:focus-visible .nav-label {
+    outline-color: var(--color-brass);
+  }
+
+  /* L'ENTRÉE SUIT LE FIL.
+
+     Un libellé n'apparaît pas quand la page est prête : il apparaît quand le
+     TRAIT arrive sous lui. Le retard de chacun est calculé, pas échelonné —
+     `drawNavPlates()` cherche à quelle longueur la branche croise l'ordonnée
+     du plot, puis inverse la courbe du dessin pour en tirer l'instant. Un
+     stagger fixe aurait décroché dès qu'on change le nombre d'items, la
+     hauteur d'un item ou la courbe.
+
+     `backwards` est ce qui tient la promesse : sans lui, le libellé serait
+     visible pendant tout son retard et n'entrerait jamais.
+
+     Les images de fin sont implicites (pas de `to`), et c'est voulu pour le
+     libellé : sa valeur d'arrivée dépend de l'item — 0.7 s'il est inactif, 1
+     s'il l'est. Un `to` écrit en dur allumerait les quatre. */
+  .nav-plate[data-entering] .nav-link::before {
+    animation: nav-node-enter 0.34s cubic-bezier(0.34, 1.56, 0.64, 1)
+      var(--enter-delay, 0s) backwards;
+  }
+
+  .nav-plate[data-entering] .nav-label {
+    animation: nav-label-enter 0.5s cubic-bezier(0.23, 1, 0.32, 1)
+      var(--enter-delay, 0s) backwards;
+  }
+
+  .nav-plate[data-entering] .nav-link[data-active]::after {
+    animation: nav-spur-enter 0.34s cubic-bezier(0.34, 1.56, 0.64, 1)
+      calc(var(--enter-delay, 0s) + 0.12s) backwards;
+  }
+
+  /* Le clavier ne s'attend pas : si l'on tabule dans le rail pendant que le
+     trait descend encore, l'item visé se montre tout de suite. Une entrée est
+     un ornement, un anneau de focus posé sur un mot invisible est un défaut —
+     et la fenêtre existe pour de vrai, elle dure jusqu'à 0,56 s. */
+  .nav-plate[data-entering] .nav-link:focus-visible .nav-label,
+  .nav-plate[data-entering] .nav-link:focus-visible::before {
+    animation: none;
+  }
+
+  @keyframes nav-node-enter {
+    from {
+      transform: scale(0);
+    }
+  }
+
+  /* Le libellé vient DU fil, pas d'en dessous : il est poussé vers sa place
+     comme l'amorce le pousserait. Même geste que le décalage de 4px au
+     survol, à une autre échelle. */
+  @keyframes nav-label-enter {
+    from {
+      opacity: 0;
+      transform: translateX(var(--enter-shift));
+    }
+  }
+
+  @keyframes nav-spur-enter {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  /* LA PIÈCE EN VOYAGE (voir `travelNavSignal()`). Le plot lui-même, redessiné
+     en SVG pour pouvoir quitter la boîte de son lien et suivre la branche.
+
+     `fill-box` est ce qui rend l'origine des transformations utilisable : sans
+     lui, `transform-origin: center` désigne le centre du viewBox, et une
+     simple mise à l'échelle fait fuir le plot en diagonale au lieu de le
+     rétracter sur lui-même. Vu à l'écran, pas déduit.
+
+     `:global()` n'est pas décoratif non plus : ces éléments sont créés par le
+     script, donc ils ne portent PAS l'attribut de portée qu'Astro ajoute au
+     balisage. Scopées, les trois règles ci-dessous ne s'appliquaient à rien —
+     et c'est justement `fill-box` qui manquait. */
+  :global(.nav-travel) {
+    pointer-events: none;
+  }
+
+  :global(.nav-travel-pad) {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  :global(.nav-travel-spur) {
+    transform-box: fill-box;
+    transform-origin: left center;
+  }
+
+  /* Le poids du registre est 500 ; l'item actif l'achète en faisant retomber
+     les inactifs à 400. À déclarer ici et pas via un utilitaire `font-normal`
+     : `.register-ident` est hors couche et bat toutes les couches Tailwind,
+     donc l'utilitaire perdait en silence et tout le rail restait à 500. */
   .nav-link:not([data-active]) {
     font-weight: 400;
   }
 
-  .nav-link[data-active]::before {
-    transform: scaleY(1);
-    /* Lets the rail slide between items across a navigation. Only one item is
-       active per page, so the name is never duplicated; the mobile menu is
-       display:none at this breakpoint and can't collide with it. */
-    view-transition-name: nav-rail;
+  /* Le brass à pleine force est la chose la plus bruyante d'une page sombre —
+     toutes les autres pièces brass vivent entre 28 et 35%. Ramené vers la
+     couleur de page, il tombe à 4.3:1, au-dessus des 3:1 qu'un indicateur
+     d'état demande, sans l'éblouissement. Le mode clair garde
+     `--color-brass-ink` entier ; il n'a pas ce problème. */
+  .nav-plate {
+    --nav-signal: var(--color-brass-ink);
   }
 
-  /* Same rail, laid on its side. No hover half-state — this menu is touch-only. */
-  .mobile-nav-label::after {
-    content: "";
-    position: absolute;
-    right: 0;
-    bottom: -0.4rem;
-    left: 0;
-    height: 3px;
-    background: var(--color-brass-ink);
-    transform: scaleX(0);
-    transition: transform 0.25s ease;
+  :global(.dark) .nav-plate {
+    --nav-signal: color-mix(in srgb, var(--color-brass) 65%, var(--color-page));
   }
 
-  [data-active] .mobile-nav-label::after {
-    transform: scaleX(1);
-  }
-
-  /* Full-strength brass is the loudest thing on a dark page — every other brass
-     element sits at 28-35%. Knocking it back toward the page colour lands at
-     4.3:1, comfortably above the 3:1 a state indicator needs, without the glare.
-     Light mode keeps the full --color-brass-ink; it doesn't have this problem. */
-  :global(.dark) .nav-link::before,
-  :global(.dark) .mobile-nav-label::after {
-    background: color-mix(in srgb, var(--color-brass) 65%, var(--color-page));
-  }
-
-  /* The rail's length carries information, so it stays; only the travel goes. */
+  /* Le dessin fini, parfaitement immobile : le plot garde sa taille, l'amorce
+     sa longueur — l'information reste, seul le trajet part. */
   @media (prefers-reduced-motion: reduce) {
+    .nav-label,
     .nav-link::before,
-    .mobile-nav-label::after {
+    .nav-link::after {
       transition: none;
     }
   }
@@ -467,6 +1029,462 @@ const relFor = (s: SocialLink) => {
       buttons.forEach((btn) => btn.removeEventListener("click", toggleTheme));
   }
 
+  /* LE PLOT QUITTE SON SIÈGE ET DESCEND LE FIL.
+
+     Le geste, en une phrase : au clic, le plot actif rétracte son amorce et se
+     comprime en courant, le courant parcourt la branche jusqu'au plot suivant,
+     et s'y rouvre en plot. Une seule pièce, un seul trajet — pas un plot qui
+     glisse PUIS un courant qui le rattrape, ce qui était la version d'avant et
+     racontait la même chose deux fois.
+
+     POURQUOI AVANT LE SWAP, ET PAS PENDANT.
+     Une transition de vue rend des instantanés figés pendant toute sa durée :
+     rien de vivant ne peut jouer dessous. Le geste se joue donc entièrement
+     sur le DOM SORTANT, en parallèle du fetch (`event.loader` enveloppé, le
+     motif documenté par Astro), et la page suivante arrive avec son plot déjà
+     à la bonne place — au pixel près, donc le fondu d'Astro n'a rien à
+     traverser. C'est aussi ce qui borne le coût : la latence ajoutée est
+     `max(fetch, geste)`, pas la somme.
+
+     LA PIÈCE EST REDESSINÉE EN SVG, et il le faut : le plot CSS est un
+     `::before` prisonnier de la boîte de son lien, il ne peut pas descendre
+     jusqu'au suivant. Le SVG de la plaque, lui, est en pixels 1:1 sur cette
+     même boîte, et `nodeY(i)` y est exactement le `top: 50%` du lien i — les
+     deux plots sont donc superposables, et le relais ne se voit pas.
+
+     Le courant reste BRASS pendant le trajet. C'est l'état qui se déplace, pas
+     un signal d'ambiance : le point d'encre de `respire.ts` répond à l'horloge,
+     celui-ci répond au visiteur. Deux points sur des fils, deux encres, et la
+     Règle du Signal unique tient — le brass, c'est l'état. */
+  const RETRACT_MS = 90;
+  const SEAT_MS = 150;
+  /* Le geste ne peut jamais retenir la navigation plus longtemps que ça. Voir
+     `travelNavSignal()` : sur un onglet caché, la timeline du document est
+     GELÉE — `Animation.finished` ne se règle alors jamais, et une navigation
+     qui l'attend reste en l'air indéfiniment. Le cas n'a rien de théorique :
+     il suffit de cliquer un lien puis de changer d'onglet. */
+  const TRAVEL_BUDGET_MS = 1200;
+  const SVG_NS = "http://www.w3.org/2000/svg";
+
+  let travelling: SVGGElement | null = null;
+
+  function activeIndexFor(links: HTMLAnchorElement[], path: string) {
+    return links.findIndex((a) => {
+      const href = new URL(a.href).pathname;
+      if (href === "/") return path === "/";
+      return path === href || path.startsWith(href + "/");
+    });
+  }
+
+  function visibleNavPlate(): HTMLElement | null {
+    return (
+      [...document.querySelectorAll<HTMLElement>(".nav-plate")].find(
+        (el) => el.getClientRects().length > 0 && !el.closest("[inert]"),
+      ) ?? null
+    );
+  }
+
+  function clearTravel() {
+    travelling?.remove();
+    travelling = null;
+    document.documentElement.classList.remove("nav-travelling");
+  }
+
+  async function travelNavSignal(to: URL): Promise<void> {
+    clearTravel();
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Onglet caché : la timeline est gelée, le geste ne jouerait pas et ne se
+    // terminerait pas non plus. Personne ne le regarde — on saute.
+    if (document.hidden) return;
+
+    const plate = visibleNavPlate();
+    const svg = plate?.querySelector("svg");
+    if (!plate || !svg) return;
+
+    const links = [...plate.querySelectorAll<HTMLAnchorElement>(".nav-link")];
+    const fromLink = links.find((a) => a.hasAttribute("data-active"));
+    const toIndex = activeIndexFor(links, to.pathname);
+    if (!fromLink || toIndex < 0) return;
+
+    const toLink = links[toIndex];
+    // Même item (un article depuis /blog, par exemple) : rien ne bouge, et le
+    // clic ne doit pas payer une animation qui ne dit rien.
+    if (toLink === fromLink) return;
+
+    const y0 = fromLink.offsetTop + fromLink.offsetHeight / 2;
+    const y1 = toLink.offsetTop + toLink.offsetHeight / 2;
+
+    const css = getComputedStyle(plate);
+    const num = (n: string) => parseFloat(css.getPropertyValue(n));
+    // `--wire-x`, pas `--branch-x` : le SVG a toujours son origine à gauche,
+    // même quand la plaque est retournée. `--spur-dir` dit de quel côté
+    // l'amorce pousse.
+    const x = num("--wire-x");
+    const dir = num("--spur-dir") < 0 ? -1 : 1;
+    const r = num("--pad-active-r");
+    const spur = num("--spur");
+    if (!Number.isFinite(x) || !Number.isFinite(r)) return;
+
+    const brass = css.getPropertyValue("--nav-signal").trim();
+
+    const g = document.createElementNS(SVG_NS, "g");
+    g.setAttribute("class", "nav-travel");
+    const rect = document.createElementNS(SVG_NS, "rect");
+    rect.setAttribute("class", "nav-travel-spur");
+    rect.setAttribute("x", String(dir > 0 ? x : x - spur));
+    rect.setAttribute("y", "-0.5");
+    rect.setAttribute("width", String(spur));
+    rect.setAttribute("height", "1");
+    rect.setAttribute("fill", brass);
+    rect.style.transformOrigin = dir > 0 ? "left center" : "right center";
+    const dot = document.createElementNS(SVG_NS, "circle");
+    dot.setAttribute("class", "nav-travel-pad");
+    dot.setAttribute("cx", String(x));
+    dot.setAttribute("cy", "0");
+    dot.setAttribute("r", String(r));
+    dot.setAttribute("fill", brass);
+    g.append(rect, dot);
+    g.style.transform = `translateY(${y0}px)`;
+    svg.appendChild(g);
+    travelling = g;
+
+    document.documentElement.classList.add("nav-travelling");
+
+    /* La courbe des tracés qui se dessinent, une seule sur tout le site pour
+       ce qui suit un fil ; le rattrapage de l'arrivée emprunte le ressort de
+       `wave-enter` — le plot se rassied, il ne se pose pas. */
+    const WIRE = "cubic-bezier(0.4, 0, 0.2, 1)";
+    const SEAT = "cubic-bezier(0.34, 1.56, 0.64, 1)";
+    const travelMs = Math.max(140, Math.min(Math.abs(y1 - y0) * 2, 360));
+    const done = (a: Animation) => a.finished.catch(() => {});
+
+    // 1. L'amorce rentre, le plot se comprime en courant.
+    await Promise.all([
+      done(
+        rect.animate(
+          { transform: ["scaleX(1)", "scaleX(0)"] },
+          {
+            duration: RETRACT_MS,
+            easing: "ease-in",
+            fill: "forwards",
+          },
+        ),
+      ),
+      done(
+        dot.animate(
+          { transform: ["scale(1)", "scale(0.55)"] },
+          {
+            duration: RETRACT_MS,
+            easing: "ease-in",
+            fill: "forwards",
+          },
+        ),
+      ),
+    ]);
+
+    // 2. Le courant descend (ou remonte) la branche.
+    await done(
+      g.animate(
+        { transform: [`translateY(${y0}px)`, `translateY(${y1}px)`] },
+        { duration: travelMs, easing: WIRE, fill: "forwards" },
+      ),
+    );
+
+    // 3. Il se rouvre en plot et repousse son amorce.
+    await Promise.all([
+      done(
+        dot.animate(
+          { transform: ["scale(0.55)", "scale(1)"] },
+          {
+            duration: SEAT_MS,
+            easing: SEAT,
+            fill: "forwards",
+          },
+        ),
+      ),
+      done(
+        rect.animate(
+          { transform: ["scaleX(0)", "scaleX(1)"] },
+          {
+            duration: SEAT_MS,
+            easing: SEAT,
+            delay: 40,
+            fill: "forwards",
+          },
+        ),
+      ),
+    ]);
+  }
+
+  /* Le geste doit être FINI quand la page bascule, sinon il se ferait couper
+     au milieu — d'où l'attente ici plutôt qu'un `astro:page-load`. Il court à
+     côté du chargement, jamais après : `Promise.all`, pas deux `await`.
+
+     Le garde-fou de 5 s n'est pas décoratif. Si le chargement échoue, Astro
+     retombe sur une navigation classique et tout est remis à neuf ; mais si
+     quoi que ce soit d'autre laisse la promesse en l'air, `html.nav-travelling`
+     resterait posée et le rail n'aurait plus de plot du tout. */
+  document.addEventListener("astro:before-preparation", (event) => {
+    const e = event as Event & {
+      to: URL;
+      loader: () => Promise<void>;
+    };
+    const load = e.loader;
+    e.loader = async () => {
+      /* Le geste court SOUS un budget, jamais sans. S'il déborde — onglet
+         passé à l'arrière-plan en plein trajet, timeline gelée — la page
+         bascule quand même, et le swap efface la pièce en vol comme la classe
+         `nav-travelling`. Un ornement ne prend pas la navigation en otage. */
+      const budget = new Promise<void>((resolve) =>
+        window.setTimeout(resolve, TRAVEL_BUDGET_MS),
+      );
+      await Promise.all([
+        load(),
+        Promise.race([travelNavSignal(e.to), budget]),
+      ]);
+    };
+  });
+
+  /* LE BUS, À LA HAUTEUR DE L'ÉCRAN.
+
+     Seule mesure du composant, et elle est inévitable : la hauteur du viewport
+     n'existe pas au rendu. Rejouée au redimensionnement, sinon le bus reste à
+     la taille de l'écran d'avant.
+
+     Le tiret est remis à zéro en même temps que le `d`. Le dessin d'entrée —
+     et les corrections de `respire.ts` — laissent un `stroke-dasharray` égal à
+     la longueur d'ALORS ; sur un tracé devenu plus long, ce tiret trop court
+     rouvre un trou au milieu du bus. C'est le genre de défaut qu'on ne voit
+     qu'après avoir agrandi la fenêtre, donc jamais. */
+  function sizeNavBus() {
+    document
+      .querySelectorAll<SVGPathElement>("[data-nav-bus]")
+      .forEach((path) => {
+        const svg = path.ownerSVGElement;
+        const h = svg ? Math.round(svg.getBoundingClientRect().height) : 0;
+        if (!h) return;
+        const x = path.dataset.navBus ?? "8";
+        path.setAttribute("d", `M ${x} 0 L ${x} ${h}`);
+        if (drawn.has("bus")) {
+          path.style.strokeDasharray = "";
+          path.style.strokeDashoffset = "";
+        }
+      });
+  }
+
+  /* LE DESSIN NE SE REJOUE PAS ENTRE LES PAGES.
+
+     Le rail est le même d'une page à l'autre : le voir se re-encrer derrière
+     chaque clic en faisait un événement à chaque fois, et un chrome qui
+     s'annonce à chaque page cesse d'être un chrome. Il se dessine donc une
+     fois, à l'arrivée sur le site, et plus jamais — `circuit.ts` ignore ces
+     SVG (`data-draw-once`) et c'est ce module qui les prend en charge, parce
+     que lui seul survit aux navigations : le DOM, lui, est remplacé.
+
+     Les plaques de la PAGE continuent de se dessiner à chaque navigation.
+     Elles appartiennent à la page, et la page a changé.
+
+     Une plaque encore invisible n'est pas marquée dessinée — le menu mobile
+     n'existe à l'écran qu'à sa première ouverture, et c'est là qu'il se
+     dessine, pas dans le dos du visiteur. */
+  const drawn = new Set<string>();
+  let busDraw: { delay: number; dur: number; length: number } | null = null;
+
+  /* À QUEL INSTANT LE TRAIT PASSE SOUS UN PLOT — les deux moitiés du calcul.
+
+     `lengthAtY` cherche la longueur de branche à laquelle le tracé atteint une
+     ordonnée. La branche descend de façon monotone (S, droite, biais), donc
+     une dichotomie suffit et rien n'a besoin d'être supposé de sa forme : elle
+     peut changer, la synchro suit.
+
+     `drawProgressToTime` fait le trajet inverse de la courbe du dessin. Le
+     dessin est un `cubic-bezier(0.4, 0, 0.2, 1)` : on connaît la fraction de
+     tracé qui doit être dessinée (la SORTIE de la courbe) et on cherche
+     l'instant (son ENTRÉE). Une règle de trois linéaire se trompait de 150 ms
+     aux extrémités — assez pour qu'un libellé s'allume avant que le trait ne
+     l'atteigne, ce qui est précisément le défaut que ce calcul existe pour
+     éviter. */
+  function lengthAtY(path: SVGPathElement, y: number, total: number): number {
+    let lo = 0;
+    let hi = total;
+    for (let i = 0; i < 20; i++) {
+      const mid = (lo + hi) / 2;
+      if (path.getPointAtLength(mid).y < y) lo = mid;
+      else hi = mid;
+    }
+    return (lo + hi) / 2;
+  }
+
+  function drawProgressToTime(fraction: number): number {
+    const y = (t: number) => 3 * (1 - t) * t * t + t * t * t;
+    const x = (t: number) =>
+      3 * (1 - t) * (1 - t) * t * 0.4 + 3 * (1 - t) * t * t * 0.2 + t * t * t;
+    let lo = 0;
+    let hi = 1;
+    for (let i = 0; i < 24; i++) {
+      const mid = (lo + hi) / 2;
+      if (y(mid) < fraction) lo = mid;
+      else hi = mid;
+    }
+    return x((lo + hi) / 2);
+  }
+
+  /* QUAND LA BRANCHE COMMENCE À SE DESSINER.
+
+     `data-draw-delay="bus"` veut dire : au moment où le front du BUS arrive à
+     la jonction, où qu'elle soit. Un nombre en dur y était avant, calé sur une
+     nav qui vivait en haut de l'écran ; la nav est descendue et ce nombre
+     serait devenu faux en silence — la branche aurait poussé bien avant que le
+     courant ne l'atteigne, ce qui est exactement le défaut que toute cette
+     synchronisation existe pour éviter. Le bus étant une droite verticale de 0
+     à sa longueur, la fraction cherchée est simplement l'ordonnée de la
+     jonction rapportée à cette longueur.
+
+     `plate.offsetTop` est mesuré depuis l'<aside>, qui est `sticky` donc
+     positionné : c'est le repère du SVG du bus, posé en inset-0 dessus. */
+  function baseDelayFor(svg: SVGSVGElement): number {
+    const attr = svg.dataset.drawDelay;
+    if (attr !== "bus") return Number(attr ?? 0.05);
+
+    const plate = svg.closest<HTMLElement>(".nav-plate");
+    const branch = svg.querySelector<SVGPathElement>("[data-nav-branch]");
+    if (!busDraw || !plate || !branch || !busDraw.length) return 0.05;
+
+    const junction = plate.offsetTop + branch.getPointAtLength(0).y;
+    const fraction = Math.max(0, Math.min(1, junction / busDraw.length));
+    return busDraw.delay + busDraw.dur * drawProgressToTime(fraction);
+  }
+
+  function drawNavPlates() {
+    document
+      .querySelectorAll<SVGSVGElement>("svg[data-draw-once]")
+      .forEach((svg) => {
+        const key = svg.dataset.drawOnce ?? "";
+        if (drawn.has(key)) return;
+        // Rendu nul (l'autre rendu au-delà du point de bascule) ou hors de
+        // l'arbre (le menu fermé) : rien à dessiner, et rien à consommer.
+        if (!svg.getClientRects().length || svg.closest("[inert]")) return;
+        drawn.add(key);
+
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+          return;
+
+        /* Onglet à l'arrière-plan : la timeline du document est gelée, donc
+           l'entrée ne jouerait pas — elle laisserait seulement les plots à
+           `opacity: 0` et les libellés à leur image de départ, jusqu'à ce que
+           l'onglet revienne au premier plan. Le visiteur qui arrive trois
+           secondes plus tard doit trouver le dessin FINI, pas une animation
+           en attente. Même doctrine que `respire.ts` : un temps passé hors du
+           regard est sauté, jamais dépensé à l'aveugle. */
+        if (document.hidden) return;
+
+        /* La branche attend que le bus soit passé devant sa jonction : le
+           bus met ~0.3s à descendre les 106 premiers pixels (la courbe part
+           lentement), et la branche pousse de là. C'est l'ordre du dessin qui
+           raconte le branchement — l'inverse donnerait une branche greffée
+           sur rien. */
+        const base = baseDelayFor(svg);
+        let branch: {
+          path: SVGPathElement;
+          delay: number;
+          dur: number;
+        } | null = null;
+
+        svg
+          .querySelectorAll<SVGPathElement>(".circuit-trace")
+          .forEach((path, i) => {
+            const length = path.getTotalLength();
+            if (!length) return;
+            /* 260 px/s, plafonné — sauf pour le bus, qui a son propre
+               plafond parce qu'il est quatre fois plus long que n'importe
+               quelle autre trace du site : à la cadence commune il partait
+               pour 3,9 s, et au plafond commun il retardait tout ce qui
+               l'attend en aval. Un trait long se lit plus vite qu'un court,
+               à vitesse égale. */
+            const dur =
+              Number(svg.dataset.drawDur) ||
+              Math.max(0.4, Math.min(length / 260, 1.1));
+            const delay = base + i * 0.12;
+            path.style.strokeDasharray = String(length);
+            path.style.strokeDashoffset = String(length);
+            path.style.animation = `circuit-draw ${dur.toFixed(2)}s cubic-bezier(0.4, 0, 0.2, 1) ${delay.toFixed(2)}s forwards`;
+            // Relevé ici plutôt que recalculé : la synchro des libellés lit
+            // les temps que le dessin a RÉELLEMENT reçus, donc les deux ne
+            // peuvent pas diverger.
+            if (path.hasAttribute("data-nav-branch"))
+              branch = { path, delay, dur };
+            if (path.hasAttribute("data-nav-bus"))
+              busDraw = { delay, dur, length };
+          });
+
+        syncPlateToBranch(svg, base, branch);
+      });
+  }
+
+  /* TOUT CE QUI EST POSÉ SUR LA BRANCHE ENTRE QUAND LE TRAIT L'ATTEINT.
+
+     Une seule fonction porte le calendrier — libellés, plots, points de
+     jonction — parce que c'est un seul calendrier : l'ordonnée de la pièce,
+     traduite en longueur de tracé, puis en instant. Deux horloges, c'était
+     l'état d'avant : les points de jonction attendaient un échelonnement fixe
+     de 0,95 s alors que le trait passait sur eux dès 0,35 s.
+
+     Sans branche (le bus, qui ne porte rien), l'échelonnement fixe reste : il
+     n'y a rien à synchroniser. */
+  function syncPlateToBranch(
+    svg: SVGSVGElement,
+    base: number,
+    branch: { path: SVGPathElement; delay: number; dur: number } | null,
+  ) {
+    const total = branch?.path.getTotalLength() ?? 0;
+    const whenAt = (y: number) => {
+      if (!branch || !total) return null;
+      const fraction = Math.min(1, lengthAtY(branch.path, y, total) / total);
+      return branch.delay + branch.dur * drawProgressToTime(fraction);
+    };
+
+    let last = 0;
+
+    svg.querySelectorAll<SVGElement>(".circuit-dot").forEach((dot, i) => {
+      const cy = Number(dot.getAttribute("cy"));
+      const at = Number.isFinite(cy) ? whenAt(cy) : null;
+      const delay = at ?? base + 0.6 + i * 0.08;
+      dot.style.opacity = "0";
+      dot.style.animation = `circuit-appear 0.3s ease-out ${delay.toFixed(3)}s forwards`;
+      last = Math.max(last, delay);
+    });
+
+    const plate = svg.closest<HTMLElement>(".nav-plate");
+    if (!plate || !branch) return;
+
+    plate.querySelectorAll<HTMLElement>(".nav-link").forEach((link) => {
+      const at = whenAt(link.offsetTop + link.offsetHeight / 2);
+      if (at === null) return;
+      link.style.setProperty("--enter-delay", `${at.toFixed(3)}s`);
+      last = Math.max(last, at);
+    });
+
+    plate.dataset.entering = "";
+    // Retiré une fois la dernière entrée finie : l'attribut ne sert qu'à
+    // porter les animations, et un attribut d'état qui traîne finit toujours
+    // par être lu comme un état.
+    window.setTimeout(
+      () => plate.removeAttribute("data-entering"),
+      (last + 1) * 1000,
+    );
+  }
+
+  function initNavPlates() {
+    sizeNavBus();
+    drawNavPlates();
+  }
+
+  let resizeTimer = 0;
+  window.addEventListener("resize", () => {
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(initNavPlates, 150);
+  });
+
   function initMobileMenu() {
     const toggleEl = document.getElementById("mobile-menu-toggle");
     const menuEl = document.getElementById("mobile-menu");
@@ -502,6 +1520,9 @@ const relFor = (s: SocialLink) => {
     function openMenu() {
       menu.classList.remove("translate-x-full");
       menu.inert = false;
+      // Le panneau vient d'entrer dans l'arbre : c'est ici, et pas au
+      // chargement, que sa plaque se dessine pour la première fois.
+      drawNavPlates();
       toggle.setAttribute("aria-expanded", "true");
       toggle.setAttribute("aria-label", "Fermer le menu");
       document.body.classList.add("menu-open");
@@ -536,12 +1557,15 @@ const relFor = (s: SocialLink) => {
 
   let cleanupMenu = initMobileMenu();
   let cleanupTheme = initThemeToggle();
+  initNavPlates();
 
   document.addEventListener("astro:page-load", () => {
     if (cleanupMenu) cleanupMenu();
     if (cleanupTheme) cleanupTheme();
     cleanupMenu = initMobileMenu();
     cleanupTheme = initThemeToggle();
+    initNavPlates();
+    clearTravel();
   });
 
   document.addEventListener("astro:before-preparation", () => {

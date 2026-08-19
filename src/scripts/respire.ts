@@ -61,10 +61,20 @@ function clearAll(): void {
 const grid = (): HTMLElement | null =>
   document.querySelector<HTMLElement>(".blog-dot-grid");
 
+/* Les deux axes, et le second n'est pas décoratif : le menu mobile est garé
+   HORS ÉCRAN À DROITE quand il est fermé (translate-x-full), pas replié. Un
+   test vertical seul le déclarait visible, et depuis que sa plaque porte des
+   tracés de circuit (SideNav.astro), corrections et signaux allaient s'y
+   dépenser sans témoin — exactement ce que le commentaire de correct() refuse.
+   Le rail en `display:none` sous md sort par la même porte : boîte nulle. */
 const inView = (el: Element): boolean => {
   const r = el.getBoundingClientRect();
   return (
-    r.bottom > 0 && r.top < window.innerHeight && (r.width > 0 || r.height > 0)
+    r.bottom > 0 &&
+    r.top < window.innerHeight &&
+    r.right > 0 &&
+    r.left < window.innerWidth &&
+    (r.width > 0 || r.height > 0)
   );
 };
 

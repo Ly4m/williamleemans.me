@@ -7,8 +7,15 @@
 
    Traitement retenu (#21) : plutôt qu'une boîte surgissant dans un coin —
    forme que le site n'utilise nulle part — le lien se lit comme le premier
-   item de la barre latérale, rail laiton compris, et ne se déplie qu'au
-   focus. Rien d'étranger n'apparaît jamais sur la page. */
+   item de la barre latérale et ne se déplie qu'au focus. Rien d'étranger
+   n'apparaît jamais sur la page.
+
+   Depuis que le rail est un schéma (2026-08-19), le lien porte la même
+   grammaire : un plot laiton et une amorce jusqu'à son libellé. Mais il se
+   branche sur le BUS (x=8) et non sur la branche (x=22), et au-dessus de la
+   jonction : il est en amont de la nav, il n'en est pas un item. C'est la
+   seule raison pour laquelle son amorce est plus longue que celles du rail —
+   ne pas les « accorder ». */
 ---
 
 <a href="#contenu" class="skip-link register-ident">Aller au contenu</a>
@@ -20,11 +27,25 @@
   .skip-link {
     position: fixed;
     z-index: 50;
-    /* Calé sur la nav : rail à 1.5rem (le pl-6 de l'aside), texte à 2.25rem
-       (+ le px-3 du .nav-link), juste au-dessus d'ACCUEIL qui ouvre à 7.5rem. */
-    top: 5.5rem;
+    /* Calé sur la plaque du rail : bus à 8px, libellé à 3rem (48px, le
+       `--label-x` du rail).
+
+       ANCRÉ EN BAS depuis que le rail y est descendu. L'arithmétique, à
+       vérifier si les constantes de SideNav bougent : la rangée d'icônes
+       occupe 56px depuis le bas (h-8 + mb-6), la plaque en fait 322
+       (headroom 66 + 4×36 + 3×12 + tailroom 76), et la jonction de la branche
+       tombe 42px sous le haut de la plaque — soit 336px du bas. Le plot du
+       lien se pose 18px au-dessus, et la boîte dépliée mesure 31.2px
+       (line-height 2.6 sur 12px) avec son plot au milieu : 336 + 18 − 15.6.
+
+       En bas et pas en haut parce que l'ordre du focus doit suivre l'œil :
+       laissé en haut de l'écran, il faisait sauter le clavier haut → bas →
+       haut. Il se lit toujours comme le premier item du rail ; le rail a
+       simplement déménagé. */
+    right: auto;
+    bottom: 338px;
     left: 0;
-    padding: 0 0.75rem 0 2.25rem;
+    padding: 0 0.75rem 0 3rem;
     font-size: 0.75rem;
     line-height: 0;
     color: var(--color-charcoal);
@@ -44,23 +65,49 @@
     color: var(--color-primary-100);
   }
 
-  /* Le rail de la nav, à l'identique. */
+  /* Le plot, sur le bus. Même diamètre que le plot actif du rail (7px). */
   .skip-link::before {
     content: "";
     position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 1.5rem;
-    width: 3px;
-    background: var(--color-brass-ink);
-    transform: scaleY(0);
+    top: 50%;
+    left: 8px;
+    width: 7px;
+    height: 7px;
+    margin-top: -3.5px;
+    margin-left: -3.5px;
+    border-radius: 50%;
+    background: var(--skip-signal);
+    transform: scale(0);
     transition: transform 0.25s ease;
   }
 
-  /* Même laiton rabattu que .nav-link::before : à pleine force, il serait
+  /* L'amorce, du bus jusqu'au libellé. */
+  .skip-link::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 8px;
+    width: 32px;
+    height: 1px;
+    margin-top: -0.5px;
+    background: var(--skip-signal);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.25s ease;
+  }
+
+  /* Même laiton rabattu que le plot du rail : à pleine force, il serait
      l'élément le plus bruyant de la page sombre. */
-  :global(.dark) .skip-link::before {
-    background: color-mix(in srgb, var(--color-brass) 65%, var(--color-page));
+  .skip-link {
+    --skip-signal: var(--color-brass-ink);
+  }
+
+  :global(.dark) .skip-link {
+    --skip-signal: color-mix(
+      in srgb,
+      var(--color-brass) 65%,
+      var(--color-page)
+    );
   }
 
   .skip-link:focus {
@@ -69,7 +116,11 @@
   }
 
   .skip-link:focus::before {
-    transform: scaleY(1);
+    transform: scale(1);
+  }
+
+  .skip-link:focus::after {
+    transform: scaleX(1);
   }
 
   /* Sur mobile la barre latérale n'existe pas : le lien se range sous
@@ -78,12 +129,19 @@
   @media (max-width: 767px) {
     .skip-link {
       top: 3.5rem;
+      bottom: auto;
       padding-left: 1.25rem;
       background: var(--color-page);
     }
 
-    .skip-link::before {
+    .skip-link::before,
+    .skip-link::after {
       left: 0;
+      margin-left: 0;
+    }
+
+    .skip-link::after {
+      width: 16px;
     }
   }
 
@@ -91,7 +149,8 @@
      seule la durée tombe. */
   @media (prefers-reduced-motion: reduce) {
     .skip-link,
-    .skip-link::before {
+    .skip-link::before,
+    .skip-link::after {
       transition: none;
     }
   }
