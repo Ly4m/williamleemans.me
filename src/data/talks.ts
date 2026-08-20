@@ -120,3 +120,40 @@ export const formatDate = (iso: string): string =>
     month: "long",
     year: "numeric",
   }).format(new Date(`${iso}T12:00:00`));
+
+/**
+ * The most recent outing, and how long ago it was.
+ *
+ * This is NOT the availability flag the page refuses. It exists because the
+ * header plate prints a year span and the closing line speaks in the present
+ * tense, and when those two drift apart the reader believes the plate. The
+ * closing line borrows this to say the quiet part in the first person, in
+ * prose, which is the only register this page addresses organisers in.
+ *
+ * Derived rather than written into the copy so the sentence cannot go stale:
+ * give a talk, and the clause removes itself on the next build. Build-time, so
+ * a site that sits unbuilt for a year crosses the threshold silently — the same
+ * property `yearSpan` already has, and acceptable for the same reason.
+ */
+const DORMANT_AFTER_MONTHS = 12;
+
+export const lastTalk = (() => {
+  const latest = talks
+    .flatMap((t) => t.occurrences)
+    .map((o) => o.date)
+    .sort()
+    .at(-1);
+  if (!latest) return null;
+
+  const then = new Date(`${latest}T12:00:00`);
+  const now = new Date();
+  const months =
+    (now.getFullYear() - then.getFullYear()) * 12 +
+    (now.getMonth() - then.getMonth());
+
+  return {
+    label: formatDate(latest),
+    months,
+    dormant: months >= DORMANT_AFTER_MONTHS,
+  };
+})();

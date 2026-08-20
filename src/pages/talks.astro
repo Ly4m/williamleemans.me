@@ -1,7 +1,13 @@
 ---
 import BlogLayout from "../layouts/BlogLayout.astro";
 import TalksDecoration from "../components/TalksDecoration.astro";
-import { sortedTalks, talkCount, yearSpan, formatDate } from "../data/talks.ts";
+import {
+  sortedTalks,
+  talkCount,
+  yearSpan,
+  formatDate,
+  lastTalk,
+} from "../data/talks.ts";
 
 const countLabel = `N:${String(talkCount).padStart(2, "0")}`;
 
@@ -51,41 +57,76 @@ const structuredData = JSON.stringify({
       {
         sortedTalks.map((talk) => (
           <li>
-            <h2 class="font-voice text-charcoal dark:text-primary-100 text-xl">
+            <h2 class="font-voice text-charcoal dark:text-primary-100 text-2xl">
               {talk.title}
             </h2>
 
-            <p class="text-faded mt-1 max-w-[55ch] text-lg">{talk.pitch}</p>
+            <p class="text-faded mt-1 max-w-[55ch]">{talk.pitch}</p>
 
-            <ul class="mt-3 space-y-1">
+            {/*
+             * The blog index's row, transposed: subject — dot leader — the
+             * figure, in that order. The date is NOT a fixed-width column; it
+             * takes its natural width and the leader absorbs every bit of the
+             * variance, so the video slot's fixed width is what lands each
+             * date on the same right edge. That is the only arrangement in
+             * which `tabular-nums` on `.register-notation` actually buys a
+             * column — the years line up under each other, the month names
+             * stay ragged to their left.
+             *
+             * The event name is the row's ONLY flexible item, and it has to
+             * stay that way. With every item `shrink-0`, an event called
+             * "Conférence Nationale du Développement Logiciel de Lille" pushed
+             * a 390px viewport out to 537px of horizontal scroll — measured,
+             * not feared. Letting the name shrink and wrap keeps the date and
+             * video columns exactly where they are and costs only the leader,
+             * which has nothing to span by then anyway.
+             */}
+            <ul class="mt-3">
               {talk.occurrences.map((o) => (
-                <li class="text-faded flex flex-wrap items-baseline gap-x-2 text-sm">
+                <li class="occurrence text-faded flex items-center gap-2 text-sm">
                   {o.eventUrl ? (
                     <a
                       href={o.eventUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="py-0.5"
+                      class="min-w-0 py-1"
+                      aria-label={`${o.event} — le site de la conférence (nouvelle fenêtre)`}
                     >
                       {o.event}
                     </a>
                   ) : (
-                    <span>{o.event}</span>
+                    <span class="min-w-0">{o.event}</span>
                   )}
-                  <time datetime={o.date} class="register-notation">
+
+                  <span
+                    aria-hidden="true"
+                    class="dot-leader grow leading-none"
+                  />
+
+                  <time datetime={o.date} class="register-notation shrink-0">
                     {formatDate(o.date)}
                   </time>
-                  {o.video && (
-                    <a
-                      href={o.video}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="mine py-0.5"
-                      aria-label={`Voir la vidéo — ${talk.title}`}
-                    >
-                      Voir la vidéo
-                    </a>
-                  )}
+
+                  {/*
+                   * Fixed width whether or not there is a video: an unrecorded
+                   * outing has to read as a visible absence in the column, not
+                   * as a row that simply stopped earlier.
+                   */}
+                  <span class="w-[6.5rem] shrink-0 text-right">
+                    {o.video ? (
+                      <a
+                        href={o.video}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="mine py-1"
+                        aria-label={`Voir la vidéo — ${talk.title} (nouvelle fenêtre)`}
+                      >
+                        Voir la vidéo
+                      </a>
+                    ) : (
+                      <span class="no-video" aria-hidden="true" />
+                    )}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -94,10 +135,27 @@ const structuredData = JSON.stringify({
       }
     </ul>
 
+    {
+      /*
+       * The page's whole address to conference organisers, and it stays prose.
+       * The middle clause exists so the plate's year span and this paragraph stop
+       * contradicting each other: it says the silence out loud, in my voice,
+       * before the invitation rather than after it. It disappears on its own the
+       * next time I give a talk.
+       */
+    }
     <p class="text-faded mt-16 max-w-[68ch] text-sm">
       Je donne ces talks en français, depuis Lille, et je me déplace volontiers.
+      {
+        lastTalk?.dormant && (
+          <>
+            Le dernier remonte à {lastTalk.label}, et ça commence à faire
+            long.{" "}
+          </>
+        )
+      }
       Si l'un d'eux a sa place dans votre programme, <a
-        class="mine"
+        class="mine py-1"
         href="mailto:william@lmns.fr">écrivez-moi</a
       >.
     </p>
@@ -129,8 +187,43 @@ const structuredData = JSON.stringify({
     border-bottom-color: var(--color-brass);
   }
 
+  /* The row binds on interaction, never on proximity. The blog index can hang
+     its hover on `.group` because the whole row is one anchor; an occurrence
+     row has two destinations and stretches of nothing between them, so it
+     hangs on `:has(a:hover)` instead. Hovering the gap inks nothing, and the
+     row never claims to be clickable where it isn't. */
+  .occurrence .dot-leader,
+  .occurrence time {
+    transition: color 0.3s ease-in-out;
+  }
+
+  .occurrence:has(a:hover) .dot-leader,
+  .occurrence:has(a:hover) time {
+    color: var(--color-charcoal);
+    /* Eases off, snaps on — the blog rows' behaviour, and the reason both
+       lists feel like the same object under the cursor. */
+    transition: none;
+  }
+
+  :global(.dark) .occurrence:has(a:hover) .dot-leader,
+  :global(.dark) .occurrence:has(a:hover) time {
+    color: var(--color-primary-100);
+  }
+
+  /* An outing nobody filmed. The slot keeps its width, so the absence sits in
+     the column as a struck-out figure would on a plate, rather than reading as
+     a row that simply ended early. */
+  .no-video {
+    display: inline-block;
+    width: 0.75rem;
+    border-top: 1px solid currentColor;
+    vertical-align: middle;
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    a {
+    a,
+    .occurrence .dot-leader,
+    .occurrence time {
       transition: none;
     }
   }
