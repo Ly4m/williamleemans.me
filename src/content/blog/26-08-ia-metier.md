@@ -3,28 +3,31 @@ slug: "developpement-assiste-par-ia"
 title: "Cette fois, je suis dans la hype"
 description: "Développement assisté par IA : pourquoi celui qui a fait un talk contre la hype est hypé cette fois, et comment je vois le métier changer."
 pubDate: "2026-08-12"
-readingTime: 6
+readingTime: 8
+related:
+  - "cap-pacelc-system-design"
+  - "garder-un-historique-git-propre"
 ---
 
-En février 2024, j'ai donné un talk qui s'appelait *Hype Driven Development*. En juin de la même année, j'en ai remis une couche au Devfest Lille avec *[Maîtriser la Hype : Passion versus Raison](/talks)*. Le message tenait en une phrase : choisis tes technos avec la raison, pas avec la hype.
+En février 2024, j'ai donné un talk qui s'appelait *Hype Driven Development*. En juin de la même année, j'en ai remis une couche au Devfest Lille avec *[Maîtriser la Hype : Passion versus Raison](/talks)*. Un message simple : choisis tes technos avec la raison, pas avec la hype.
 
-Deux ans plus tard, je fais du développement augmenté par IA tous les jours, et j'adore ça.
+Depuis deux ans je suis plongé dans le développement augmenté par IA, tous les jours, et je kiffe ça.
 
-Donc soit je me suis assis sur mon propre talk, soit il se passe quelque chose qui mérite mieux qu'un haussement d'épaules. J'ai pris le temps de me poser la question honnêtement. Voilà où j'en suis.
+Est-ce que je n'ai pas respecté mon propre talk et je suis tombé sous le joug de la hype ou bien y a-t-il vraiment un shift sérieux qui se passe dans notre métier ? J'ai pris le temps de me poser la question honnêtement. Voilà où j'en suis.
 
 ## Ce qui ne me hype pas : aller plus vite
 
 Autant commencer par là, parce que c'est l'argument qu'on entend partout et c'est pas le meilleur.
 
-C'est aussi celui où les chiffres sont les moins flatteurs. En 2025, METR a fait passer un essai randomisé à seize développeurs open source expérimentés, sur 246 tâches, dans des repositories qu'ils connaissaient depuis cinq ans en moyenne. Résultat : [19 % plus lents avec les outils d'IA](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/) que sans. Et le meilleur : les mêmes développeurs estimaient après coup avoir été 20 % plus rapides.
+C'est aussi celui où les chiffres sont les moins flatteurs. En 2025, METR a fait passer un essai randomisé à seize développeurs open source expérimentés, sur 246 tâches, dans des repositories qu'ils connaissaient depuis cinq ans en moyenne. Résultat : [19 % plus lents avec les outils d'IA](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/) que sans. Et le meilleur dans tout ça : les mêmes développeurs estimaient après coup avoir été 20 % plus rapides.
 
 C'est l'étude qu'on me sort systématiquement quand je dis que je suis hypé. Sauf que si on la lit vraiment, elle est plus intéressante que ça.
 
-METR est revenu dessus en février 2026 pour annoncer qu'ils changeaient de protocole. Leur constat est clair : les développeurs refusaient de travailler sans IA même payés 50 $/heure, et surtout ils évitaient de soumettre les tâches sur lesquelles ils pensaient que l'IA les aiderait le plus. Autrement dit, l'expérience se vidait toute seule des cas où ça marche. Ils écrivent noir sur blanc que [le vrai gain pourrait être bien plus élevé sur les tâches qui sortent de l'échantillon](https://metr.org/blog/2026-02-24-uplift-update/).
+METR est revenu dessus en février 2026 pour annoncer qu'ils changeaient de protocole. Leur constat est clair : une part croissante des développeurs ne veut plus travailler sans IA, même payée 50 $/heure, et 30 à 50 % d'entre eux disent avoir renoncé à soumettre certaines tâches parce qu'ils ne voulaient pas les faire sans assistance. Autrement dit, l'expérience se vidait toute seule des cas où ça marche. Ils écrivent noir sur blanc que [le vrai gain pourrait être bien plus élevé sur les tâches qui sortent de l'échantillon](https://metr.org/blog/2026-02-24-uplift-update/).
 
 > Une étude honnête qui dit « notre méthode ne mesure plus ce qu'on croyait » vaut mieux qu'un chiffre rond qu'on affiche sur LinkedIn.
 
-Mais tout ce débat mesure la mauvaise chose.
+Mais tout ce débat se focus sur la mauvaise chose.
 
 Taper du code n'a jamais été mon goulot d'étranglement. Si mon métier se résumait à produire des lignes, ça ferait quinze ans que je m'ennuie.
 
@@ -36,7 +39,8 @@ Avant, une journée typique, c'était : réfléchir vingt minutes, puis passer u
 
 Aujourd'hui, la transcription est accélérée. Ce qui reste, c'est formuler l'intention : qu'est-ce qu'on construit, dans quel ordre, avec quels compromis, et qu'est-ce qu'on refuse de faire. C'est exactement le travail que je préfère, et c'est celui qui remplit mes journées maintenant.
 
-<svg class="svg-ia1" viewBox="0 0 600 195" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:600px;display:block;margin:2rem auto;" role="img" aria-label="Deux axes comparant où se concentre mon temps de travail. Avant : surtout sur l'écriture du code. Maintenant : surtout sur l'intention, la conception et la relecture.">
+<figure>
+<svg class="svg-ia1" viewBox="0 0 600 195" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:600px;display:block;" role="img" aria-label="Deux axes comparant où se concentre mon temps de travail. Avant : surtout sur l'écriture du code. Maintenant : surtout sur l'intention, la conception et la relecture.">
   <style>
     .svg-ia1 { --stroke: #252525; --text: #252525; --sub: #6b6b6b; }
     .dark .svg-ia1 { --stroke: #fafafa; --text: #fafafa; --sub: #9b9b9b; }
@@ -67,18 +71,34 @@ Aujourd'hui, la transcription est accélérée. Ce qui reste, c'est formuler l'i
   <text class="step" x="395" y="168" text-anchor="middle">écriture</text>
   <text class="step" x="525" y="168" text-anchor="middle">relecture</text>
 </svg>
+  <figcaption><span class="fig-num">Fig. 1</span> — Ce n'est pas le travail qui a disparu, c'est sa répartition qui s'est déplacée.</figcaption>
+</figure>
 
-Le diagramme n'a pas d'échelle, et c'est volontaire : je n'ai pas chronométré mes journées. Mais la forme, elle, est correcte.
+Ce diagramme n'a pas d'échelle, et c'est volontaire : je n'ai pas chronométré mes journées. Mais le principe est là.
 
 Ce déplacement a un effet secondaire que je n'avais pas vu venir : il rend les bonnes questions d'architecture beaucoup plus rentables. Quand écrire trois variantes coûtait trois jours, on choisissait sur intuition et on assumait. Quand ça coûte un après-midi, on peut réellement aller voir. Les [compromis dont je parlais dans mon article sur PACELC](/blog/cap-pacelc-system-design) ne sont plus des débats autour de la théorie : on peut les prototyper, les tester.
 
 ## Il n'y a pas que l'écriture du code qui est augmentée
 
-C'est sur l'écriture du code que le changement est le plus visible, mais ce n'est pas le plus important. L'utilisation de l'IA m'aide aussi énormément sur la partie cadrage : une session de questions-réponses me permet d'être challengé sur les designs que je propose et de m'assurer de ne laisser aucun angle mort dans mes spécifications.
+C'est sur l'écriture du code que le changement est le plus visible, mais ce n'est pas le plus important. Mon pari, c'est que l'IA me rende meilleur, pas seulement plus rapide.
 
-Dans la compréhension aussi : quand je dois intégrer et décortiquer un code que je ne connais pas, l'IA me permet d'avoir rapidement des analyses plus ou moins poussées et accélère grandement ma capacité à intervenir.
+### Le cadrage
 
-## La relecture devient une compétence critique
+J'ai toujours préféré bien poser ma réflexion avant d'attaquer le code. Aujourd'hui, j'utilise des agents pour me challenger sur ma conception, vérifier rapidement mes hypothèses dans le code et prototyper (ça, j'adore). Et ça tombe bien : pour qu'une équipe d'agents soit efficace, il faut lui fournir un contexte aux petits oignons.
+
+Par exemple, j'ai toujours essayé de faire attention à l'accessibilité, sans jamais être excellent sur le sujet. Aujourd'hui, mon agent de cadrage ne me lâche pas tant que cette partie n'est pas traitée.
+
+### Les tests
+
+Quand on fait du développement augmenté, il est indispensable d'avoir des mécaniques de vérification automatisées : c'est ce qui permet aux agents de converger vers une solution. Et c'est cette contrainte qui fait que mon code n'a jamais été aussi bien testé. Le TDD n'a jamais été aussi omniprésent dans ma pratique.
+
+### La qualité
+
+Là, on arrive sur ma nouvelle bataille. Je sais que j'ai tendance à faire parfois de la sur-qualité, mais je constate que l'AI slop se rencontre de plus en plus sur le terrain, et qu'une codebase qui commence à dégénérer se détériore beaucoup plus vite quand ce sont des agents qui écrivent le code.
+
+Rédiger des ADR, expliciter les contraintes et les normes du projet, choisir la bonne architecture, poser un ubiquitous language : tout ça était déjà fortement recommandé, ça devient obligatoire.
+
+### La code review devient une compétence critique
 
 C'est le changement le plus concret dans mon quotidien, et celui dont on parle le moins.
 
@@ -92,7 +112,7 @@ Un retry ajouté « par sécurité » sur un appel qui n'est pas idempotent. Un 
 
 Repérer ça demande une compétence différente de celle que j'ai passé quinze ans à construire. Il faut lire du code en se demandant non pas « est-ce que c'est faux ? » mais « qui a décidé ça, et est-ce que quelqu'un l'a décidé ? ».
 
-Je trouve ça passionnant. Et je ne connais personne qui ait une méthode propre pour le faire. C'est très exactement le genre d'inconnu que j'aime.
+Je trouve ça passionnant. Et je ne connais personne qui ait une méthode propre pour le faire. C'est très exactement le genre d'inconnu qui me fait aimer ce métier.
 
 Certains ne relisent même plus le code et font entièrement confiance au filet de sécurité qu'ils construisent avec leurs tests (par exemple le célèbre Uncle Bob, qui a [fait pas mal de remous sur les réseaux](https://x.com/unclebobmartin/status/2080257779395154409) avec ça cet été).
 
@@ -120,7 +140,7 @@ La première, c'est le code que plus personne dans l'équipe ne comprend. Pas du
 
 La seconde, c'est ma propre perception. L'écart entre les 19 % mesurés et les 20 % ressentis dans l'étude METR est le résultat le plus solide de tout ce débat, et il ne parle pas des outils : il parle de nous. Je ne suis pas un bon juge de ma propre productivité, et je ne vois pas pourquoi je ferais exception.
 
-Donc j'y vais à fond, en sachant que mon ressenti n'est pas une mesure.
+J'y vais à fond quand même. Mon instinct me dit que le dev augmenté est le bon pari, et je sais que mon instinct n'est pas une mesure.
 
 ## Au final
 

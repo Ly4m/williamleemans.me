@@ -4,6 +4,9 @@ title: "Nouvelle Machine"
 description: "Passage au MacBook Pro 14″ : comment je reconstruis mon dev setup de zéro, apps, terminal, dotfiles et thème Gruvbox, à chaque nouvelle machine."
 pubDate: "2025-09-23"
 readingTime: 2
+related:
+  - "garder-un-historique-git-propre"
+  - "developpement-assiste-par-ia"
 
 ---
 
@@ -81,7 +84,7 @@ Pour cet automne, je suis parti sur le thème [Gruvbox](https://github.com/morhe
 
 C’est un détail, mais un bon thème change vraiment l’ambiance de travail.
 
-![My Gruvbox themed desktops.](images/screenshot.jpg)
+![Mes bureaux sous le thème Gruvbox : terminal, éditeur et navigateur dans les mêmes tons chauds](images/screenshot.jpg "Le thème Gruvbox, d'un bout à l'autre du bureau, et la première chose que je réinstalle.")
 
 ## Au final
 

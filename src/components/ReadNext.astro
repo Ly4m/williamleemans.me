@@ -4,26 +4,41 @@ type Props = {
 };
 
 const { posts } = Astro.props;
+
+/**
+ * UTC, for the reason `[slug].astro` documents twice: `pubDate` is coerced from
+ * a bare `YYYY-MM-DD`, so it lands on UTC midnight and the local getters go
+ * back a month on a date of the 1st in any zone west of UTC. This formatter
+ * used `getFullYear()`/`getMonth()` while the `datetime` attribute beside it
+ * was already UTC — the human-readable and machine-readable labels could
+ * disagree on the same row.
+ */
 const fmt = (d: Date) =>
-  `${d.getFullYear()} · ${(d.getMonth() + 1).toString().padStart(2, "0")}`;
+  `${d.getUTCFullYear()} · ${(d.getUTCMonth() + 1).toString().padStart(2, "0")}`;
+
+/* The selection is date-proximate (see `readNextFor` in the page), but a column
+   of tabular figures asserts an order, so render it in one: newest first. */
+const ordered = [...posts].sort(
+  (a, b) => b.pubDate.getTime() - a.pubDate.getTime(),
+);
 ---
 
-<nav aria-label="À lire ensuite" class="mt-20 max-w-[68ch]">
+<nav aria-label="À lire ensuite" class="mt-20">
   <div class="mb-6 flex items-center gap-3">
     <h2 class="text-faded register-ident shrink-0 text-xs">À lire ensuite</h2>
     <span class="heading-trace-line" aria-hidden="true"></span>
   </div>
-  <ul class="flex flex-col gap-1">
+  <ul class="flex flex-col">
     {
-      posts.map((p) => (
+      ordered.map((p) => (
         <li>
           <a
             href={`/blog/${p.slug}`}
-            class="group flex items-center justify-between gap-1 py-0.5"
+            class="group flex min-h-11 items-center justify-between gap-1 py-1"
           >
             <time
               datetime={p.pubDate.toISOString().slice(0, 10)}
-              class="text-faded register-notation group-hover:text-charcoal dark:group-hover:text-primary-100 text-sm transition-colors group-hover:transition-none motion-reduce:transition-none"
+              class="text-faded register-notation group-hover:text-charcoal dark:group-hover:text-primary-100 shrink-0 text-sm transition-colors group-hover:transition-none motion-reduce:transition-none"
             >
               {fmt(p.pubDate)}
             </time>
@@ -31,7 +46,11 @@ const fmt = (d: Date) =>
               aria-hidden="true"
               class="text-faded dot-leader grow leading-none transition-colors group-hover:transition-none motion-reduce:transition-none"
             />
-            <span class="group-hover:text-charcoal dark:group-hover:text-primary-100 text-faded">
+            {/* The title rests in full ink: the list leads with what it lists,
+                and on touch there is no hover to reveal it. The month, the
+                leader and nothing else carry the faded rest state — the same
+                division the blog index already uses. */}
+            <span class="text-charcoal dark:text-primary-100 text-right">
               {p.title}
             </span>
           </a>

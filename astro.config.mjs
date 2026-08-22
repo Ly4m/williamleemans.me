@@ -12,6 +12,7 @@ import sitemap from "@astrojs/sitemap";
 import svelte from "@astrojs/svelte";
 
 import rehypeTableScroll from "./src/lib/rehype-table-scroll.mjs";
+import rehypeFigure from "./src/lib/rehype-figure.mjs";
 
 const SITE = "https://lmns.fr";
 
@@ -90,7 +91,7 @@ export default defineConfig({
     responsiveStyles: true,
   },
   markdown: {
-    rehypePlugins: [rehypeTableScroll],
+    rehypePlugins: [rehypeTableScroll, rehypeFigure],
     shikiConfig: {
       themes: {
         light: "vitesse-light",

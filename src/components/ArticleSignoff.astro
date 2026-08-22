@@ -1,0 +1,187 @@
+---
+/**
+ * The article's colophon — the revision block a technical plate always carries.
+ *
+ * The header plate (BlogPostDecoration) opens the article with `T:06` and
+ * `2026·05`; this closes it with who drew it and when it was last corrected.
+ * `dateModified` existed in the schema, the JSON-LD and the OG payload and was
+ * displayed nowhere, which is why `ember-animation.md` had to hand-write its
+ * own correction notice in prose: the template knew and the reader didn't.
+ *
+ * It is also the only place the visible page names its author. A reader
+ * arriving on a post from a link — the majority case — could previously read
+ * the whole thing without learning whose site it was.
+ */
+type Props = {
+  pubDate: Date;
+  dateModified?: Date;
+};
+
+const { pubDate, dateModified } = Astro.props;
+
+/**
+ * UTC, for the reason `[slug].astro` gives at length: `pubDate` is coerced from
+ * a bare `YYYY-MM-DD` and lands on UTC midnight, so the local getters go back a
+ * month on a date of the 1st anywhere west of UTC.
+ */
+const notation = (date: Date) =>
+  `${date.getUTCFullYear()}·${(date.getUTCMonth() + 1)
+    .toString()
+    .padStart(2, "0")}`;
+
+const iso = (date: Date) => date.toISOString().slice(0, 10);
+
+/* A revision that isn't a revision is noise: only show the correction when the
+   post actually carries one. */
+const corrected =
+  dateModified && dateModified.getTime() !== pubDate.getTime()
+    ? dateModified
+    : undefined;
+---
+
+<footer class="signoff mt-12">
+  <p class="register-ident signoff-name">William Leemans · Lille</p>
+
+  <p class="register-notation signoff-revision">
+    publié <time datetime={iso(pubDate)}>{notation(pubDate)}</time>{
+      corrected && (
+        <>
+          {" — corrigé "}
+          <time datetime={iso(corrected)}>{notation(corrected)}</time>
+        </>
+      )
+    }
+  </p>
+
+  <p class="signoff-links">
+    <a href="/blog">
+      <span class="label"
+        ><span aria-hidden="true">←</span> Tous les articles</span
+      >
+    </a>
+    <a href="/rss.xml">
+      <span class="label">Flux RSS</span>
+    </a>
+  </p>
+</footer>
+
+<style>
+  /* The hairline treatment every container on this site gets: 1px border at
+     0.15/0.1, 3px radius, transparent ground — drawn on the sheet, not laid on
+     it — and the registration ticks that mark it as a plate. */
+  .signoff {
+    position: relative;
+    border: 1px solid rgba(37, 37, 37, 0.15);
+    border-radius: 3px;
+    padding: 0.85rem 1rem 0.75rem;
+  }
+
+  :global(.dark) .signoff {
+    border-color: rgba(250, 250, 250, 0.1);
+  }
+
+  /* Registration ticks: 6px L-marks a pixel outside the border, top-left and
+     bottom-right, the same crop marks MediaCard and .photo-portrait wear. */
+  .signoff::before,
+  .signoff::after {
+    content: "";
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-color: rgba(37, 37, 37, 0.3);
+    border-style: solid;
+    pointer-events: none;
+  }
+
+  .signoff::before {
+    top: -1px;
+    left: -1px;
+    border-width: 1px 0 0 1px;
+  }
+
+  .signoff::after {
+    bottom: -1px;
+    right: -1px;
+    border-width: 0 1px 1px 0;
+  }
+
+  :global(.dark) .signoff::before,
+  :global(.dark) .signoff::after {
+    border-color: rgba(250, 250, 250, 0.25);
+  }
+
+  /* The name leads, so it takes full ink at the badge step of the
+     identification register. */
+  .signoff-name {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--color-charcoal);
+  }
+
+  :global(.dark) .signoff-name {
+    color: var(--color-primary-100);
+  }
+
+  /* The revision is measurement, so it is notation, and it annotates rather
+     than speaks — one step down, in the pencil. */
+  .signoff-revision {
+    margin-top: 0.2rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--color-faded);
+  }
+
+  /* Left edge and right edge of the same column ReadNext uses below, so the two
+     closing blocks share one grid instead of each finding its own. */
+  .signoff-links {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 0.9rem;
+  }
+
+  /* The whole row is the target, only the label carries the rule — the pattern
+     the home page's contact rows already use. 44px of height on touch, which is
+     the reason for the negative margin: the target grows, the plate doesn't. */
+  .signoff-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-block: -0.6rem;
+    font-family: var(--font-voice);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.11em;
+    /* One step under the name, which is what lets the name lead without
+       dimming the links — and the same step as "À lire ensuite" below, so the
+       two closing blocks label themselves at one size. */
+    font-size: 0.75rem;
+    color: var(--color-charcoal);
+  }
+
+  :global(.dark) .signoff-links a {
+    color: var(--color-primary-100);
+  }
+
+  .signoff-links .label {
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s ease-in-out;
+  }
+
+  /* My own surfaces hover in brass — on the line, never on the text — and the
+     line needs the darker ink to clear 3:1 on Paper. */
+  .signoff-links a:hover .label {
+    border-bottom-color: var(--color-brass-ink);
+  }
+
+  :global(.dark) .signoff-links a:hover .label {
+    border-bottom-color: var(--color-brass);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .signoff-links .label {
+      transition: none;
+    }
+  }
+</style>

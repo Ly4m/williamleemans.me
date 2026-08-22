@@ -103,6 +103,19 @@
      higher — which is why equal `px` never looked equal. Re-measure this if
      the voice ever changes face; nothing else needs touching. */
   --notation-aspect: 0.456;
+
+  /* The article's own size, as a token because two rules have to agree on it:
+     the prose that reads at this size, and the closing blocks that have to
+     resolve `55ch` against it (see `.article-measure`). The value and its
+     mobile step are argued at `.prose.prose-longform`; this is only where
+     they are stored. */
+  --size-longform: 1.375rem;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --size-longform: 1.1875rem;
+  }
 }
 
 .dark {
@@ -358,7 +371,7 @@ article {
    only the size: 55ch tracks whatever size it lands on, so the 20px and the
    22px surface both come out at the same character count. */
 .prose.prose-longform {
-  font-size: 1.375rem;
+  font-size: var(--size-longform);
   line-height: 1.7;
 }
 
@@ -378,12 +391,10 @@ article {
    the 17px monospace's 8.77px, so mobile long-form is fractionally SMALLER
    than what it replaced. The 45-character line is what forbids going further
    here. It is the one surface where the ramp pays a real price, and it is
-   recorded rather than hidden. */
-@media (max-width: 767px) {
-  .prose.prose-longform {
-    font-size: 1.1875rem;
-  }
-}
+   recorded rather than hidden.
+
+   The value itself lives on `--size-longform` at the top of this file, because
+   the closing blocks need the same number to resolve their measure. */
 
 /* Wide tables scroll inside their wrapper (src/lib/rehype-table-scroll.mjs)
    instead of panning the whole page on mobile — the treatment <pre> already
@@ -427,6 +438,52 @@ article {
 .prose blockquote footer {
   font-family: var(--font-voice);
   font-style: italic;
+}
+
+/* The register had no consumers for nine months: `.prose figcaption` was
+   defined here and not one of the seven articles captioned a figure, so every
+   diagram sat on the page unannotated while the site's own vocabulary named
+   figure numbers as a job for notation. A plate annotates its figures; this is
+   that annotation.
+
+   Brass earns its place the same way it does on `.photo-portrait figcaption`:
+   one hairline tick, on a line, never on the text. */
+.prose figcaption {
+  margin-top: 0.75rem;
+  padding-left: 0.6rem;
+  border-left: 1px solid var(--color-brass-ink);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--color-faded);
+}
+
+.dark .prose figcaption {
+  border-left-color: var(--color-brass);
+}
+
+/* The figure number is counted, not spoken, so it leaves the italic and takes
+   the notation face — at the same optical size, via the aspect the whole
+   register is adjusted by. */
+.prose figcaption .fig-num {
+  font-family: var(--font-notation);
+  font-style: normal;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  font-size-adjust: var(--notation-aspect);
+  letter-spacing: 0;
+}
+
+/* A figure is one object: the drawing and its annotation travel together, so
+   the margin the bare SVGs used to carry individually now lives on the wrapper
+   and the caption sits tight under the plate. */
+.prose figure {
+  margin: 2rem 0;
+}
+
+.prose figure > svg,
+.prose figure > img {
+  display: block;
+  margin: 0 auto;
 }
 
 /* And the blockquote itself is NOT annotation, which is the line the register
@@ -490,6 +547,22 @@ article {
    blocks, and its MEAN sits 7–13 characters below its own median. Its median
    does not deviate from the other three at all. Count medians, over more than
    one article, on filled lines. */
+/* The blocks that CLOSE an article — the sign-off plate and "À lire ensuite" —
+   have to land on the same column as the prose above them, and `ch` is the trap:
+   55ch resolves against the element's OWN font-size, so a closing block set at
+   0.8125rem comes out at well under half the article's width. ReadNext carried a
+   hand-tuned `max-w-[68ch]` for exactly this reason — a number that looked close
+   at the size it was tuned at, and overhung the article by ~80px at 1440, which
+   made the last thing a reader saw the one place the page broke its own column.
+
+   So the measure is declared once, at the ARTICLE's size, and the children
+   declare their own sizes inside it. Anything set here in `em` would inherit
+   22px as its base, so the children name `rem`. */
+.article-measure {
+  max-width: 55ch;
+  font-size: var(--size-longform);
+}
+
 .prose {
   max-width: 55ch;
 
@@ -559,8 +632,27 @@ article {
    already draws a trace off every h2 and h3, in the same ink as the circuit
    plates. That is what carries the scan; the size step only has to be big
    enough to be seen before the trace draws. */
+/* h2 is announced by a trace across the whole measure; h3 is not marked at
+   all. The levels differ in KIND now, which is what the size step alone could
+   never do: 28.6px against 24.2px is 1.18×, in the same family, weight, colour
+   and tracking.
+
+   What this replaced was one short trace injected INSIDE every h2 and h3,
+   running off to the right of the words. It took its length from whatever the
+   heading left over — 39–100px on the long French headings this blog writes,
+   and on a phone a stub that stole a seventh of the line and forced an extra
+   wrap — and it gave both levels the same mark. A heading no longer contains
+   its decoration; it sits under one.
+
+   `position: relative` anchors the trace, `padding-top` is the air between the
+   wire and the words. The trace itself is built in `src/scripts/blog-post.ts`
+   at a measured pixel width, and the reason it is not a CSS hairline is
+   recorded there: the arcs in this vocabulary replace a segment of the line
+   rather than sitting on top of it. */
 .prose.prose-longform :where(h2) {
   font-size: 1.3em;
+  position: relative;
+  padding-top: 0.9em;
 }
 
 .prose.prose-longform :where(h3) {
@@ -690,8 +782,8 @@ article {
   z-index: 100;
   pointer-events: none;
   will-change: transform;
-  /* Ink still wet — part of the respire layer; hidden entirely under
-     reduced motion with the rest of this bar. */
+  /* Ink still wet — part of the respire layer. Under reduced motion the BREATH
+     goes and the bar stays; see the media query below. */
   animation: respire-ink 7s ease-in-out infinite;
 }
 
@@ -699,9 +791,15 @@ article {
   background-color: rgba(250, 250, 250, 0.28);
 }
 
+/* The bar's BREATH is motion; the bar's WIDTH is information — where you are
+   in a 9500px document. This block used to `display: none` the whole thing,
+   which made it the one instrument on the site that loses its information
+   under `reduce` while every other one keeps it and drops only its travel.
+   The site's own rule is "final state visible, information preserved"; the
+   only element carrying data was the one breaking it. */
 @media (prefers-reduced-motion: reduce) {
   #reading-progress {
-    display: none;
+    animation: none;
   }
 }
 
@@ -711,32 +809,33 @@ article {
    knocked-back brass the token holds, so the one hairline that runs across an
    article was the only decoration on the night sheet with no brass in it.
    This is the token the file already forbids hard-coding. */
+/* The section trace sits ON the heading's top edge rather than inside it. It
+   used to be a flex child of the heading (`flex-shrink: 0; margin-left: 12px`),
+   which is exactly how it ended up competing with the words for the line.
+
+   `position`/`top`/`left` are ALSO written inline by `blog-post.ts`, and that
+   duplication is deliberate: the trace is a full-measure block built by
+   script, so a moment without this rule — a stale stylesheet, an older cached
+   build — drops it into the heading's flow as a second wire under the words.
+   The geometry cannot depend on a stylesheet arriving. What lives only here is
+   the ink and the pointer-events, neither of which can break the layout. */
 .heading-trace {
+  position: absolute;
+  top: 0;
+  left: 0;
   color: var(--ink-circuit);
-  flex-shrink: 0;
-  margin-left: 12px;
+  pointer-events: none;
 }
 
+/* Still the hairline that runs off the blog index's year mark and the
+   "À lire ensuite" label. It is no longer injected into article headings —
+   those carry a whole trace now — so nothing animates it any more, and the
+   `heading-trace-draw` keyframes and their reduced-motion companion went with
+   the injection that used them. */
 .heading-trace-line {
   flex: 1;
   height: 1px;
   background-color: var(--ink-circuit);
-}
-
-@keyframes heading-trace-draw {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-  to {
-    clip-path: inset(0 0% 0 0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .heading-trace-line {
-    clip-path: none !important;
-    animation: none !important;
-  }
 }
 
 /* Circuit decorations. The names must be global: both drivers

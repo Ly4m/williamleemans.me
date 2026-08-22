@@ -99,6 +99,10 @@ components:
     textColor: "{colors.charcoal}"
     rounded: "{rounded.hairline}"
     padding: "0.1rem 0.35rem"
+  article-signoff:
+    rounded: "{rounded.card}"
+    padding: "0.85rem 1rem 0.75rem"
+    textColor: "{colors.charcoal}"
 ---
 
 # Design System: williamleemans.me
@@ -126,7 +130,7 @@ reserve was spent on the owner's decision, at the owner's volume
 The palette is monochrome plus one conductor. Charcoal ink on paper (light),
 paper ink on the night sheet (dark), a faded pencil grey for secondary text —
 and a single brass wire, **Signal**, that carries every live state: the active
-nav rail, the focus ring, the finished-state badge, a caption's tick. Signal
+nav pad, the focus ring, the finished-state badge, a caption's tick. Signal
 never colors running text; it rides on lines. Motion is entrance, draw-on,
 and breath — headings slide down, content waves in with a staggered spring,
 circuit traces draw themselves, and the ambient respire layer keeps the
@@ -144,7 +148,8 @@ not by size.
 - One sheet, two registers: flowing (Now, flow field) and constrained
   (everything else, dot grid) — the same thin-line primitive, never a third.
 - Monochrome plus one brass Signal, on lines and state only.
-- Hairline construction: 1px borders, 3px rails, 6px corner ticks, 2px dots.
+- Hairline construction: 1px borders and traces, 6px corner ticks, 2px dots,
+  4–7px pads.
 - One roman voice for headings and prose, its italic for annotation, a
   monospace for figures alone — two families, three registers.
 - Motion draws the page like ink, then keeps it breathing (la machine
@@ -158,9 +163,10 @@ Two inks, a pencil, two sheets, and one brass wire.
 
 - **Signal** (#E4A94D): the site's single accent, in its true brass — dark
   mode only, where it reads against the night sheet. It marks state: the
-  active nav rail, focus rings, the "done" badge, figcaption ticks, the home
-  invitation's tick, and the WL mark. Decorations knock it back to 28–50% washes (`--ink-circuit`); the
-  nav rail mixes it 65% toward the page to avoid glare.
+  active nav pad and its spur, focus rings, the "done" badge, figcaption
+  ticks, the home invitation's tick, and the WL mark. Decorations knock it
+  back to 28–50% washes (`--ink-circuit`); the nav pad mixes it 65% toward the
+  page to avoid glare.
 - **Signal encré** (#8f6a1a): the same wire in light mode, inked down to clear
   3:1 on Paper — true brass manages only 1.9:1 there. Everything Signal does
   in dark, Signal encré does in light.
@@ -183,8 +189,9 @@ Two inks, a pencil, two sheets, and one brass wire.
   not Charcoal: the dark sheet is deeper than the light ink.
 - **Circuit ink** (rgba(107,107,107,0.65) light / brass washes dark): the
   decoration ink, always via `--ink-circuit` / `--ink-circuit-strong` — never
-  hard-coded. The strong variant exists only for decoration over the moving
-  flow field.
+  hard-coded. The strong variant has two consumers and only two: decoration
+  over the moving flow field, and the nav's hover pad — the step that lets
+  hover read as _more ink_ before active adds brass.
 
 ### Guest Inks
 
@@ -202,7 +209,7 @@ only Jetdev and Scanzee, in the prose, are guests.
 ### Named Rules
 
 **The One Signal Rule.** Brass is the only accent on the site, and it carries
-state on lines — rails, rings, ticks, badges. It never colors running text,
+state on lines — pads, spurs, rings, ticks, badges. It never colors running text,
 and nothing else (no green, no blue) may carry state; a second accent is the
 defect this rule exists to name.
 
@@ -260,17 +267,23 @@ synthesised.
   exists for, so it carries the clearest step of the ramp. The measure lives
   on `.prose` and is inherited; this rule sets only the size. On a phone the
   viewport binds the line rather than the `ch` measure, so size alone decides
-  how many characters fit.
+  how many characters fit. **The size is a token, `--size-longform`**, because
+  two rules have to agree on it: the prose that reads at it, and
+  `.article-measure`, which resolves the closing blocks' `55ch` against it (see
+  Layout). The mobile step lives on the token too, so the closing blocks narrow
+  with the prose rather than needing their own breakpoint.
 - **Article heads** (`.prose-longform` h2 1.3em / h3 1.1em): 28.6px and
   24.2px against a 36px h1 and a 22px body — steps of 1.26× / 1.18× / 1.10×.
   Typography's 1.5em/1.25em defaults put h2 at 33px, **1.09× under the h1**
   (1.05× on mobile) in the same family, weight, colour and tracking, so a
   reader scanning for the next section got no landmark. The heads come down
   rather than the title going up: 36px over a 20px body is already the
-  monograph scale this file argues for. The second axis is the
-  `.heading-trace-line` hairline, never a weight — Typography asks `strong`
-  for a 600 Alegreya does not ship, which resolves to the same 700 the heads
-  wear, so `.prose strong` names 700 outright.
+  monograph scale this file argues for. The second axis is a MARK, never a
+  weight, and only h2 gets one: a section trace across the whole measure, sat
+  above the heading (see Components). h3 carries nothing, so the two levels
+  differ in kind rather than by 4px. Typography asks `strong` for a 600
+  Alegreya does not ship, which resolves to the same 700 the heads wear, so
+  `.prose strong` names 700 outright.
 - **Ident** (`.register-ident` — Alegreya 500, roman caps, tracking 0.11em):
   what names rather than speaks — nav items (0.875rem in the rail, 1.5rem in
   the mobile overlay), section labels ("À lire ensuite", 0.75rem), badges
@@ -412,6 +425,19 @@ single layout hinge): the rail becomes a fixed 3.5rem top bar with the
 animated WL logo and a hamburger opening a full-screen overlay menu (slide-in,
 `inert` while closed).
 
+**The blocks that close an article share the article's column, and `ch` is the
+trap.** `55ch` resolves against the element's _own_ font size, so a closing
+block set at 0.8125rem comes out at well under half the width of 22px prose.
+"À lire ensuite" carried a hand-tuned `max-w-[68ch]` for exactly this reason —
+a number that looked close at the size it was tuned at, and overhung the
+article by ~80px at 1440, which made the last thing a reader saw the one place
+the page broke its own column. So the measure is declared once at the
+_article's_ size — `.article-measure` (`max-width: 55ch`, `font-size:
+var(--size-longform)`) wraps the article, the sign-off and the read-next
+block — and the children declare their own sizes inside it. Measured after:
+all three sit at 645px on desktop, 358px at 390px. Anything set in `em` inside
+that wrapper would inherit 22px as its base, so the children name `rem`.
+
 The ground is part of the layout: a fixed full-page dot grid (1px dots on a
 20px cell, 13% ink light / 6% dark) on constrained pages, the flow-field
 canvas on Now pages. Both sit behind everything at `z-0`, `pointer-events:
@@ -420,7 +446,7 @@ none`.
 ## Elevation & Depth
 
 The system is flat today: not a single `box-shadow` exists. Depth is conveyed
-by line weight (1px hairlines vs 3px rails), ink opacity (13% grid → 65%
+by line weight (1px hairlines against 4–7px pads), ink opacity (13% grid → 65%
 decoration → full text), and the register of the ground behind the content.
 This is observed fact rather than doctrine — a future shadow is not banned,
 but it would be the first one, and it must earn its place against a system
@@ -437,9 +463,10 @@ on hover.
 
 The signature form is the **registration tick**: 6px L-shaped corner marks at
 the top-left and bottom-right of cards and framed photos, drawn one pixel
-outside the border — the crop marks of a technical plate. Rails are 3px solid
-Signal; underlines are 1px hairlines that ride 1px below text, never
-`text-decoration`.
+outside the border — the crop marks of a technical plate. State on the nav is
+a round **pad** on a 1px trace (4px resting, 6px hover, 7px active) with a
+spur reaching toward its label, never a bar; underlines are 1px hairlines that
+ride 1px below text, never `text-decoration`.
 
 ## Components
 
@@ -450,20 +477,71 @@ as lines growing or borders waking, never as lifting or glowing.
 
 ### Navigation
 
-- **Desktop rail:** the identification register — roman caps at 0.875rem with
-  0.11em tracking — the score's margin of instrument names — resting at 70%
-  opacity; hover restores full ink and nudges the label 4px right. The active
-  item carries a 3px Signal rail on its left edge and steps to weight 500;
-  hover on inactive items grows a 40%-height stub of the same rail — hover and
-  active differ by _length_, not opacity. The rail slides between items across
-  page navigations (`view-transition-name: nav-rail`); reduced motion keeps
-  position and length, dropping only the travel.
-- **Mobile:** full-screen overlay, 1.5rem caps with the same rail laid on its
-  side (3px underline, `scaleX` 0→1); no hover half-state — it's touch-only.
-  Social links and theme toggle sit at the bottom.
-- **Dark-mode rail:** Signal mixed 65% toward the page (full brass is the
-  loudest thing on a dark page; 65% lands at 4.3:1, above the 3:1 a state
-  indicator needs).
+**The nav is a printed circuit, not a rail.** Until 2026-08 the active item
+wore a 3px brass bar on its left edge — a coloured `border-left`, which is
+exactly the category default this file warns about, and the one place on the
+site where brass was a _bar_ rather than a _wire_. It is gone, replaced from
+the owner's sketch (2026-08-19) by the vocabulary the decorations already
+speak.
+
+- **The plate.** A bus runs the full height of the aside at x=8; a branch
+  leaves it on a cubic S-curve, runs vertically at x=22 past the items, and
+  returns to the bus below — one wire that goes out to fetch the labels
+  (x=48) and comes back. Both in `--ink-circuit`, `stroke-width: 1`, with
+  `r=2` junction dots and no end ticks on the bus (a tick marks an end, and
+  the bus has none on screen). The whole plate is `aria-hidden` and
+  `pointer-events: none`. **The SVG is laid 1:1 in pixels over the nav's
+  box** — no `preserveAspectRatio`, no percentage width, or the alignment
+  breaks.
+- **The rail sits at the bottom** (`mt-auto`). Clustered in the first third it
+  left two thirds of bare wire below it, which reads as a _remainder_; pushed
+  down, the same length becomes an _approach_. `mt-auto` rather than absolute
+  positioning, so on a short screen the margin retracts by itself.
+- **Three states, and they differ by ink _and_ length.** Each item carries a
+  round pad on the branch and a spur reaching toward its label. Rest: 4px pad
+  in `--ink-circuit`, spur at `scaleX(0)`. Hover: 6px pad in
+  `--ink-circuit-strong`, 9px spur. Active: 7px pad in `--nav-signal`, 18px
+  spur. The old rule said hover and active differ by _length, not opacity_ —
+  that held only because both wore the same brass. Now the length step stays
+  and the ink step joins it, which _tightens_ the One Signal Rule: brass marks
+  the live state alone, and the decoration ink carries everything provisional.
+  The label steps 0.7 → 1 opacity and 4px right on hover; inactive items keep
+  the sanctioned weight-400 deviation against the register's 500.
+- **The state travels the wire; it does not slide over the page.**
+  `view-transition-name: nav-rail` was removed deliberately — a view
+  transition would glide the pad from one item to the next _across_ the page,
+  when the gesture wants it to leave its seat and run the _wire_. So
+  `travelNavSignal()` animates one piece in three phases on the outgoing DOM,
+  in parallel with the fetch: retract (90ms, ease-in), travel (140–360ms
+  scaled by distance, on the circuit curve `cubic-bezier(0.4, 0, 0.2, 1)`),
+  seat (150ms, spring). **One piece, one journey** — a pad that slides and
+  then a current that catches up was the previous version, and it told the
+  same story twice. The current stays brass for the whole trip: it is the
+  state moving, not an ambient signal.
+- **The plate draws once per session, not per navigation.** The nav is chrome
+  and identical from page to page, so `circuit.ts` skips any
+  `data-draw-once` SVG and ownership sits in `SideNav.astro`, behind a
+  module-level set that survives navigations. Draw speed is 260px/s clamped to
+  0.4–1.1s, except the bus, which is pinned to 0.85s (at the common cadence a
+  full-height wire took 3.9s).
+- **Dots and labels are scheduled by where the ink is**, not by a fixed
+  stagger: the path length at a dot's ordinate, run back through an inverted
+  easing curve, gives the moment the drawing front actually crosses it. Two
+  clocks was the previous state — the junction dots waited on a fixed 0.95s
+  while the line passed them at 0.35s.
+- **Mobile (`< md`):** the aside is `hidden md:flex`, and the overlay does not
+  drop the vocabulary — it **mirrors and enlarges** it. A full plate on the
+  right: its own bus at x=12 (with the two end ticks the desktop bus lacks),
+  branch at x=30, labels at x=66, `r=2.5` dots, 5px/9px pads, 24px spurs, and
+  1.5rem caps. The one deliberate subtraction is the hover spur (0px) — the
+  whole hover block sits inside `@media (hover: hover)`, because on a touch
+  screen the state sticks after a tap and two items look lit.
+- **Dark-mode state ink:** Signal mixed 65% toward the page (full brass is the
+  loudest thing on a dark page, where every other brass part lives at 28–35%;
+  65% lands at 4.3:1, above the 3:1 a state indicator needs, without the
+  glare).
+- **The skip link branches onto the bus, not the branch** — which is the only
+  reason its spur is longer (32px) than the rail's. Don't "harmonise" them.
 
 ### List Rows (blog index)
 
@@ -474,6 +552,58 @@ reading time rest in Faded and ink up to match on hover, easing in but
 snapping off (`group-hover:transition-none`). Years are group headings — the
 year mark, tracked 0.18em with a hairline trace — so rows carry only the
 month.
+
+**The same row runs at the end of an article** ("À lire ensuite",
+`ReadNext.astro`), and it obeys the same division: the title in full ink, the
+month and leader in Faded. It had drifted — the title rested in Faded, so the
+one thing a reader chooses from was the faintest ink on the page, and on touch
+no hover ever revealed it. Rows are 44px targets, and the two are ordered
+newest-first: a column of tabular figures asserts an order, so it renders in
+one even though the _selection_ is date-proximate.
+
+### Occurrence Rows (Talks)
+
+The blog index's row, transposed: event name — dot leader — date (notation,
+`shrink-0`) — a fixed `6.5rem` right-aligned slot for the video link. Same
+`.dot-leader`, same eases-in / snaps-off hover, so both lists feel like one
+object under the cursor.
+
+**The row binds on interaction, never on proximity.** The blog index can hang
+its hover on `.group` because the whole row is one anchor; an occurrence row
+has _two_ destinations and stretches of nothing between them, so it hangs on
+`:has(a:hover)` instead. Hovering the gap inks nothing, and the row never
+claims to be clickable where it isn't.
+
+**`.no-video`** is the page's one mark of its own: a 0.75rem 1px rule holding
+the video slot's width when there is no recording. The slot keeps its width so
+the absence sits in the column the way a struck-out figure would on a plate,
+rather than reading as a row that ended early.
+
+### Article Sign-off (blog post)
+
+The article's colophon, and the counterweight to the header plate: the header
+opens a post with `T:06` and `2026·05`, this closes it with who drew it and
+when it was last corrected. A revision block is what an annotated technical
+plate always carries, and the page had none — `dateModified` lived in the
+schema, the JSON-LD and the OG payload and was displayed nowhere, so a
+correction had to be hand-written into the prose to reach a reader.
+
+- **Shape:** the standard container treatment — 1px hairline
+  (rgba(37,37,37,0.15) light / rgba(250,250,250,0.1) dark), 3px radius,
+  transparent ground, and registration ticks top-left and bottom-right.
+- **Name** (`.register-ident`, 0.8125rem, full ink): `William Leemans ·
+Lille` — the only place the visible page names its author.
+- **Revision** (`.register-notation`, 0.75rem, Faded): `publié 2026·05 —
+corrigé 2026·07`, in the same notation the header plate labels with. The
+  correction is rendered only when the post carries one; a revision that isn't
+  a revision is noise.
+- **Links** (ident caps, 0.75rem — one step under the name, and the same step
+  as the "À lire ensuite" label, so the two closing blocks label themselves at
+  one size): `← Tous les articles` and `Flux RSS`, pushed to the two edges of
+  the column so the block shares a grid with the read-next rows below it. Full
+  ink resting, underline waking to Signal on hover — the owner's own surfaces,
+  brass on the line and never on the text. 44px targets, bought with a
+  negative block margin so the target grows and the plate doesn't.
 
 ### Cards (MediaCard — books & games)
 
@@ -525,9 +655,33 @@ Their annotations — post counts, year spans, reading times — are measurement
 so they take the notation face through one shared `.circuit-label` rule rather
 than a family literal per decoration. Each page family has its own plate: Home
 (header, margin, footer), blog list, blog post, Talks, Now. Blog posts also
-inject heading traces — a 1px line drawing itself after each h2 — and a 2px
-reading-progress hairline at the viewport top (hidden entirely under reduced
-motion).
+inject a **section trace** above each h2 — see below — and a 2px
+reading-progress hairline at the viewport top, which keeps its width under
+reduced motion and loses only its breath.
+
+**The section trace** is the article's own plate: a full-measure wire built in
+`src/scripts/blog-post.ts` at the heading's measured pixel width, carrying one
+to three components — an arc, a tent, a pad, a via — and inking itself on from
+the left as the heading arrives. Feature count comes from the measure: three
+across a wide desktop column, two at 645px, one at 358px, because the run is
+less than half as long on a phone and the trace should read as sparse
+instrumentation rather than a busy strip.
+
+It replaced a short trace injected INSIDE every h2 and h3, running off to the
+right of the words, which took its length from whatever the heading left over:
+39–100px on the long French headings this blog writes, and on a phone a stub
+that stole a seventh of the line and forced an extra wrap. It also gave both
+levels the same mark. A heading no longer contains its decoration; it sits
+under one.
+
+**The baseline is drawn in the SVG, not left to a CSS rule underneath, and
+that is a decision with a cost.** The arcs and tents in this vocabulary
+_replace_ a segment of the line — `BlogPostDecoration` goes line, arc dome,
+line, and never both at once — so a continuous CSS hairline with an arc on top
+would close the arc into a loop, a shape this drawing does not own. Keeping
+the arcs means the trace is JavaScript's to make, and before it runs h2 and h3
+are separated by their size step alone. Drawn at a measured width, it is also
+redrawn on resize — without the entrance, because a resize is not an arrival.
 
 ### Signature: The Flow Field
 
@@ -614,7 +768,7 @@ single static frame under reduced motion.
 
 ### Do:
 
-- **Do** put every new state indicator in Signal — on a line, a ring, a rail,
+- **Do** put every new state indicator in Signal — on a line, a ring, a pad,
   or a badge wash — with #8f6a1a in light and #E4A94D (often mixed toward the
   page) in dark.
 - **Do** draw new decorations in `--ink-circuit`; reach for
@@ -633,14 +787,22 @@ single static frame under reduced motion.
   400 and only 400; a bolder notation is a synthesised weight, which the
   system forbids.
 - **Do** pair every animation with its `prefers-reduced-motion: reduce`
-  ending: final state visible, information preserved (a rail keeps its
-  length; only the travel goes).
+  ending: final state visible, information preserved (a pad keeps its size, a
+  spur its length; only the travel goes).
 - **Do** keep both themes honest in the same change: every color decision
   ships its `.dark` counterpart, and the mobile browser bar follows
   `--color-page`.
 
 ### Don't:
 
+- **Don't** put the nav's state back as a bar. A brass `border-left` on the
+  active item is the category default, and it was the one place on this site
+  where the accent was a bar rather than a wire. State is a pad on a trace.
+  Nor give it `view-transition-name` — the pad must travel the wire, not glide
+  over the page.
+- **Don't** size a closing block's measure in `ch` against its own font size.
+  `55ch` at 0.8125rem is less than half the article's column; that is how the
+  hand-tuned `68ch` got there. Put it inside `.article-measure`.
 - **Don't** introduce a second accent. The green "done" badge was the site's
   only one, and it was removed for carrying state — brass's job.
 - **Don't** put brass on running text, or true brass (#E4A94D) on Paper —

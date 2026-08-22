@@ -4,6 +4,9 @@ title: "Garder un historique Git propre"
 description: "Comment garder un historique Git propre, écrire de bons commits et utiliser rebase efficacement."
 pubDate: "2025-10-15"
 readingTime: 4
+related:
+  - "nouvelle-machine"
+  - "developpement-assiste-par-ia"
 howTo:
   name: "Comment garder un historique Git propre"
   steps:
@@ -100,7 +103,7 @@ Rebase déplace vos commits au-dessus d’un point donné, comme un couper-colle
 
 Voici l’historique avant le rebase :
 
-![Avant le rebase : la branche new-feature part du commit B avec les commits C et D, tandis que main a avancé jusqu’au commit E](images/3/rebase-1.svg)
+![Avant le rebase : la branche new-feature part du commit B avec les commits C et D, tandis que main a avancé jusqu’au commit E](images/3/rebase-1.svg "Avant : new-feature part de B, pendant que main continue d'avancer sans elle.")
 
 ```bash
 git rebase main
@@ -108,7 +111,7 @@ git rebase main
 
 Git déplace vos commits au-dessus de main, gardant l’historique propre et linéaire :
 
-![Après le rebase : les commits C et D de new-feature sont déplacés au-dessus du commit E, dernier commit de main, pour un historique linéaire](images/3/rebase-2.svg)
+![Après le rebase : les commits C et D de new-feature sont déplacés au-dessus du commit E, dernier commit de main, pour un historique linéaire](images/3/rebase-2.svg "Après : les mêmes commits, reposés sur E. Rien n'a été fusionné, tout a été déplacé.")
 
 Mais ce n’est que le début. On peut aller beaucoup plus loin avec rebase.
 
@@ -119,7 +122,7 @@ Le rebase interactif (`git rebase -i main`) ouvre une todo list de vos commits d
 Imaginons que je viens de terminer une feature de scaffolding UI, et qu’elle est prête à être mergée dans main.
 Sauf qu’elle est divisée en deux commits, et qu’un commit lié à la documentation a besoin d’être renommé.
 
-![Avant le rebase interactif : la branche ui-scaffolding contient trois commits — feat: ui part 1 (C), add doc (D) et feat: ui part 2 (E) — tandis que main a avancé jusqu’au commit F](images/3/interactive-1.svg)
+![Avant le rebase interactif : la branche ui-scaffolding contient trois commits — feat: ui part 1 (C), add doc (D) et feat: ui part 2 (E) — tandis que main a avancé jusqu’au commit F](images/3/interactive-1.svg "Trois commits pour une seule feature, et un message de doc à reformuler.")
 
 Je veux faire trois choses :
 
@@ -129,7 +132,7 @@ Je veux faire trois choses :
 
 **Étape 1 : démarrer le rebase interactif**
 
-J’utilise la commande rebase avec l’option -i (ou --interactive) pour démarrer le rebase en mode interactif.
+J’utilise la commande rebase avec l’option `-i` (ou `--interactive`) pour démarrer le rebase en mode interactif.
 
 ```bash
 git rebase -i main
@@ -165,7 +168,7 @@ reword D # add doc
 
 Une fois le fichier sauvegardé, Git applique les modifications sur l’historique.
 
-![Après le rebase interactif : ui-scaffolding, rebasée sur le commit F de main, ne contient plus que deux commits — feat: scaffolds UI et docs: adds UI screenshots](images/3/interactive-2.svg)
+![Après le rebase interactif : ui-scaffolding, rebasée sur le commit F de main, ne contient plus que deux commits — feat: scaffolds UI et docs: adds UI screenshots](images/3/interactive-2.svg "Après le squash et le reword : deux commits qui racontent ce qui a été fait.")
 
 Et voilà, un historique propre et une branche à jour avec main!
 
@@ -183,8 +186,8 @@ Comme rebase réécrit l’historique, vous devrez sans doute forcer le push :
 git push --force
 ```
 
-> Attention : git push --force peut écraser le travail des autres.
-> Utilisez plutôt --force-with-lease pour éviter les mauvaises surprises.
+> Attention : `git push --force` peut écraser le travail des autres.
+> Utilisez plutôt `--force-with-lease` pour éviter les mauvaises surprises.
 
 ### Comment corriger un ancien commit avec git fixup ?
 
@@ -192,20 +195,20 @@ Pour corriger un commit plus ancien que le dernier, créez un commit ciblé avec
 
 Disons que vous avez plusieurs commits sur votre branche et que vous devez en corriger un en particulier.
 
-![La branche new-feature contient deux commits — feat: scaffolds UI (C) et docs: adds UI screenshots (D) — et c’est le commit C qu’il faut corriger](images/3/fixup-1.svg)
+![La branche new-feature contient deux commits — feat: scaffolds UI (C) et docs: adds UI screenshots (D) — et c’est le commit C qu’il faut corriger](images/3/fixup-1.svg "C'est C qu'il faut corriger, pas D, le dernier. C'est tout le problème.")
 
-Pour corriger le commit D, vous pourriez utiliser --amend.
+Pour corriger le commit D, vous pourriez utiliser `--amend`.
 
 Mais pour le commit C, c’est plus compliqué : il faudrait créer un nouveau commit, lancer un rebase interactif, éditer la todo… bref, un peu lourd.
 
-Heureusement, il existe mieux : --fixup, qui crée un commit ciblant directement celui à corriger.
+Heureusement, il existe mieux : `--fixup`, qui crée un commit ciblant directement celui à corriger.
 
 ```bash
 git commit --fixup C
 git rebase -i --autosquash main
 ```
 
-Avec --autosquash, Git déplace automatiquement les commits “fixup” à côté de leurs commits cibles, puis les fusionne.
+Avec `--autosquash`, Git déplace automatiquement les commits “fixup” à côté de leurs commits cibles, puis les fusionne.
 
 ```bash
 pick C # feat: scaffolds UI
@@ -215,7 +218,7 @@ pick D # docs: adds UI screenshots"
 
 Résultat : un historique propre, et la correction bien intégrée dans le commit C :
 
-![Après le fixup et l’autosquash : la correction est fusionnée dans le commit C, devenu feat: scaffolds UI with the fix, et l'historique reste propre avec deux commits](images/3/fixup-2.svg)
+![Après le fixup et l’autosquash : la correction est fusionnée dans le commit C, devenu feat: scaffolds UI with the fix, et l'historique reste propre avec deux commits](images/3/fixup-2.svg "L'autosquash a rangé la correction dans C. Aucun commit « fix typo » n'est resté.")
 
 ---
 

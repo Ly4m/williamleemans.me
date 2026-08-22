@@ -5,6 +5,9 @@ description: "Comment j’ai créé une animation de particules simple avec l’
 pubDate: "2025-11-06"
 dateModified: "2026-08-12"
 readingTime: 1
+related:
+  - "hello-world"
+  - "flux-rss"
 ---
 
 > **Note d'août 2026** — ce fond n'existe plus : les particules ont été

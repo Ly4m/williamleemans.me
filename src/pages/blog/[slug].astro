@@ -3,6 +3,7 @@ import { getCollection, render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import BlogLayout from "../../layouts/BlogLayout.astro";
 import BlogPostDecoration from "../../components/BlogPostDecoration.astro";
+import ArticleSignoff from "../../components/ArticleSignoff.astro";
 import ReadNext from "../../components/ReadNext.astro";
 
 export async function getStaticPaths() {
@@ -137,25 +138,43 @@ const structuredData = JSON.stringify({
 >
   <div id="reading-progress" aria-hidden="true"></div>
 
-  <header class="py-12">
-    <h1
-      class="font-voice text-charcoal dark:text-primary-100 text-3xl md:text-4xl"
-    >
-      {post.data.title}
-    </h1>
-    <p class="text-faded register-notation text-sm">
-      {post.data.readingTime} min — <time
-        datetime={post.data.pubDate.toISOString().slice(0, 10)}
-        >{fmtMeta(post.data.pubDate)}</time
-      >
-    </p>
-    <BlogPostDecoration readingTime={readingTime} dateLabel={dateLabel} />
-  </header>
+  {
+    /*
+    `article-measure` puts every block on the article's own column — title,
+    prose, sign-off and "À lire ensuite" all resolve `55ch` against the prose
+    size rather than their own, so the page keeps one left and right edge from
+    the title to the last row.
 
-  <div class="text-charcoal dark:text-primary-100 mb-40">
-    <article class="prose prose-longform dark:prose-invert wave-enter-content">
-      <Content />
+    The <header> lives INSIDE the <article>: it carries the h1 and the date,
+    and outside it a reader who jumps to the article landed in an article with
+    no heading and no date in it.
+  */
+  }
+  <div class="text-charcoal dark:text-primary-100 article-measure mb-16">
+    <article>
+      <header class="py-12">
+        <h1
+          class="font-voice text-charcoal dark:text-primary-100 text-3xl md:text-4xl"
+        >
+          {post.data.title}
+        </h1>
+        <p class="text-faded register-notation text-sm">
+          {post.data.readingTime} min — <time
+            datetime={post.data.pubDate.toISOString().slice(0, 10)}
+            >{fmtMeta(post.data.pubDate)}</time
+          >
+        </p>
+        <BlogPostDecoration readingTime={readingTime} dateLabel={dateLabel} />
+      </header>
+
+      <div class="prose prose-longform dark:prose-invert wave-enter-content">
+        <Content />
+      </div>
     </article>
+    <ArticleSignoff
+      pubDate={post.data.pubDate}
+      dateModified={post.data.dateModified}
+    />
     {readNext.length > 0 && <ReadNext posts={readNext} />}
   </div>
 </BlogLayout>

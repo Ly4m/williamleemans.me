@@ -32,15 +32,23 @@ function makeRect(x: number, y: number, w: number, h: number): SVGRectElement {
   return r;
 }
 
+/**
+ * Ink the trace on, left to right, and return the moment the last segment
+ * finishes so the junction dots can land behind the drawing front rather than
+ * on a fixed stagger that stopped being true when the trace got longer.
+ *
+ * 300px/s: a section trace runs the whole measure, and the 120px/s the short
+ * inline stub used would have taken five seconds to cross it.
+ */
 function animateTraces(svg: SVGSVGElement): number {
   let t = 0;
   svg.querySelectorAll<SVGPathElement>(".circuit-trace").forEach((path) => {
     const len = path.getTotalLength();
-    const dur = Math.max(0.2, Math.min(len / 120, 0.55));
+    const dur = Math.max(0.25, Math.min(len / 300, 0.9));
     path.style.strokeDasharray = String(len);
     path.style.strokeDashoffset = String(len);
     path.style.animation = `circuit-draw ${dur.toFixed(2)}s cubic-bezier(0.4,0,0.2,1) ${t.toFixed(2)}s forwards`;
-    t += dur * 0.7;
+    t += dur * 0.75;
   });
   svg
     .querySelectorAll<SVGElement>(".circuit-dot, .circuit-rect")
@@ -64,13 +72,25 @@ function seededRand(seed: string) {
   };
 }
 
-function injectTrace(heading: HTMLElement) {
-  if (heading.querySelector(".heading-trace")) return;
+type Prim = "arc-up" | "arc-down" | "tent" | "pad" | "via";
 
-  heading.style.display = "flex";
-  heading.style.alignItems = "center";
+/** The widest any single feature can consume, used to decide whether one more
+ *  still fits before the run-out. Keep in step with `apply` below. */
+const WIDEST = 36;
 
-  const rand = seededRand(heading.textContent?.trim() ?? "");
+/**
+ * Draw one section trace, exactly `width` wide.
+ *
+ * The baseline is drawn here rather than left to a CSS rule underneath,
+ * because the arcs and tents in this vocabulary REPLACE a segment of the line
+ * — `BlogPostDecoration` goes line, arc dome, line, and never both at once. A
+ * continuous CSS hairline with an arc on top would close the arc into a loop,
+ * which is a shape this drawing does not own. The cost is that the trace is
+ * JavaScript's to make: before it runs, h2 and h3 are separated by their size
+ * step alone.
+ */
+function buildTrace(width: number, seed: string): SVGSVGElement {
+  const rand = seededRand(seed);
   const ri = (lo: number, hi: number) =>
     Math.floor(rand() * (hi - lo + 1)) + lo;
   const pick = <T>(opts: [T, number][]): T => {
@@ -89,6 +109,7 @@ function injectTrace(heading: HTMLElement) {
   let x = 0;
 
   const addLine = (to: number) => {
+    if (to <= x) return;
     paths.push(`M ${x} ${Y} L ${to} ${Y}`);
     x = to;
   };
@@ -124,24 +145,6 @@ function injectTrace(heading: HTMLElement) {
     dots.push([x, Y, 1.75], [x, Y - h, 1.25]);
   };
 
-  type Prim = "arc-up" | "arc-down" | "tent" | "pad" | "via";
-
-  const primary: [Prim, number][] = [
-    ["arc-up", 25],
-    ["arc-down", 20],
-    ["tent", 20],
-    ["pad", 20],
-    ["via", 15],
-  ];
-  const secondary: [Prim | null, number][] = [
-    [null, 45],
-    ["arc-up", 12],
-    ["arc-down", 10],
-    ["tent", 10],
-    ["pad", 8],
-    ["via", 15],
-  ];
-
   const apply = (p: Prim) => {
     if (p === "arc-up") addArcUp(ri(10, 18));
     if (p === "arc-down") addArcDown(ri(10, 15));
@@ -150,23 +153,53 @@ function injectTrace(heading: HTMLElement) {
     if (p === "via") addVia(ri(8, 14));
   };
 
-  addLine(ri(20, 50));
-  apply(pick(primary));
-  const sec = pick(secondary);
-  if (sec) {
-    addLine(x + ri(10, 25));
-    apply(sec);
+  const kinds: [Prim, number][] = [
+    ["arc-up", 25],
+    ["arc-down", 20],
+    ["tent", 20],
+    ["pad", 20],
+    ["via", 15],
+  ];
+
+  // A phone gets one event on the line and a long desktop measure gets three:
+  // the trace should read as sparse instrumentation on a run of wire, not as a
+  // busy strip, and the run is less than half as long at 390px.
+  const wanted = width < 420 ? 1 : width < 700 ? 2 : 3;
+  const runOut = 40;
+
+  addLine(ri(28, 64));
+
+  for (let placed = 0; placed < wanted; placed++) {
+    if (x + WIDEST > width - runOut) break;
+    apply(pick(kinds));
+    if (placed < wanted - 1) {
+      addLine(Math.min(x + ri(50, 130), width - runOut - WIDEST));
+    }
   }
-  addLine(x + 10);
+
+  addLine(width);
 
   const svg = document.createElementNS(SVG_NS, "svg") as SVGSVGElement;
-  svg.setAttribute("width", String(x));
+  svg.setAttribute("width", String(width));
   svg.setAttribute("height", "3");
-  svg.setAttribute("viewBox", `0 0 ${x} 3`);
+  svg.setAttribute("viewBox", `0 0 ${width} 3`);
   svg.setAttribute("fill", "none");
+  // Arcs, tents and vias rise above the baseline into the heading's own top
+  // margin. Clipping them to the 3px box would flatten every feature away.
   svg.setAttribute("overflow", "visible");
   svg.setAttribute("aria-hidden", "true");
   svg.classList.add("heading-trace");
+
+  /* Positioning is written inline, not left to the class alone. This element
+     is a full-measure block created by script: if `.heading-trace` is missing
+     or stale for even a moment — a half-swapped stylesheet, a cached older
+     build — an unpositioned copy lands in the heading's flow and pushes a
+     second wire out under the words. That failure was seen, and it is the kind
+     the reader notices and the tests do not. The class still carries the ink
+     and the pointer-events; only the geometry is pinned here. */
+  svg.style.position = "absolute";
+  svg.style.top = "0";
+  svg.style.left = "0";
 
   paths.forEach((d) => svg.appendChild(makePath(d)));
   rects.forEach(([rx, ry, rw, rh]) =>
@@ -174,34 +207,74 @@ function injectTrace(heading: HTMLElement) {
   );
   dots.forEach(([cx, cy, r]) => svg.appendChild(makeDot(cx, cy, r)));
 
-  const line = document.createElement("span");
-  line.classList.add("heading-trace-line");
-  line.setAttribute("aria-hidden", "true");
+  return svg;
+}
 
+/**
+ * A section trace across the top of an h2 — the mark that says a new region of
+ * the sheet starts here.
+ *
+ * It replaces a short trace that was injected INSIDE every h2 and h3 and ran
+ * off to the right of the words. That stub took its length from whatever the
+ * heading left over: 39–100px on the long French headings this blog writes,
+ * and on a phone it stole a seventh of the line and forced an extra wrap. It
+ * also gave both levels the same mark, so the only thing separating an h2 from
+ * an h3 was 4px of type. Now h2 is announced and h3 is not.
+ */
+function injectSectionTrace(heading: HTMLElement, animate: boolean) {
+  const width = Math.round(heading.clientWidth);
+  if (width < 120) return;
+
+  heading.querySelector(".heading-trace")?.remove();
+
+  const svg = buildTrace(width, heading.textContent?.trim() ?? "");
   heading.appendChild(svg);
-  heading.appendChild(line);
 
-  const lineDelay = animateTraces(svg);
-  line.style.animation = `heading-trace-draw 0.7s cubic-bezier(0.4,0,0.2,1) ${lineDelay.toFixed(2)}s forwards`;
-  line.style.clipPath = "inset(0 100% 0 0)";
+  if (animate) animateTraces(svg);
 }
 
 function initHeadingTraces() {
-  const headings = document.querySelectorAll<HTMLElement>(
-    ".prose h2, .prose h3",
-  );
+  const headings = [
+    ...document.querySelectorAll<HTMLElement>(".prose h2"),
+  ] as HTMLElement[];
+  if (!headings.length) return;
+
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          injectTrace(entry.target as HTMLElement);
-          observer.unobserve(entry.target);
-        }
+        if (!entry.isIntersecting) return;
+        injectSectionTrace(entry.target as HTMLElement, true);
+        observer.unobserve(entry.target);
       });
     },
     { threshold: 0.1 },
   );
   headings.forEach((h) => observer.observe(h));
+
+  // The trace is drawn at a measured pixel width, so a resize leaves it either
+  // short of the column or hanging past it. Redraw the ones already placed —
+  // without the entrance, because a resize is not an arrival.
+  let timer: number | undefined;
+  const onResize = () => {
+    window.clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      headings.forEach((h) => {
+        if (h.querySelector(".heading-trace")) injectSectionTrace(h, false);
+      });
+    }, 150);
+  };
+
+  window.addEventListener("resize", onResize, { passive: true });
+
+  document.addEventListener(
+    "astro:before-swap",
+    () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("resize", onResize);
+      observer.disconnect();
+    },
+    { once: true },
+  );
 }
 
 function initReadingProgress() {
