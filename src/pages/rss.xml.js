@@ -16,7 +16,9 @@ export async function GET(context) {
     title: "William Leemans | Blog",
     description: "Le site personnel de William Leemans",
     site: context.site,
-    trailingSlash: false,
+    // Le site est bâti au format `directory` : `/blog/<slug>/` est l'adresse
+    // réelle du fichier, celle du `<link rel="canonical">` et du sitemap.
+    trailingSlash: true,
     stylesheet: "/rss.xsl",
     items: sortedPosts.map((post) => ({
       title: post.data.title,

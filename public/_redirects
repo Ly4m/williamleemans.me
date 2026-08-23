@@ -2,8 +2,8 @@ https://williamleemans.me/*  https://lmns.fr/:splat  301!
 https://www.williamleemans.me/*  https://lmns.fr/:splat  301!
 
 # Blog moved from file-id URLs to slug URLs
-/blog/26-01-rss         /blog/flux-rss                       301!
-/blog/26-05-cap         /blog/cap-pacelc-system-design       301!
-/blog/ember-animation   /blog/animation-de-particules        301!
-/blog/keeping-it-clean  /blog/garder-un-historique-git-propre 301!
-/blog/new-machine-day   /blog/nouvelle-machine               301!
+/blog/26-01-rss         /blog/flux-rss/                        301!
+/blog/26-05-cap         /blog/cap-pacelc-system-design/        301!
+/blog/ember-animation   /blog/animation-de-particules/         301!
+/blog/keeping-it-clean  /blog/garder-un-historique-git-propre/ 301!
+/blog/new-machine-day   /blog/nouvelle-machine/                301!

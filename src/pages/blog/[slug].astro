@@ -69,7 +69,10 @@ const readingTime = `T:${String(post.data.readingTime).padStart(2, "0")}`;
 const dateLabel = fmtDate(post.data.pubDate);
 
 const site = Astro.site?.toString() ?? "https://lmns.fr";
-const postUrl = new URL(`/blog/${post.data.slug}`, site).toString();
+/** Slash final obligatoire : le `<link rel="canonical">` des layouts le porte
+ * (il vient de `Astro.url.pathname`), et le sitemap aussi. Sans lui, le JSON-LD
+ * désigne une URL qui redirige, donc une autre URL que la canonique. */
+const postUrl = new URL(`/blog/${post.data.slug}/`, site).toString();
 
 const graph: object[] = [
   {
@@ -95,7 +98,7 @@ const graph: object[] = [
         "@type": "ListItem",
         position: 2,
         name: "Blog",
-        item: new URL("/blog", site).toString(),
+        item: new URL("/blog/", site).toString(),
       },
       {
         "@type": "ListItem",
