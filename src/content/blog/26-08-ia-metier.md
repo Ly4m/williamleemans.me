@@ -19,7 +19,7 @@ Est-ce que je n'ai pas respecté mon propre talk et je suis tombé sous le joug 
 
 Autant commencer par là, parce que c'est l'argument qu'on entend partout et c'est pas le meilleur.
 
-C'est aussi celui où les chiffres sont les moins flatteurs. En 2025, METR a fait passer un essai randomisé à seize développeurs open source expérimentés, sur 246 tâches, dans des repositories qu'ils connaissaient depuis cinq ans en moyenne. Résultat : [19 % plus lents avec les outils d'IA](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/) que sans. Et le meilleur dans tout ça : les mêmes développeurs estimaient après coup avoir été 20 % plus rapides.
+C'est aussi celui où les chiffres sont les moins flatteurs. En 2025, METR a mesuré des développeurs open source expérimentés sur leur propre code, avec et sans IA, en tirant au sort. Résultat : [19 % plus lents avec les outils](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/). Et le meilleur dans tout ça : les mêmes développeurs estimaient après coup avoir été 20 % plus rapides.
 
 C'est l'étude qu'on me sort systématiquement quand je dis que je suis hypé. Sauf que si on la lit vraiment, elle est plus intéressante que ça.
 
@@ -86,27 +86,35 @@ C'est sur l'écriture du code que le changement est le plus visible, mais ce n'e
 
 J'ai toujours préféré bien poser ma réflexion avant d'attaquer le code. Aujourd'hui, j'utilise des agents pour me challenger sur ma conception, vérifier rapidement mes hypothèses dans le code et prototyper (ça, j'adore). Et ça tombe bien : pour qu'une équipe d'agents soit efficace, il faut lui fournir un contexte aux petits oignons.
 
-Par exemple, j'ai toujours essayé de faire attention à l'accessibilité, sans jamais être excellent sur le sujet. Aujourd'hui, mon agent de cadrage ne me lâche pas tant que cette partie n'est pas traitée.
+Par exemple, j'ai toujours essayé de faire attention à l'accessibilité, sans jamais être excellent sur le sujet. La navigation au clavier, typiquement : je savais qu'il fallait la vérifier, et je la vérifiais quand j'y pensais. Aujourd'hui, mon agent de cadrage ne me lâche pas tant qu'elle n'est pas traitée.
+
+Ce n'est pas l'agent qui est bon en accessibilité. C'est que j'ai été obligé d'écrire noir sur blanc ce que je n'avais jamais formalisé, et que quelque chose me le relit maintenant à chaque fois. Je n'ai pas délégué la compétence : je l'ai enfin mise par écrit.
 
 ### Les tests
 
 Quand on fait du développement augmenté, il est indispensable d'avoir des mécaniques de vérification automatisées : c'est ce qui permet aux agents de converger vers une solution. Et c'est cette contrainte qui fait que mon code n'a jamais été aussi bien testé. Le TDD n'a jamais été aussi omniprésent dans ma pratique.
 
+Ce qui a changé, ce n'est pas ma discipline, c'est l'intérêt. Pendant quinze ans, écrire les tests d'abord était un effort que je payais pour moi-dans-six-mois, et c'est toujours la première chose qu'on lâche sous pression. Là, c'est ce qui fait tourner ma boucle cet après-midi.
+
+Concrètement, je relis les tests avant que l'implémentation commence. C'est là que je valide le contrat, et c'est le seul moment où ça veut vraiment dire quelque chose : un test relu après coup, sur du code qui passe déjà, ne prouve pas grand-chose. Il a été écrit en connaissant la réponse.
+
 ### La qualité
 
-Là, on arrive sur ma nouvelle bataille. Je sais que j'ai tendance à faire parfois de la sur-qualité, mais je constate que l'AI slop se rencontre de plus en plus sur le terrain, et qu'une codebase qui commence à dégénérer se détériore beaucoup plus vite quand ce sont des agents qui écrivent le code.
+Là, on arrive sur ma nouvelle bataille. J'ai toujours eu tendance à faire de la sur-qualité, et je l'ai longtemps pris pour un défaut. C'est en train de devenir ma compétence la plus utile.
 
-Rédiger des ADR, expliciter les contraintes et les normes du projet, choisir la bonne architecture, poser un ubiquitous language : tout ça était déjà fortement recommandé, ça devient obligatoire.
+Parce que je vois de plus en plus d'AI slop sur le terrain, et qu'une codebase qui commence à dégénérer se détériore beaucoup plus vite quand ce sont des agents qui écrivent le code. Un agent ne ralentit pas devant un truc mal foutu : il s'aligne dessus.
 
-### La code review devient une compétence critique
+Rédiger des ADR, expliciter les contraintes et les normes du projet, choisir la bonne architecture, poser un ubiquitous language : tout ça était déjà fortement recommandé, ça devient obligatoire. Sur un projet, un ADR qui décrivait exactement notre manière d'implémenter une architecture hexagonale a suffi à ce que les agents gardent la structure propre. Le document ne servait plus seulement à expliquer la décision à l'humain qui arrive : il la fait tenir.
+
+## La code review devient une compétence critique
 
 C'est le changement le plus concret dans mon quotidien, et celui dont on parle le moins.
 
 Une revue de code classique cherche des erreurs : un cas non géré, une variable mal nommée, une requête dans une boucle. On lit du code écrit par quelqu'un dont on connaît les habitudes, et on sait où regarder.
 
-Relire du code généré, ce n'est pas ça. Le code est souvent propre, cohérent, bien nommé, et il passe les tests. Tests qu'il a parfois écrits lui-même, d'ailleurs. L'erreur n'est presque jamais dans la ligne.
+Relire du code généré, ce n'est pas ça. Le code est souvent propre, cohérent, bien nommé, et il passe les tests. Tests qu'il a parfois écrits lui-même, d'ailleurs. L'erreur n'est presque jamais dans la syntaxe.
 
-Elle est dans l'intention que personne n'a formulée.
+Elle est dans l'intention qui vient du corpus et que personne n'a demandée.
 
 Un retry ajouté « par sécurité » sur un appel qui n'est pas idempotent. Un cache dont personne n'a décidé la durée de vie. Un `catch` qui avale une erreur que quelqu'un, quelque part, avait besoin de voir. Rien de tout ça n'est un bug au sens strict. Ce sont des décisions prises par défaut, par un truc qui n'avait aucun moyen de savoir qu'il en prenait une.
 
@@ -138,9 +146,9 @@ Je suis enthousiaste, pas naïf. Deux choses me font douter.
 
 La première, c'est le code que plus personne dans l'équipe ne comprend. Pas du code illisible : du code que personne n'a eu besoin de comprendre pour le livrer. Ça se paye toujours, et ça se paye au pire moment.
 
-La seconde, c'est ma propre perception. L'écart entre les 19 % mesurés et les 20 % ressentis dans l'étude METR est le résultat le plus solide de tout ce débat, et il ne parle pas des outils : il parle de nous. Je ne suis pas un bon juge de ma propre productivité, et je ne vois pas pourquoi je ferais exception.
+La seconde, c'est ma propre perception. L'écart entre les 19 % mesurés et les 20 % ressentis dans l'étude METR ne parle pas des outils : il parle de nous. Je ne suis pas un bon juge de ma propre productivité, et je ne vois pas pourquoi je ferais exception.
 
-J'y vais à fond quand même. Mon instinct me dit que le dev augmenté est le bon pari, et je sais que mon instinct n'est pas une mesure.
+J'y vais à fond quand même. Mon instinct me dit que le dev augmenté est le bon pari, même si je sais que mon instinct n'est pas une mesure.
 
 ## Au final
 
