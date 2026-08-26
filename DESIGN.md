@@ -543,6 +543,98 @@ speak.
 - **The skip link branches onto the bus, not the branch** — which is the only
   reason its spur is longer (32px) than the rail's. Don't "harmonise" them.
 
+### Sommaire (blog post)
+
+An opt-in table of contents in the article's right margin, `xl` and up, listing
+**h2 only**. It is not "like" the rail — it is the same plate, drawn by the same
+function: `trace()` and `plateVars()` were lifted out of `SideNav.astro` into
+`src/lib/circuit-plate.ts` on 2026-08-24 and both surfaces import them, so the
+two wires cannot drift. Junction dots, the S-curve leaving the bus above the
+first plot, one plot per item, the diagonal rejoin below the last. **It draws no
+bus of its own** (`withBus: false`, exactly the rail's arrangement): since
+2026-08-25 the article carries two continuous buses and the plate branches onto
+the right one. The abscissae coincide with nothing moved — the plate opens at
+`prose + 48` and its internal bus sat at `+8`, which is the `prose + 56` the
+continuous bus now runs at. Hover lights the plot to `--ink-circuit-strong`, pushes the 9px
+spur out with a `scaleX`, and shifts the label 2px — the rail's own hover,
+value for value.
+
+**What made it possible was dropping h3.** The first build drew the bus as a
+`border-left` and the plots as `::before`, precisely because `trace()` needs a
+fixed `itemH` and headings that wrap have no height known in advance. h2-only
+removes the nested groups, so an item is a fixed `--item-h` box with its label
+centred at one line or two, the pitch is constant again, and the plate is
+computable at build time. Still no measurement JavaScript.
+
+Config differences from `RAIL`, and only these: `labelX` 40 (against 48 — the
+rail carries one-word labels in caps, this carries sentences and must leave 184
+of its 224px to them), `itemH` 42 (against 36 — two lines of 0.875rem at 1.35 is
+37.8px), `headroom`/`tailroom` 34 (against 66/76 — the rail's plate is anchored
+to the bottom of a full-height screen with the icon row beneath it; this one is
+free-standing). `busX` 8 and `branchX` 22 are the rail's, unchanged, because it
+is the same drawing.
+
+- **The plot rides the FIRST LINE, not the middle of its box** (`nodeOffset`
+  9.5 = half a 19px line, against the rail's implicit `itemH / 2`). Labels are
+  top-aligned for the same reason. Centred in a fixed-height box, a one-line
+  entry and a two-line entry do not start at the same height: the plot fell in
+  the interline on two-line entries and on the text on one-line ones, and the
+  pitch of the _first lines_ jumped 9.4px at the hinge between the two kinds —
+  `54, 54, 54, 54, 63.4, 54, 54`. The wire was on a perfect pitch and the text
+  was not, which is what reads as "some titles aren't aligned any more". Now
+  every plot is 0px from its first line and the first-line pitch is 54
+  throughout. The line-height is pinned in `px`, not as a ratio, because
+  `--node-offset` is exactly half of it and 1.35 × 14px would give 9.45 — half
+  a pixel between the plot and the line it points at.
+- **`headroom` 52 / `tailroom` 28 are constrained, not chosen.** The branch's
+  curvature is absolute, so raising the plot inside its item forces a taller
+  headroom to keep the junction on the bus: `headroom >= 48 - offset`,
+  `tailroom >= 46 + offset - itemH`, both written in `circuit-plate.ts`. Moving
+  the plot to the first line without moving `headroom` sent the branch out at
+  y=1.5 on a bus starting at y=6 — visible in the SVG's `d=` long before it
+  would have been visible on screen. These values leave 13.5px of bus above the
+  top junction and 14.5px below the bottom one.
+- **The caps register was refused on a measurement, not a preference.**
+  `.register-ident` on these labels pushes three of eight entries to three lines
+  — at 0.875rem, 0.8125rem, 0.75rem _and_ 0.6875rem, so it is not rescuable by
+  shrinking — and a three-line label overflows the fixed 42px box into its
+  neighbour. Roman at 0.875rem never exceeds two lines. Measured on
+  `developpement-assiste-par-ia`, the busiest article.
+- **No brass, no state.** It does not follow the reader and has no current item.
+  Deliberate, not a forgotten scroll-spy: the rail's active plot is already lit
+  on these pages, and two brass "you are here" marks break the single-Signal
+  rule. Position in the article is `#reading-progress`'s job. `padActiveR` and
+  `spur` are filled in only because the shared type demands them; they never
+  resolve.
+- **Outside `<article>`, before it in the DOM.** Visual order matches focus
+  order, and an eight-link navigation does not become part of the post for
+  reader modes and extractors. The useful corollary is that it never inherits
+  `article a`'s hairline — the plot is already the mark that says "target".
+- **It redraws on every page, so it carries no `data-draw-once`** — unlike the
+  rail. `circuit.ts` states the rule: the rail is chrome, identical from page to
+  page, and re-inking it behind every click made the same wire blink; the
+  sommaire belongs to the page, and the page did change.
+- **Geometry, measured not estimated:** measure 645px (55ch at 22px, Alegreya's
+  `0` advancing 0.533em); the rail eats 160px on the left — a 96px in-flow box
+  **plus** `<main>`'s `md:ml-16`, which is not what the classes suggest; gutter
+  3rem; column **14rem**. That leaves 51px to the window edge at 1280, 94 at
+  1366, 131 at 1440. Below 1280 it would overflow, hence `display: none` rather
+  than a narrower column. The plate is `56 + 54n` px tall — 488px at eight
+  entries, inside the sticky `calc(100dvh - 8rem)`.
+- **The top offset is approximate on purpose.** `<header>` lives inside
+  `<article>`, so an absolute anchored on the wrapper starts level with the h1;
+  reaching the first paragraph needs a height no CSS rule can read. 14.5rem is
+  the header's measured height on a two-line title, and the error is erased the
+  moment the reader scrolls and the plate sticks.
+- **Landing:** `rehype-heading-focus.mjs` puts `tabindex="-1"` on every h2/h3 so
+  the focus follows the jump — Safari drops it otherwise, the failure already
+  recorded on `SkipLink.astro` — and `.prose h2/h3` carry
+  `scroll-margin-top: 2.5rem`. It used to exist to clear the section trace's
+  arcs; since the trace moved UNDER the heading (2026-08-25) there is nothing
+  above an h2 to clip, and the value now buys the plainer thing — a heading
+  landing flush against the window edge reads badly. It no longer answers to any
+  geometry.
+
 ### List Rows (blog index)
 
 The dot-leader row: month (notation, tabular-nums, Faded) — a 2px-dot leader
@@ -745,6 +837,12 @@ once in words.
   (below `xl`, where the buses do not exist and the trace starts at the text
   edge). One number cannot be right in both cases — the same mistake as the old
   `--font-sans` pointing at a monospace: one name for two realities.
+- **The plate's junctions slide.** The right bus is static and the sommaire is
+  sticky, so the branch's two junction dots travel along the wire as you scroll.
+  A solder that moves is the one unresolved aesthetic reservation of this whole
+  build, arbitrated in favour of a sommaire that stays to hand (decided
+  2026-08-25).
+
 ### Signature: The Flow Field
 
 The Now pages' ground: slow drifting streamlines following a simplex flow
@@ -870,6 +968,11 @@ single static frame under reduced motion.
   across the margin, and at four or five per screen the margin becomes a ladder.
   Measured before opening it to figures — never more than three taps in a 900px
   window, tightest pair 149px — and that headroom is what the rule protects.
+- **Don't** give the sommaire a current-section state, in brass or otherwise.
+  It is static by decision: the rail's active plot is already lit on those
+  pages, and where the reader is in the article is `#reading-progress`'s job.
+  A scroll-spy would also open a second `IntersectionObserver` over
+  `.prose h2`, which `blog-post.ts` already walks for the section traces.
 - **Don't** introduce a second accent. The green "done" badge was the site's
   only one, and it was removed for carrying state — brass's job.
 - **Don't** put brass on running text, or true brass (#E4A94D) on Paper —

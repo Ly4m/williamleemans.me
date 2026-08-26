@@ -5,6 +5,7 @@ import BlogLayout from "../../layouts/BlogLayout.astro";
 import BlogPostDecoration from "../../components/BlogPostDecoration.astro";
 import ArticleSignoff from "../../components/ArticleSignoff.astro";
 import ReadNext from "../../components/ReadNext.astro";
+import TableOfContents from "../../components/TableOfContents.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
@@ -43,7 +44,10 @@ export async function getStaticPaths() {
 }
 
 const { post, readNext } = Astro.props;
-const { Content } = await render(post);
+/* `headings` sort de la même chaîne markdown que les `id` des titres : les
+   ancres du sommaire ne peuvent donc pas dériver de leurs cibles, et lychee
+   les vérifie de toute façon (`--include-fragments` en CI). */
+const { Content, headings } = await render(post);
 
 /**
  * UTC rather than the build machine's zone: `pubDate` is coerced from a bare
@@ -152,10 +156,15 @@ const structuredData = JSON.stringify({
     and outside it a reader who jumps to the article landed in an article with
     no heading and no date in it.
 
-    `relative` est posée ICI et pas sur `.article-measure` : le primitif est
-    global et ne décrit qu'une colonne de texte — lui donner un contexte de
-    positionnement pour ses seuls abonnés en ferait un conteneur de mise en
-    page, ce qu'il n'est pas.
+    `relative` sert au sommaire, qui se raccroche à cette enveloppe pour aller
+    se poser dans la marge droite. La classe est posée ICI et pas sur
+    `.article-measure` : le primitif est global et ne décrit qu'une colonne de
+    texte — lui donner un contexte de positionnement pour un seul consommateur
+    en ferait un conteneur de mise en page, ce qu'il n'est pas.
+
+    Le sommaire est AVANT `<article>` : l'ordre visuel et l'ordre du focus se
+    suivent, et une navigation de onze liens ne devient pas un morceau de
+    l'article pour qui lit `<article>` au mot.
   */
   }
   <div
@@ -177,6 +186,7 @@ const structuredData = JSON.stringify({
     <div class="article-bus article-bus-gauche" aria-hidden="true"></div>
     <div class="article-bus article-bus-droite" aria-hidden="true"></div>
 
+    <TableOfContents headings={headings} enabled={post.data.toc} />
     <article>
       <header class="py-12">
         <h1

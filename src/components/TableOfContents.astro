@@ -1,0 +1,355 @@
+---
+import type { MarkdownHeading } from "astro";
+import type { TraceCfg } from "../lib/circuit-plate";
+import { trace, plateVars } from "../lib/circuit-plate";
+
+/* ---------------------------------------------------------------------------
+   LE SOMMAIRE EST UNE PLAQUE. La même que le rail, à trois nombres près.
+
+   La première version dessinait le bus en `border-left` et les plots en
+   `::before`, pour éviter d'avoir à mesurer quoi que ce soit — le tracé SVG du
+   rail sort de constantes fixes (`itemH`, `gap`), et des titres de 59
+   caractères qui passent à la ligne n'ont pas de hauteur connue d'avance.
+
+   Ce qui a levé la contrainte : le sommaire ne liste plus que les h2. Plus de
+   groupes imbriqués, plus de hauteurs variables — un item est une boîte de
+   `--item-h`, comme dans le rail, et le libellé s'y centre qu'il fasse une
+   ligne ou deux. Le pas redevient constant, donc `trace()` redevient calculable
+   au build, donc la plaque se dessine pour de bon : bus, deux repères de fin,
+   branche en S au-dessus du premier plot, plot par item, retour en biais sous
+   le dernier. Zéro JavaScript de mesure, comme avant.
+
+   `trace()` et `plateVars()` sont MUTUALISÉS avec `SideNav.astro` — voir
+   `src/lib/circuit-plate.ts`. Le fil de cette plaque ne peut donc pas dériver
+   de celui du rail : c'est la même fonction.
+
+   Trois choses à ne pas « harmoniser » :
+
+   1. AUCUN LAITON, et aucun état. Le sommaire ne suit pas la lecture ; il n'a
+      pas d'item courant. C'est délibéré, pas un scroll-spy oublié — le plot
+      actif du rail est déjà allumé à l'écran sur ces pages, et deux « vous êtes
+      ici » en laiton cassent la Règle du Signal unique. La position dans
+      l'article appartient à `#reading-progress`. `padActiveR` et `spur` sont
+      donc renseignés parce que le type les exige, et ne se résolvent jamais.
+
+   2. IL EST HORS DE `<article>`, et pas seulement avant lui dans le DOM. Une
+      navigation de huit liens à l'intérieur de l'article en devient un morceau
+      pour tout ce qui lit `<article>` au mot — modes lecture, extracteurs.
+      Corollaire utile : il n'hérite pas du filet de `article a`. Le plot est
+      déjà la marque qui dit « ceci est une cible ».
+
+   3. LA PLAQUE SE REDESSINE À CHAQUE PAGE, et n'a donc PAS de
+      `data-draw-once` — contrairement au rail. La règle est écrite dans
+      `circuit.ts` : le rail est du chrome, identique d'une page à l'autre, et
+      le réencrer à chaque clic ferait clignoter le même fil ; le sommaire, lui,
+      appartient à la page, et la page a bel et bien changé.
+--------------------------------------------------------------------------- */
+
+type Props = {
+  headings: MarkdownHeading[];
+  enabled?: boolean;
+};
+
+const { headings, enabled = false } = Astro.props;
+
+/* h2 seulement. Un h3 est un repli à l'intérieur d'une section, pas une
+   destination : `blog-post.ts` tient déjà la même ligne pour les tracés de
+   section (« h2 est annoncé et h3 ne l'est pas »), et les inclure ferait de
+   nouveau varier la hauteur des items, ce que cette plaque ne supporte pas. */
+const entrees = headings.filter((h) => h.depth === 2);
+
+/* Un sommaire de deux entrées est du mobilier. Le drapeau est une demande, pas
+   une garantie : on ne casse pas le build pour ça — `toc: true` est une donnée
+   BIEN FORMÉE, et le nombre de titres vit dans le corps, pas dans l'en-tête.
+   C'est un constat de qualité, et un constat ne fait échouer personne. */
+const PLANCHER = 3;
+const visible = enabled && entrees.length >= PLANCHER;
+
+/* La plaque du sommaire. Les abscisses sont celles du rail (bus 8, branche 22)
+   parce que c'est le même dessin ; seul `labelX` se resserre — le rail a 48px
+   parce qu'il porte des libellés d'un mot en capitales, le sommaire a 224px en
+   tout et doit en laisser 184 à des phrases entières.
+
+   `itemH: 42` tient deux lignes de 19px (38px) ; `nodeOffset: 9.5` est la
+   moitié d'une ligne, donc le plot se pose sur la PREMIÈRE ligne de chaque
+   entrée et non au milieu de la boîte. Les libellés sont calés en haut pour la
+   même raison : centrés dans une boîte fixe, une entrée d'une ligne et une
+   entrée de deux ne commencent pas à la même hauteur, et le pas des premières
+   lignes sautait de 9,4px à la charnière. Le fil vise le début du texte, comme
+   une puce de liste — et comme le rail, dont les libellés n'ont jamais qu'une
+   ligne.
+
+   `headroom: 52` / `tailroom: 28` ne sont pas au goût : la courbure de la
+   branche est absolue, donc un `nodeOffset` plus haut dans l'item exige un
+   `headroom` plus grand pour que la jonction reste sur le bus. Les deux bornes
+   sont écrites dans `circuit-plate.ts` ; ici elles laissent 13,5px de bus
+   au-dessus de la jonction haute et 14,5px sous la basse. */
+const SOMMAIRE: TraceCfg = {
+  busX: 8,
+  branchX: 22,
+  labelX: 40,
+  itemH: 42,
+  gap: 12,
+  nodeOffset: 9.5,
+  headroom: 52,
+  tailroom: 28,
+  padR: 2,
+  padActiveR: 3.5,
+  spur: 18,
+  spurHover: 9,
+};
+
+/* `withBus: false` — exactement l'arrangement du rail, dont le bus vit dans
+   l'<aside> et non dans la plaque. Depuis que l'article porte ses deux bus
+   continus (`.article-bus` dans `global.css`), le sommaire n'a plus à dessiner
+   le sien : sa branche se brute sur celui de droite. Les abscisses coïncident
+   sans rien déplacer — la plaque ouvre à `prose + 48`, son bus interne était à
+   `+8`, soit les `prose + 56` où passe désormais le bus continu.
+
+   Conséquence assumée (round « circuit », Q2a) : la plaque étant collante et le
+   bus statique, les deux jonctions de la branche COULISSENT le long du fil au
+   défilement. Une soudure qui se déplace, c'est la seule réserve esthétique de
+   tout ce chantier — arbitrée en faveur d'un sommaire qui reste sous la main. */
+const plaque = trace(SOMMAIRE, entrees.length, false);
+---
+
+{
+  visible && (
+    <nav class="sommaire" aria-labelledby="sommaire-titre">
+      <div class="sommaire-corps">
+        <div class="sommaire-bloc">
+          {/* Un <p> et non un titre : ce bloc précède le <h1> dans le document,
+            et un h2 placé avant lui mentirait sur le plan de la page. Le nom
+            accessible vient d'`aria-labelledby`, qui n'a besoin d'aucun
+            niveau. */}
+          <p id="sommaire-titre" class="register-ident sommaire-titre">
+            Sommaire
+          </p>
+
+          <div
+            class="sommaire-plate"
+            style={`${plateVars(SOMMAIRE)};height:${plaque.plateH}px`}
+          >
+            <svg
+              class="sommaire-trace"
+              width={SOMMAIRE.labelX}
+              height={plaque.plateH}
+              viewBox={`0 0 ${SOMMAIRE.labelX} ${plaque.plateH}`}
+              fill="none"
+              aria-hidden="true"
+            >
+              {/* Ni bus ni repères de fin ici : ils appartiennent à
+                  `.article-bus`, dans `global.css`. La plaque ne dessine plus
+                  que sa branche et ses plots. */}
+              <path
+                d={plaque.branchD}
+                stroke="currentColor"
+                stroke-width="1"
+                class="circuit-trace"
+              />
+              {plaque.junctions.map((y) => (
+                <circle
+                  cx={plaque.busX}
+                  cy={y}
+                  r="2"
+                  fill="currentColor"
+                  class="circuit-dot"
+                />
+              ))}
+            </svg>
+
+            {entrees.map((e) => (
+              <a href={`#${e.slug}`} class="sommaire-link">
+                <span class="sommaire-label">{e.text}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </nav>
+  )
+}
+
+<style>
+  .sommaire {
+    display: none;
+  }
+
+  /* 80rem = le `xl` de Tailwind, et le seuil est MESURÉ, pas choisi. La mesure
+     fait 645px (le `0` d'Alegreya avance de 0.533em, soit 55ch à 22px), et le
+     rail mange 160px à gauche — 96px de boîte en flux plus le `md:ml-16` du
+     <main>, ce qui n'est pas ce qu'on croit en lisant les classes. Colonne et
+     gouttière comprises, le sommaire s'arrête donc à 51px du bord de la fenêtre
+     à 1280px, 94 à 1366, 131 à 1440. En dessous de 1280 il déborderait : d'où
+     `display: none`, et non une colonne rétrécie.
+
+     Pas de variante mobile : ce sommaire sert à REVENIR dans un article, pas à
+     le survoler avant de le lire. */
+  @media (min-width: 80rem) {
+    .sommaire {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: calc(100% + 3rem);
+      width: 14rem;
+      height: 100%;
+    }
+  }
+
+  /* La plaque est CENTRÉE dans la fenêtre, à toutes les hauteurs de défilement.
+     Une colonne collante pleine hauteur, pas un `top` fixe : c'est ce qui
+     supprime le seul nombre approximatif qu'avait ce composant. Calée en haut,
+     elle devait démarrer au niveau du premier paragraphe, hauteur que personne
+     ne peut lire en CSS — le <header> vit dans <article>, et le h1 fait une à
+     trois lignes selon le titre. Centrée, la question ne se pose plus : la
+     plaque ne dépend plus de ce qui la précède. */
+  .sommaire-corps {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    display: flex;
+    overflow-y: auto;
+  }
+
+  /* `margin: auto` et non `justify-content: center` : les deux centrent, mais
+     seul le premier reste atteignable quand le contenu dépasse. Un conteneur
+     de défilement dont les items sont centrés par `justify-content` rogne le
+     HAUT et le rend inatteignable — c'est le piège flexbox classique, et il se
+     déclencherait exactement sur l'article le plus fourni, dans une fenêtre
+     courte, c'est-à-dire au seul moment où le sommaire sert. */
+  .sommaire-bloc {
+    width: 100%;
+    margin: auto 0;
+  }
+
+  /* 0.75rem : le pas du registre d'identification, celui des items du rail et
+     du lien d'évitement. Ce libellé fait le même travail qu'eux — nommer une
+     plaque — et n'a aucune raison d'inventer un palier. */
+  .sommaire-titre {
+    margin: 0 0 0.5rem;
+    padding-left: var(--label-x, 40px);
+    font-size: 0.75rem;
+    color: var(--color-faded);
+  }
+
+  .sommaire-plate {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    padding-top: var(--headroom);
+  }
+
+  .sommaire-trace {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: var(--ink-circuit);
+    pointer-events: none;
+  }
+
+  .sommaire-link {
+    position: relative;
+    display: flex;
+    height: var(--item-h);
+    /* En HAUT, pas au centre : voir la note sur `nodeOffset` plus haut. */
+    align-items: flex-start;
+    padding-left: var(--label-x);
+    color: var(--color-faded);
+    text-decoration: none;
+    font-size: 0.875rem;
+    /* En px et non en ratio : `--node-offset` en est la moitié exacte, et une
+       interligne de 1.35 sur 14px donnerait 9,45 — un demi-pixel qui sépare le
+       plot de la ligne qu'il vise. 19px se coupe en deux proprement. */
+    line-height: 19px;
+  }
+
+  /* Le libellé porte seul l'atténuation, comme dans le rail : posée sur le
+     lien, elle emporterait aussi le plot et l'amorce, et l'état redeviendrait
+     une affaire d'opacité — ce que la géométrie ci-dessous existe pour
+     éviter. */
+  .sommaire-label {
+    display: inline-block;
+    transition:
+      color 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  /* LE PLOT : un point d'encre de décoration posé sur la branche, à peine plus
+     large que le fil. Mêmes calculs que `.nav-link::before`, mêmes variables —
+     elles viennent toutes de `plateVars()`. */
+  .sommaire-link::before {
+    content: "";
+    position: absolute;
+    top: var(--node-offset);
+    left: var(--branch-x);
+    width: calc(var(--pad-r) * 2);
+    height: calc(var(--pad-r) * 2);
+    margin-top: calc(var(--pad-r) * -1);
+    margin-left: calc(var(--pad-r) * -1);
+    border-radius: 50%;
+    background: var(--ink-circuit);
+    transition:
+      width 0.25s ease,
+      height 0.25s ease,
+      margin 0.25s ease,
+      background 0.25s ease;
+  }
+
+  /* L'AMORCE : le brin qui relie le plot à son libellé. Le brin pousse hors du
+     plot par un scaleX, il n'apparaît pas d'un bloc. */
+  .sommaire-link::after {
+    content: "";
+    position: absolute;
+    top: var(--node-offset);
+    left: var(--branch-x);
+    width: var(--spur-hover);
+    height: 1px;
+    margin-top: -0.5px;
+    background: var(--ink-circuit);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.25s ease;
+  }
+
+  /* `hover: hover` : sur un écran tactile l'état resterait collé après le tap
+     et deux items paraîtraient allumés. Même raison que dans le rail. */
+  @media (hover: hover) {
+    .sommaire-link:hover .sommaire-label {
+      color: var(--color-charcoal);
+      transform: translateX(2px);
+    }
+
+    /* L'encre de décoration à pleine force, pas l'encre du texte : le fil se
+       réveille sous le doigt, il ne s'allume pas. */
+    .sommaire-link:hover::before {
+      width: calc(var(--pad-r) * 2 + 2px);
+      height: calc(var(--pad-r) * 2 + 2px);
+      margin-top: calc(var(--pad-r) * -1 - 1px);
+      margin-left: calc(var(--pad-r) * -1 - 1px);
+      background: var(--ink-circuit-strong);
+    }
+
+    .sommaire-link:hover::after {
+      transform: scaleX(1);
+    }
+  }
+
+  .sommaire-link:focus-visible .sommaire-label {
+    color: var(--color-charcoal);
+  }
+
+  :global(.dark) .sommaire-link:hover .sommaire-label,
+  :global(.dark) .sommaire-link:focus-visible .sommaire-label {
+    color: var(--color-primary-100);
+  }
+
+  /* Le fil garde son dessin final ; seul le voyage tombe. */
+  @media (prefers-reduced-motion: reduce) {
+    .sommaire-label,
+    .sommaire-link::before,
+    .sommaire-link::after {
+      transition: none;
+    }
+  }
+</style>

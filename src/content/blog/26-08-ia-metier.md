@@ -4,6 +4,7 @@ title: "Cette fois, je suis dans la hype"
 description: "Développement assisté par IA : pourquoi celui qui a fait un talk contre la hype est hypé cette fois, et comment je vois le métier changer."
 pubDate: "2026-08-12"
 readingTime: 8
+toc: true
 related:
   - "cap-pacelc-system-design"
   - "garder-un-historique-git-propre"
