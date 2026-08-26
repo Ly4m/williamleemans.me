@@ -1,5 +1,7 @@
 ---
 import AnimatedLogo from "./AnimatedLogo.astro";
+import type { TraceCfg } from "../lib/circuit-plate";
+import { trace, plateVars } from "../lib/circuit-plate";
 
 interface NavItem {
   label: string;
@@ -120,19 +122,6 @@ const relFor = (s: SocialLink) => {
       couche ambiante (`respire.ts`) — le rail se fait corriger et parcourir
       comme n'importe quelle plaque. C'est voulu : le rail est une plaque.
 --------------------------------------------------------------------------- */
-type TraceCfg = {
-  busX: number;
-  branchX: number;
-  labelX: number;
-  itemH: number;
-  gap: number;
-  headroom: number;
-  tailroom: number;
-  padR: number;
-  padActiveR: number;
-  spur: number;
-  spurHover: number;
-};
 
 const RAIL: TraceCfg = {
   busX: 8,
@@ -161,78 +150,6 @@ const OVERLAY: TraceCfg = {
   spur: 24,
   spurHover: 0,
 };
-
-/* `mirror` retourne la plaque : le fil passe à DROITE des libellés au lieu
-   d'à gauche. Le repère du SVG, lui, reste toujours à origine gauche — c'est
-   la seule chose qu'on ne peut pas retourner — donc les abscisses sont prises
-   depuis le bord opposé. `busX`/`branchX` de la config restent, dans les deux
-   cas, des distances au bord LE PLUS PROCHE : c'est ce qui permet aux mêmes
-   variables CSS de servir les deux plaques sans condition. */
-function trace(cfg: TraceCfg, n: number, withBus: boolean, mirror = false) {
-  const busX = mirror ? cfg.labelX - cfg.busX : cfg.busX;
-  const branchX = mirror ? cfg.labelX - cfg.branchX : cfg.branchX;
-  const pitch = cfg.itemH + cfg.gap;
-  const listH = n * cfg.itemH + Math.max(0, n - 1) * cfg.gap;
-  const plateH = cfg.headroom + listH + cfg.tailroom;
-  const nodeY = (i: number) => cfg.headroom + cfg.itemH / 2 + i * pitch;
-  const first = nodeY(0);
-  const last = nodeY(n - 1);
-  /* La branche quitte le bus 42px au-dessus du premier plot et se redresse
-     20px avant lui ; elle le rejoint en biais 40px sous le dernier. Les deux
-     jonctions sont marquées d'un point, comme sur les plaques. */
-  const junctionOut = first - 42;
-  const straightFrom = first - 20;
-  const straightTo = last + 18;
-  const junctionIn = last + 40;
-  const busTop = 6;
-  const busBottom = plateH - 6;
-
-  return {
-    plateH,
-    busX,
-    branchX,
-    nodes: Array.from({ length: n }, (_, i) => nodeY(i)),
-    /* Le rail n'a pas de bus dans sa plaque : le sien traverse toute la
-       hauteur de l'écran et vit dans l'<aside>, hors de cette boîte. Le menu
-       mobile, lui, est un panneau qui va et vient — son bus s'arrête avec lui,
-       et porte donc ses deux repères de fin. */
-    busD: withBus ? `M ${busX} ${busTop} L ${busX} ${busBottom}` : null,
-    tickTopD: withBus
-      ? `M ${busX - 4} ${busTop} L ${busX + 4} ${busTop}`
-      : null,
-    tickBottomD: withBus
-      ? `M ${busX - 4} ${busBottom} L ${busX + 4} ${busBottom}`
-      : null,
-    branchD: [
-      `M ${busX} ${junctionOut}`,
-      `C ${busX} ${junctionOut + 11}, ${branchX} ${straightFrom - 11}, ${branchX} ${straightFrom}`,
-      `L ${branchX} ${straightTo}`,
-      `L ${busX} ${junctionIn}`,
-    ].join(" "),
-    junctions: [junctionOut, junctionIn],
-  };
-}
-
-/* Les constantes partent en variables CSS : une seule source pour le tracé
-   (au-dessus) et pour les plots/amorces (feuille de style plus bas). */
-const plateVars = (cfg: TraceCfg, mirror = false) =>
-  [
-    `--branch-x:${cfg.branchX}px`,
-    /* L'abscisse de la branche DANS LE SVG (origine toujours à gauche), et le
-       sens dans lequel l'amorce pousse. Le script en a besoin pour poser la
-       pièce en voyage : `--branch-x` lui, est une distance au bord proche, et
-       ne suffirait pas sur une plaque retournée. */
-    `--wire-x:${mirror ? cfg.labelX - cfg.branchX : cfg.branchX}px`,
-    `--spur-dir:${mirror ? -1 : 1}`,
-    `--label-x:${cfg.labelX}px`,
-    `--item-h:${cfg.itemH}px`,
-    `--gap:${cfg.gap}px`,
-    `--headroom:${cfg.headroom}px`,
-    `--pad-r:${cfg.padR}px`,
-    `--pad-active-r:${cfg.padActiveR}px`,
-    `--spur:${cfg.spur}px`,
-    `--spur-hover:${cfg.spurHover}px`,
-  ].join(";");
 
 const railTrace = trace(RAIL, items.length, false);
 /* Le menu mobile est aligné à DROITE : c'est le pouce qui l'atteint, et c'est
