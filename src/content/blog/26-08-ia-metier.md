@@ -2,7 +2,7 @@
 slug: "developpement-assiste-par-ia"
 title: "Cette fois, je suis dans la hype"
 description: "Développement assisté par IA : pourquoi celui qui a fait un talk contre la hype est hypé cette fois, et comment je vois le métier changer."
-pubDate: "2026-08-12"
+pubDate: "2026-08-26"
 readingTime: 8
 toc: true
 related:
@@ -28,9 +28,9 @@ METR est revenu dessus en février 2026 pour annoncer qu'ils changeaient de prot
 
 > Une étude honnête qui dit « notre méthode ne mesure plus ce qu'on croyait » vaut mieux qu'un chiffre rond qu'on affiche sur LinkedIn.
 
-Mais tout ce débat se focus sur la mauvaise chose.
+Mais tout ce débat se focalise sur la mauvaise chose.
 
-Taper du code n'a jamais été mon goulot d'étranglement. Si mon métier se résumait à produire des lignes, ça ferait quinze ans que je m'ennuie.
+Taper du code n'a jamais été mon goulot d'étranglement. Si mon métier se résumait à produire des lignes, ça ferait quinze ans que je m'ennuierais.
 
 ## Le vrai changement : le travail est remonté d'un cran
 
@@ -38,7 +38,7 @@ Ce qui me hype, c'est que la partie intéressante du métier a pris de la place.
 
 Avant, une journée typique, c'était : réfléchir vingt minutes, puis passer une heure à transcrire cette réflexion en code. La réflexion était le petit bout. La transcription était le gros (en termes de temps).
 
-Aujourd'hui, la transcription est accélérée. Ce qui reste, c'est formuler l'intention : qu'est-ce qu'on construit, dans quel ordre, avec quels compromis, et qu'est-ce qu'on refuse de faire. C'est exactement le travail que je préfère, et c'est celui qui remplit mes journées maintenant.
+Aujourd'hui, la transcription est accélérée. Ce qui reste, c'est formuler l'intention : ce que l'on construit, dans quel ordre, avec quels compromis, et ce que l'on refuse de faire. C'est exactement le travail que je préfère, et c'est celui qui remplit mes journées maintenant.
 
 <figure>
 <svg class="svg-ia1" viewBox="0 0 600 195" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:600px;display:block;" role="img" aria-label="Deux axes comparant où se concentre mon temps de travail. Avant : surtout sur l'écriture du code. Maintenant : surtout sur l'intention, la conception et la relecture.">
@@ -115,7 +115,7 @@ Une revue de code classique cherche des erreurs : un cas non géré, une variabl
 
 Relire du code généré, ce n'est pas ça. Le code est souvent propre, cohérent, bien nommé, et il passe les tests. Tests qu'il a parfois écrits lui-même, d'ailleurs. L'erreur n'est presque jamais dans la syntaxe.
 
-Elle est dans l'intention qui vient du corpus et que personne n'a demandée.
+Elle est dans l'ajout de choses qui viennent du corpus et que personne n'a demandée.
 
 Un retry ajouté « par sécurité » sur un appel qui n'est pas idempotent. Un cache dont personne n'a décidé la durée de vie. Un `catch` qui avale une erreur que quelqu'un, quelque part, avait besoin de voir. Rien de tout ça n'est un bug au sens strict. Ce sont des décisions prises par défaut, par un truc qui n'avait aucun moyen de savoir qu'il en prenait une.
 
@@ -131,23 +131,23 @@ Pour ma part, j'ai pris le parti que l'IA ne bosserait pas à ma place mais pour
 
 Quelques paris. Je les écris pour pouvoir me relire et avoir tort en public.
 
-**Le coût d'une idée va s'effondrer, et ça va être la meilleure partie.** J'ai un fichier de notes plein de projets que je n'ai jamais lancés parce que la marche d'entrée était trop haute pour mes soirées. Cette marche est en train de descendre. On va voir arriver une vague de logiciels bizarres, spécifiques, faits par une seule personne pour trois cents utilisateurs. Le genre de chose qui n'a jamais eu de modèle économique mais qui rend la vie meilleure. C'est ce qui me hype le plus, très loin devant les gains de productivité en entreprise.
+**Le coût d'une idée va s'effondrer, et ça va être la meilleure partie.** J'ai un fichier de notes plein de projets que je n'ai jamais lancés parce que la marche d'entrée était trop haute pour mes soirées. Cette marche est en train de descendre. C'est ce qui me hype le plus, très loin devant les gains de productivité en entreprise.
 
 **La valeur va se déplacer vers le jugement.** Savoir quoi ne pas construire, sentir qu'une abstraction va coûter cher dans six mois, dire non à une fonctionnalité. Ça ne s'automatise pas, parce que ça ne se formule pas sous forme de tâche.
 
 **Écrire du code va redevenir un choix.** Pas une corvée disparue, un choix. Il y a des morceaux que je continuerai à écrire à la main parce qu'ils sont le cœur du truc, ou parce que j'ai envie. Comme [l'animation de particules](/blog/animation-de-particules) de ce site à l'époque : personne n'avait besoin que je la fasse moi-même, et c'était tout l'intérêt.
 
-**Et l'entrée dans le métier va se durcir.** C'est le point qui me préoccupe vraiment. Les tâches sur lesquelles j'ai appris, le CRUD un peu bête, le bug de niveau deux, la petite feature isolée, sont précisément celles qu'on délègue le plus facilement. Si on supprime le terrain d'entraînement, on récolte ce qu'on mérite dans dix ans. Je n'ai pas de solution propre. Je pense juste que c'est la vraie question du métier en ce moment, et qu'elle est nettement moins discutée que le classement des modèles.
+**L'entrée dans le métier va se durcir.** C'est le point qui me préoccupe vraiment. Les tâches sur lesquelles j'ai appris, le CRUD un peu bête, le bug de niveau deux, la petite feature isolée, sont précisément celles qu'on délègue le plus facilement. Si on supprime le terrain d'entraînement, on récolte ce qu'on mérite dans dix ans. Je n'ai pas de solution propre. Je pense juste que c'est la vraie question du métier en ce moment, et qu'elle est nettement moins discutée que le classement des modèles.
 
-**Enfin, le monde des ESN va bouger.** Fini les grandes équipes de 40 devs à aligner sur un projet : je suis persuadé que le futur, ce sont des équipes de 2 à 3 personnes augmentées par l'IA, et que le modèle va s'orienter encore plus vers de la production au forfait ou à l'unité d'œuvre que vers de la prestation en régie comme on la connaît. Je dis ça depuis la place du cofondateur, et c'est ce qui rend le pari inconfortable : la régie facture du temps, et c'est précisément le temps qui se compresse. Un modèle qui vend des jours-homme n'a aucun intérêt à ce que ses équipes aillent trois fois plus vite. Un modèle qui vend un résultat, si.
+**Enfin, le monde des ESN va bouger.** Fini les grandes équipes de 40 devs à aligner sur un projet : je suis persuadé que le futur, ce sont des équipes avec moins de personnes mais augmentées par l'IA, et que le modèle va s'orienter encore plus vers de la production au forfait ou à l'unité d'œuvre que vers de la prestation en régie comme on la connaît. Je dis ça depuis la place du cofondateur, et c'est ce qui rend le pari inconfortable : la régie facture du temps, et c'est précisément le temps qui se compresse. Un modèle qui vend des jours-homme n'a aucun intérêt à ce que ses équipes aillent trois fois plus vite. Un modèle qui vend un résultat, si.
 
 ## Ce que je surveille quand même
 
-Je suis enthousiaste, pas naïf. Deux choses me font douter.
+Je suis enthousiaste, pas naïf. Je reste attentif sur certains points :
 
 La première, c'est le code que plus personne dans l'équipe ne comprend. Pas du code illisible : du code que personne n'a eu besoin de comprendre pour le livrer. Ça se paye toujours, et ça se paye au pire moment.
 
-La seconde, c'est ma propre perception. L'écart entre les 19 % mesurés et les 20 % ressentis dans l'étude METR ne parle pas des outils : il parle de nous. Je ne suis pas un bon juge de ma propre productivité, et je ne vois pas pourquoi je ferais exception.
+La seconde, c'est ma propre perception. L'écart entre les 19 % mesurés et les 20 % ressentis dans l'étude METR ne parle pas des outils : il parle de nous. Distinguer l'ilusion de la productivité avec l'impact que l'on a réellement n'est pas un travail simple mais il va être nécessaire.
 
 J'y vais à fond quand même. Mon instinct me dit que le dev augmenté est le bon pari, même si je sais que mon instinct n'est pas une mesure.
 
@@ -155,7 +155,7 @@ J'y vais à fond quand même. Mon instinct me dit que le dev augmenté est le bo
 
 Mon talk de 2024 ne disait pas « méfie-toi de tout ». Il disait : sache pourquoi tu y vas.
 
-La hype n'a jamais été le problème. Le problème, c'est la hype sans raisons : adopter un truc parce qu'il est partout, puis reconstruire dix-huit mois plus tard. Là, j'ai des raisons, elles sont dans cet article, et elles sont falsifiables : si dans deux ans je passe toujours mes journées à corriger du code que je n'ai pas écrit sans que la partie conception ait grossi, c'est que je me suis trompé.
+La hype n'a jamais été le problème. Le problème, c'est la hype sans raisons : adopter un truc parce qu'il est partout, puis reconstruire dix-huit mois plus tard. Là, j'ai des raisons, elles sont dans cet article, et elles sont vérifiable : si dans deux ans je passe toujours mes journées à corriger du code que je n'ai pas écrit sans que le temps de conception n'ait grossi, c'est que je me suis trompé.
 
 Je préfère largement écrire ça maintenant que le découvrir tranquillement dans mon coin.
 
