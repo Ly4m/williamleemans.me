@@ -279,8 +279,8 @@ synthesised.
   reader scanning for the next section got no landmark. The heads come down
   rather than the title going up: 36px over a 20px body is already the
   monograph scale this file argues for. The second axis is a MARK, never a
-  weight, and only h2 gets one: a section trace across the whole measure, sat
-  above the heading (see Components). h3 carries nothing, so the two levels
+  weight, and only h2 gets one: a section trace across the whole measure,
+  UNDERLINING the heading (see Components). h3 carries nothing, so the two levels
   differ in kind rather than by 4px. Typography asks `strong` for a 600
   Alegreya does not ship, which resolves to the same 700 the heads wear, so
   `.prose strong` names 700 outright.
@@ -655,14 +655,22 @@ Their annotations — post counts, year spans, reading times — are measurement
 so they take the notation face through one shared `.circuit-label` rule rather
 than a family literal per decoration. Each page family has its own plate: Home
 (header, margin, footer), blog list, blog post, Talks, Now. Blog posts also
-inject a **section trace** above each h2 — see below — and a 2px
+inject a **section trace** under each h2 — see below — and a 2px
 reading-progress hairline at the viewport top, which keeps its width under
 reduced motion and loses only its breath.
 
 **The section trace** is the article's own plate: a full-measure wire built in
 `src/scripts/blog-post.ts` at the heading's measured pixel width, carrying one
 to three components — an arc, a tent, a pad, a via — and inking itself on from
-the left as the heading arrives. Feature count comes from the measure: three
+the left as the heading arrives. It **underlines** the heading. It sat above it
+until 2026-08-25, where it read as a separator floating over the title rather
+than as the title's own rule; moved below, the accidents are flipped with a
+`scaleY(-1)` on the box, because arcs, tents and vias are built ABOVE the
+baseline (`Y - r`) and would otherwise poke into the descenders. The box is 3px
+tall, so its transform origin falls at 1.5px — exactly the baseline: the wire
+does not move by a pixel, only its accidents change side. The `0.9em` of air
+moved from `padding-top` to `padding-bottom` with it; it never measured a
+distance to the preceding paragraph, only the distance to the wire. Feature count comes from the measure: three
 across a wide desktop column, two at 645px, one at 358px, because the run is
 less than half as long on a phone and the trace should read as sparse
 instrumentation rather than a busy strip.

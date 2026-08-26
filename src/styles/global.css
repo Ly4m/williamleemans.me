@@ -652,7 +652,13 @@ article {
 .prose.prose-longform :where(h2) {
   font-size: 1.3em;
   position: relative;
-  padding-top: 0.9em;
+  /* L'air entre les mots et le fil — EN DESSOUS depuis que le tracé souligne le
+     titre au lieu de le surmonter (2026-08-25). C'est le même 0.9em qui était
+     en `padding-top` : il n'a jamais mesuré une distance au paragraphe
+     précédent, seulement la distance au fil, et il a suivi le fil. Le haut du
+     titre retombe donc sur la `margin-top` de Tailwind Typography, qui est
+     généreuse et suffit. */
+  padding-bottom: 0.9em;
 }
 
 .prose.prose-longform :where(h3) {
@@ -821,7 +827,7 @@ article {
    the ink and the pointer-events, neither of which can break the layout. */
 .heading-trace {
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 0;
   color: var(--ink-circuit);
   pointer-events: none;
