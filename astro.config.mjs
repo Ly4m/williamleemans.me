@@ -13,6 +13,7 @@ import svelte from "@astrojs/svelte";
 
 import rehypeTableScroll from "./src/lib/rehype-table-scroll.mjs";
 import rehypeFigure from "./src/lib/rehype-figure.mjs";
+import rehypeHeadingFocus from "./src/lib/rehype-heading-focus.mjs";
 
 const SITE = "https://lmns.fr";
 
@@ -91,7 +92,7 @@ export default defineConfig({
     responsiveStyles: true,
   },
   markdown: {
-    rehypePlugins: [rehypeTableScroll, rehypeFigure],
+    rehypePlugins: [rehypeTableScroll, rehypeFigure, rehypeHeadingFocus],
     shikiConfig: {
       themes: {
         light: "vitesse-light",
