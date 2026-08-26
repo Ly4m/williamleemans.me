@@ -691,6 +691,99 @@ the arcs means the trace is JavaScript's to make, and before it runs h2 and h3
 are separated by their size step alone. Drawn at a measured width, it is also
 redrawn on resize — without the entrance, because a resize is not an arrival.
 
+### Signature: Le circuit de l'article
+
+Two vertical buses run alongside a blog post at `xl` and up, **56px** either
+side of the measure. They **leave through the top of the page** and stop at the
+bottom, after "À lire ensuite". This is not a frame: it is a length of wire the
+page only ever shows a window of, arriving from off-page and coming to rest
+under the last row.
+
+The **left bus receives**. Each h2 extends its section trace 56px leftward to
+meet it, arriving on a **junction dot**; each figure pulls a 56px **stub** and
+arrives on a **pad** — the rect from the vocabulary, the place a component
+solders. The extension is bare: accidents stay over the column, so the trace
+still reads as a section's rule and not as an object of the margin. A figure
+draws no rule across the text, because two drawings in the same ink on top of
+each other make a knot, not a junction — and that difference gives the hierarchy
+for free: an h2 crosses the page, a figure only touches the edge. The tap is on
+the **figcaption**, not the image: `.fig-num` is already set in the notation
+register, so the wire arrives on a _name_ rather than on a box. It stops 6px
+short of the figcaption's own brass tick — two inks meeting end to end would
+read as one two-coloured line.
+
+The **right bus carries the sommaire** and nothing else. It stays bare of dots:
+giving it the left's junctions would state the same list twice, once in wire and
+once in words.
+
+- **The buses are CSS, not SVG** — unlike the nav bus, which is a measured
+  `.circuit-trace`. Not laziness: draw-on inks at `min(length / 180, 1)`s, so 1s
+  whatever the path. The nav bus is one viewport tall (~900px) and visibly
+  draws; these are one article tall (~10500px) and would cross the 900 visible
+  pixels in 0.086s. A drawing nobody can see is not worth the measuring
+  JavaScript it would cost, and the guard's JS budget sits at 11.5 KiB of 12.
+- **Junction dots and pads are carried by the subscriber, not by the bus**, and
+  that is what made "the junctions are there from load" free. A dot needs no
+  ABSOLUTE ordinate: placed at `left: -56px` on its own h2, it lands on the bus
+  at the right height whatever the layout does. No measurement, no redraw on
+  resize. The trace arrives later, on scroll, and solders onto a dot already
+  there — and it draws **from the bus outward**, because `circuit-draw` inks
+  from the start of the path and the path now starts at the spine.
+- **The floor is a `:has()`.** A bus with no subscriber is not a bus, it is a
+  line. Today only `hello-world` falls (zero h2, zero figures). Written in CSS
+  rather than counted at build because the condition IS the presence of the
+  subscribers: nothing to keep in step. The floor used to be argued from the
+  frame — "a frame around nothing is a rectangle" — and losing the frame
+  improved the sentence: the real claim was never about shape, it was about a
+  circuit needing something plugged into it.
+- **One value for the offset, `--bus-offset`.** It serves the CSS (bus, dots,
+  pads, stub length) and `src/scripts/blog-post.ts`, which READS it to extend
+  the section trace by the same amount. A second `56` would be a second place to
+  fix, and the drift would show as a wire missing its dot by two pixels.
+- **The feature count is taken on the measure, not the total width**
+  (`width - ext`). Without it, a desktop article silently went from two
+  accidents to three the day it gained 56px of bare wire.
+- **Two lead-in ranges, and that is not a refinement**: `8–32` when the trace is
+  extended (56px of bare margin already precedes it), `28–64` when it is not
+  (below `xl`, where the buses do not exist and the trace starts at the text
+  edge). One number cannot be right in both cases — the same mistake as the old
+  `--font-sans` pointing at a monospace: one name for two realities.
+- **The plate's junctions slide.** The right bus is static and the sommaire is
+  sticky, so the branch's two junction dots travel along the wire as you scroll.
+  A solder that moves is the one unresolved aesthetic reservation of this whole
+  build, arbitrated in favour of a sommaire that stays to hand (decided
+  2026-08-25).
+- **The top is cut, the bottom terminates, and the asymmetry IS the drawing**
+  (decided 2026-08-26). One end tick, at the bottom. The nav bus carries none
+  and its comment says why — "a tick marks an end, and this one has none on
+  screen" — and the top of these buses is now in exactly that case, so the same
+  argument takes its tick away. Mechanically it is `top: -4rem;
+height: calc(100% + 4rem)`, cancelling the shell's `lg:py-16`; that `4rem` is
+  a Tailwind utility CSS cannot read, so it is copied once, next to a falsifier
+  you can see — _if the buses stop touching the top of the page at ≥1280px,
+  this number and `lg:py-16` have drifted_.
+  - **Two fixed-viewport variants were considered and declined.** Anchoring the
+    buses to the viewport top, or making them a full-height fixed spine like
+    the nav bus, are both indistinguishable from this at any scroll offset but
+    zero — the buses already exit the top once you scroll. They differ only
+    past the end of the article, where there is no article left to flank, and
+    the spine variant would put a third and fourth edge-to-edge vertical on a
+    page that already has the nav bus.
+  - **The bottom does not move.** 128px of footing (`mb-16` on
+    `.article-measure` plus the shell's `lg:py-16`). Zero above, 128 below: it
+    is that reserve that makes the bottom tick read as chosen rather than
+    clipped.
+  - **The sommaire does NOT follow the buses up**, and the CSS says so in
+    place. Its plate is centred in the **viewport** (`.sommaire-corps` is
+    sticky at `top: 0`, `100dvh` tall); giving it the same `-4rem` would
+    decentre it by 32px at every scroll depth to remove a 64px settle at
+    exactly one — the top of the page. That settle predates these buses.
+  - **The reading hairline is left alone.** `#reading-progress` is fixed at
+    `top: 0` in nearly the decoration ink, so at scroll 0 the two verticals
+    terminate on a horizontal of the same weight — an accidental T. Accepted:
+    the bar floats over the buses at every scroll position but zero, and at
+    zero it is still `scaleX(0)`.
+
 ### Signature: The Flow Field
 
 The Now pages' ground: slow drifting streamlines following a simplex flow
@@ -811,6 +904,11 @@ single static frame under reduced motion.
 - **Don't** size a closing block's measure in `ch` against its own font size.
   `55ch` at 0.8125rem is less than half the article's column; that is how the
   hand-tuned `68ch` got there. Put it inside `.article-measure`.
+- **Don't** plug anything new into the article's left bus. h2 and figures, and
+  that is a rule rather than a snapshot: every new subscriber is one more wire
+  across the margin, and at four or five per screen the margin becomes a ladder.
+  Measured before opening it to figures — never more than three taps in a 900px
+  window, tightest pair 149px — and that headroom is what the rule protects.
 - **Don't** introduce a second accent. The green "done" badge was the site's
   only one, and it was removed for carrying state — brass's job.
 - **Don't** put brass on running text, or true brass (#E4A94D) on Paper —

@@ -89,7 +89,7 @@ const WIDEST = 36;
  * JavaScript's to make: before it runs, h2 and h3 are separated by their size
  * step alone.
  */
-function buildTrace(width: number, seed: string): SVGSVGElement {
+function buildTrace(width: number, seed: string, ext: number): SVGSVGElement {
   const rand = seededRand(seed);
   const ri = (lo: number, hi: number) =>
     Math.floor(rand() * (hi - lo + 1)) + lo;
@@ -164,10 +164,22 @@ function buildTrace(width: number, seed: string): SVGSVGElement {
   // A phone gets one event on the line and a long desktop measure gets three:
   // the trace should read as sparse instrumentation on a run of wire, not as a
   // busy strip, and the run is less than half as long at 390px.
-  const wanted = width < 420 ? 1 : width < 700 ? 2 : 3;
+  //
+  // Compté sur la MESURE et non sur la largeur totale : l'extension vers le bus
+  // ne rend pas la colonne plus large. Sans le `- ext`, un article de bureau
+  // passait de deux accidents à trois le jour où on lui a ajouté 56px de fil
+  // nu — une densité qui change sans que personne ne l'ait demandée.
+  const wanted = width - ext < 420 ? 1 : width - ext < 700 ? 2 : 3;
   const runOut = 40;
 
-  addLine(ri(28, 64));
+  // LE SAS, en deux plages parce que sa longueur utile dépend de ce qu'il y a
+  // devant. Étendue, la trace part du bus et traverse déjà 56px de marge nue
+  // avant d'atteindre la colonne : 8–32 de plus suffisent. Non étendue (sous
+  // `xl`, où les bus n'existent pas), elle démarre au bord du texte et il lui
+  // faut ses 28–64 d'origine. Un seul nombre ne peut pas être juste dans les
+  // deux cas — et l'extension elle-même reste NUE : aucun accident ne tombe
+  // dans la marge, ils restent tous à l'aplomb de la colonne.
+  addLine(ext + (ext > 0 ? ri(8, 32) : ri(28, 64)));
 
   for (let placed = 0; placed < wanted; placed++) {
     if (x + WIDEST > width - runOut) break;
@@ -200,7 +212,8 @@ function buildTrace(width: number, seed: string): SVGSVGElement {
   svg.style.position = "absolute";
   // SOUS le titre : le tracé souligne sa section au lieu de l'annoncer.
   svg.style.bottom = "0";
-  svg.style.left = "0";
+  // Le tracé démarre AU BUS, donc la boîte recule d'autant.
+  svg.style.left = `${-ext}px`;
   /* Et les accidents basculent vers le BAS. Arcs, tentes et vias sont bâtis
      au-dessus de la ligne de base (`Y - r`) : c'était juste quand le fil
      surmontait le titre et montait dans sa marge, ça ne l'est plus quand il le
@@ -232,13 +245,38 @@ function buildTrace(width: number, seed: string): SVGSVGElement {
  * also gave both levels the same mark, so the only thing separating an h2 from
  * an h3 was 4px of type. Now h2 is announced and h3 is not.
  */
+/**
+ * De combien la trace doit dépasser à gauche pour atteindre le bus de
+ * l'article — 0 quand les bus n'existent pas.
+ *
+ * La valeur est LUE, pas redéclarée : `--bus-offset` vit dans `global.css`, qui
+ * s'en sert aussi pour poser les bus, les points de jonction et les pads. Un
+ * second `56` ici serait un second endroit à corriger, et le décalage se
+ * verrait comme un fil qui rate son point de deux pixels — le genre de dérive
+ * que personne ne remarque et qu'aucun test n'attrape.
+ *
+ * Le seuil `80rem` est celui du `@media` qui allume les bus. Les deux doivent
+ * rester d'accord : sous ce seuil, une trace étendue partirait dans le vide.
+ */
+const BUS_MQ = "(min-width: 80rem)";
+
+function busExtension(): number {
+  if (!window.matchMedia(BUS_MQ).matches) return 0;
+  const v = getComputedStyle(document.documentElement).getPropertyValue(
+    "--bus-offset",
+  );
+  const n = Number.parseFloat(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
 function injectSectionTrace(heading: HTMLElement, animate: boolean) {
-  const width = Math.round(heading.clientWidth);
-  if (width < 120) return;
+  const ext = busExtension();
+  const width = Math.round(heading.clientWidth) + ext;
+  if (width - ext < 120) return;
 
   heading.querySelector(".heading-trace")?.remove();
 
-  const svg = buildTrace(width, heading.textContent?.trim() ?? "");
+  const svg = buildTrace(width, heading.textContent?.trim() ?? "", ext);
   heading.appendChild(svg);
 
   if (animate) animateTraces(svg);

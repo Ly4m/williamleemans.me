@@ -151,9 +151,33 @@ const structuredData = JSON.stringify({
     The <header> lives INSIDE the <article>: it carries the h1 and the date,
     and outside it a reader who jumps to the article landed in an article with
     no heading and no date in it.
+
+    `relative` sert au sommaire, qui se raccroche à cette enveloppe pour aller
+    se poser dans la marge droite. La classe est posée ICI et pas sur
+    `.article-measure` : le primitif est global et ne décrit qu'une colonne de
+    texte — lui donner un contexte de positionnement pour un seul consommateur
+    en ferait un conteneur de mise en page, ce qu'il n'est pas.
   */
   }
-  <div class="text-charcoal dark:text-primary-100 article-measure mb-16">
+  <div
+    class="text-charcoal dark:text-primary-100 article-measure relative mb-16"
+  >
+    {
+      /*
+      LES DEUX BUS. Deux traits, rien de plus : le dessin vit dans
+      `global.css` (`.article-bus`), les abonnés le rejoignent depuis leur
+      propre boîte, et un `:has()` les efface tous les deux sur un article où
+      rien ne se branche. Ils sont `aria-hidden` et hors du flux — un lecteur
+      d'écran n'a pas de décor à annoncer.
+
+      Celui de droite est NU de points : il ne porte que la branche du
+      sommaire. Lui donner les mêmes jonctions que celui de gauche ferait deux
+      fois la même liste, une fois en fil et une fois en mots.
+    */
+    }
+    <div class="article-bus article-bus-gauche" aria-hidden="true"></div>
+    <div class="article-bus article-bus-droite" aria-hidden="true"></div>
+
     <article>
       <header class="py-12">
         <h1
