@@ -999,6 +999,21 @@ article {
   }
 }
 
+/* Le décroché d'atterrissage des ancres — celles du sommaire, et toute autre.
+   Il ne protège PLUS le tracé : depuis que celui-ci souligne le titre au lieu
+   de le surmonter, un h2 posé au ras du haut de la fenêtre n'a plus rien
+   au-dessus de lui à faire raboter. Ce qui reste est plus simple et se dit
+   franchement — un titre collé au bord de la fenêtre se lit mal, et 40px
+   suffisent à l'en décoller. Si la valeur bouge un jour, elle n'a plus aucune
+   géométrie à respecter.
+
+   Sur `.prose` et pas sur `h2, h3` : le titre de la page et les libellés de
+   sections hors article ne sont la cible d'aucun lien. */
+.prose h2,
+.prose h3 {
+  scroll-margin-top: 2.5rem;
+}
+
 /* Still the hairline that runs off the blog index's year mark and the
    "À lire ensuite" label. It is no longer injected into article headings —
    those carry a whole trace now — so nothing animates it any more, and the

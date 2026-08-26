@@ -27,6 +27,17 @@ export type TraceCfg = {
   padActiveR: number;
   spur: number;
   spurHover: number;
+  /* Hauteur du plot DANS son item, depuis le haut de la boîte. Optionnel : par
+     défaut le plot est au milieu, ce qui est juste tant qu'un libellé tient sur
+     une ligne — le rail et le menu mobile ne passent donc rien.
+
+     Le sommaire, lui, a des libellés d'une OU deux lignes dans une boîte de
+     hauteur fixe. Centrés, ils décrochent : sur deux lignes le plot tombe dans
+     l'interligne et ne vise plus rien, sur une ligne il vise le texte, et le
+     pas des PREMIÈRES lignes saute de 9,4px à la charnière entre les deux
+     sortes — mesuré, c'est ce qui se voyait. Le sommaire cale donc ses
+     libellés en haut et pose son plot sur la première ligne. */
+  nodeOffset?: number;
 };
 
 /* Une plaque retournée (le menu mobile) dessine à droite mais son repère SVG
@@ -46,12 +57,27 @@ export function trace(
   const pitch = cfg.itemH + cfg.gap;
   const listH = n * cfg.itemH + Math.max(0, n - 1) * cfg.gap;
   const plateH = cfg.headroom + listH + cfg.tailroom;
-  const nodeY = (i: number) => cfg.headroom + cfg.itemH / 2 + i * pitch;
+  const offset = cfg.nodeOffset ?? cfg.itemH / 2;
+  const nodeY = (i: number) => cfg.headroom + offset + i * pitch;
   const first = nodeY(0);
   const last = nodeY(n - 1);
   /* La branche quitte le bus 42px au-dessus du premier plot et se redresse
      20px avant lui ; elle le rejoint en biais 40px sous le dernier. Les deux
-     jonctions sont marquées d'un point, comme sur les plaques. */
+     jonctions sont marquées d'un point, comme sur les plaques.
+
+     Ces quatre nombres sont ABSOLUS, pas proportionnels à `itemH` : c'est la
+     courbure du fil, et une plaque aux items plus hauts ne veut pas une courbe
+     plus molle. Toute config doit donc laisser la place aux jonctions, sans
+     quoi elles sortent du bus par un bout :
+
+         headroom >= 48 - offset
+         tailroom >= 46 + offset - itemH
+
+     où `offset` vaut `nodeOffset ?? itemH / 2`. Le sommaire a cassé la première
+     de ces deux bornes le jour où il a posé son plot sur la première ligne
+     (offset 21 -> 9.5) sans remonter son `headroom` : la branche partait à
+     y=1.5 pour un bus commençant à y=6. Visible dans le `d=` du SVG bien avant
+     de l'être à l'écran. */
   const junctionOut = first - 42;
   const straightFrom = first - 20;
   const straightTo = last + 18;
@@ -66,8 +92,8 @@ export function trace(
     nodes: Array.from({ length: n }, (_, i) => nodeY(i)),
     /* Le rail n'a pas de bus dans sa plaque : le sien traverse toute la
        hauteur de l'écran et vit dans l'<aside>, hors de cette boîte. Le menu
-       mobile, lui, est un panneau qui va et vient — son bus s'arrête avec lui,
-       et porte donc ses deux repères de fin. */
+       mobile et le sommaire, eux, sont des panneaux bornés — leur bus s'arrête
+       avec eux, et porte donc ses deux repères de fin. */
     busD: withBus ? `M ${busX} ${busTop} L ${busX} ${busBottom}` : null,
     tickTopD: withBus
       ? `M ${busX - 4} ${busTop} L ${busX + 4} ${busTop}`
@@ -98,6 +124,7 @@ export const plateVars = (cfg: TraceCfg, mirror = false) =>
     `--spur-dir:${mirror ? -1 : 1}`,
     `--label-x:${cfg.labelX}px`,
     `--item-h:${cfg.itemH}px`,
+    `--node-offset:${cfg.nodeOffset ?? cfg.itemH / 2}px`,
     `--gap:${cfg.gap}px`,
     `--headroom:${cfg.headroom}px`,
     `--pad-r:${cfg.padR}px`,

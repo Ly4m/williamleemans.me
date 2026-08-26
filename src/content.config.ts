@@ -42,6 +42,14 @@ const blog = defineCollection({
     dateModified: dateStricte.optional(),
     readingTime: z.number(),
     ogImage: z.string().optional(),
+    /* Le sommaire est une DÉCISION par article, pas une conséquence du nombre
+       de titres. Un seuil sur le compte serait une approximation de « cet
+       article est une surface de consultation », et une mauvaise :
+       `ember-animation` porte huit titres en 5,7 ko et se lit d'un trait, où
+       `garder-un-historique-git-propre` n'a que deux h2 mais quatre h3 qui
+       sont exactement ce qu'on vient rechercher. Par défaut absent : un
+       sommaire est un appareil, et un appareil se demande. */
+    toc: z.boolean().optional().default(false),
     related: z.array(z.string()).max(2).optional(),
     howTo: z
       .object({
