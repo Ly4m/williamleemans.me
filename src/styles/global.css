@@ -833,6 +833,155 @@ article {
   pointer-events: none;
 }
 
+/* ---------------------------------------------------------------------------
+   LE CIRCUIT DE L'ARTICLE.
+
+   Deux bus verticaux encadrent l'article à ±56px de la mesure, sur toute la
+   hauteur de l'enveloppe. Celui de GAUCHE reçoit : chaque h2 y branche sa
+   trace de section, chaque figure un moignon. Celui de DROITE ne porte que la
+   branche du sommaire (voir TableOfContents.astro, en `withBus: false` —
+   exactement l'arrangement du rail, dont le bus vit hors de la plaque).
+
+   Quatre décisions à ne pas défaire :
+
+   1. LES BUS SONT EN CSS, PAS EN SVG — contrairement au bus de la nav, qui est
+      un `.circuit-trace` mesuré. Ce n'est pas une économie de paresse : le
+      dessin à l'entrée encre à `min(longueur / 180, 1)` seconde, donc 1s quel
+      que soit le tracé. Le bus de la nav fait une hauteur de fenêtre (~900px)
+      et se dessine visiblement ; ceux-ci font la hauteur d'un article (~10500px
+      sur `developpement-assiste-par-ia`) et traverseraient les 900px visibles
+      en 0,086s. Un dessin qu'on ne peut pas voir ne vaut pas le JavaScript de
+      mesure qu'il coûterait — et le budget du garde-fou est à 11,4 KiB sur 12.
+
+   2. LES POINTS DE JONCTION ET LES PADS SONT PORTÉS PAR LEUR ABONNÉ, pas par
+      le bus, et c'est ce qui rend la décision « les jonctions sont là dès le
+      chargement » gratuite. Un point n'a pas besoin de son ordonnée ABSOLUE :
+      posé en `left: -56px` sur son propre h2, il tombe sur le bus à la bonne
+      hauteur, quelle que soit la mise en page. Aucune mesure, aucun redessin
+      au redimensionnement. La trace, elle, arrive plus tard au défilement et se
+      soude sur un point déjà là.
+
+   3. LE PLANCHER EST UN `:has()`. Un article où rien ne se branche n'a pas de
+      circuit, seulement deux traits — et un cadre autour de rien n'est plus un
+      cadre. Aujourd'hui seul `hello-world` tombe (zéro h2, zéro figure). La
+      règle est écrite en CSS plutôt que comptée au build parce que la
+      condition EST la présence des abonnés : rien à tenir en phase.
+
+   4. UNE SEULE VALEUR POUR L'ÉCART, `--bus-offset`. Elle sert ici (position des
+      bus, des points, des pads, longueur des moignons) ET dans
+      `src/scripts/blog-post.ts`, qui la lit pour rallonger la trace de section
+      d'autant. Le script la lit, il ne la redéclare pas.
+--------------------------------------------------------------------------- */
+:root {
+  --bus-offset: 56px;
+}
+
+.article-bus {
+  display: none;
+}
+
+@media (min-width: 80rem) {
+  .article-measure:has(.prose :is(h2, figure)) > .article-bus {
+    display: block;
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-left: 1px solid var(--ink-circuit);
+    pointer-events: none;
+  }
+
+  .article-bus-gauche {
+    left: calc(var(--bus-offset) * -1);
+  }
+
+  .article-bus-droite {
+    left: calc(100% + var(--bus-offset));
+  }
+
+  /* Les deux repères de fin. Le bus de la nav n'en a pas, et son commentaire
+     dit pourquoi : « un repère marque une fin, et celui-ci n'en a pas à
+     l'écran ». C'est exactement l'argument pour que ceux-ci en portent — leurs
+     deux bouts sont à l'écran, ils encadrent quelque chose. */
+  .article-bus::before,
+  .article-bus::after {
+    content: "";
+    position: absolute;
+    left: -5px;
+    width: 9px;
+    height: 1px;
+    background: var(--ink-circuit);
+  }
+
+  .article-bus::before {
+    top: 0;
+  }
+
+  .article-bus::after {
+    bottom: 0;
+  }
+
+  /* LE POINT DE JONCTION D'UN H2. Posé à 1.5px du BAS du titre : c'est
+     l'ordonnée de la ligne de base du tracé de section (`Y = 1.5` dans
+     `buildTrace`), mesurée depuis le bord dont le tracé dépend — et le tracé
+     est passé sous le titre. Le point et le fil qui viendra s'y souder doivent
+     être à la même hauteur au pixel ; s'ils divergent, ça se voit comme un fil
+     qui rate son point, et rien ne l'attrape. */
+  .article-measure:has(.prose :is(h2, figure)) .prose h2::before {
+    content: "";
+    position: absolute;
+    bottom: 1.5px;
+    left: calc(var(--bus-offset) * -1);
+    width: 4px;
+    height: 4px;
+    margin-bottom: -2px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: var(--ink-circuit);
+  }
+
+  /* LA FIGURE. Elle ne tire pas de règle en travers de la colonne — deux
+     dessins à la même encre superposés font un nœud, pas une jonction. Elle a
+     un moignon et un PAD : le rectangle du vocabulaire, l'endroit où un
+     composant se soude. Le point reste au h2, le pad à la figure ; deux sortes
+     d'abonnés, deux mots de la même langue.
+
+     Le branchement se fait sur la LÉGENDE et non sur l'image : `.fig-num` est
+     déjà composé en notation, comme les libellés des plaques — le fil arrive
+     donc sur un nom, pas sur une boîte. */
+  .article-measure:has(.prose :is(h2, figure)) .prose figcaption {
+    position: relative;
+  }
+
+  .article-measure:has(.prose :is(h2, figure)) .prose figcaption::before {
+    content: "";
+    position: absolute;
+    /* La moitié de l'interligne de la légende (1.55em) : le fil vise sa
+       première ligne, comme le plot du sommaire vise la sienne. */
+    top: 0.775em;
+    left: calc(var(--bus-offset) * -1);
+    width: 8px;
+    height: 6px;
+    margin-top: -3px;
+    margin-left: -4px;
+    border: 1px solid var(--ink-circuit);
+  }
+
+  /* Le moignon, du pad jusqu'aux abords de la légende. Il s'arrête à 6px du
+     filet laiton que `.prose figcaption` porte déjà : le fil accompagne la
+     légende, il ne se soude pas sur son tick — deux encres qui se touchent
+     bout à bout se liraient comme un seul trait à deux couleurs. */
+  .article-measure:has(.prose :is(h2, figure)) .prose figcaption::after {
+    content: "";
+    position: absolute;
+    top: 0.775em;
+    left: calc(var(--bus-offset) * -1 + 4px);
+    width: calc(var(--bus-offset) - 10px);
+    height: 1px;
+    margin-top: -0.5px;
+    background: var(--ink-circuit);
+  }
+}
+
 /* Still the hairline that runs off the blog index's year mark and the
    "À lire ensuite" label. It is no longer injected into article headings —
    those carry a whole trace now — so nothing animates it any more, and the

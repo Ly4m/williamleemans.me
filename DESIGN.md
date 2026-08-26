@@ -691,6 +691,60 @@ the arcs means the trace is JavaScript's to make, and before it runs h2 and h3
 are separated by their size step alone. Drawn at a measured width, it is also
 redrawn on resize — without the entrance, because a resize is not an arrival.
 
+### Signature: Le circuit de l'article
+
+Two vertical buses frame a blog post at `xl` and up, **56px** either side of the
+measure, running the full height of the wrapper — title through "À lire
+ensuite". Unlike the nav bus, both ends are on screen, which is exactly the
+argument for the **two end ticks** they carry and the nav bus refuses.
+
+The **left bus receives**. Each h2 extends its section trace 56px leftward to
+meet it, arriving on a **junction dot**; each figure pulls a 56px **stub** and
+arrives on a **pad** — the rect from the vocabulary, the place a component
+solders. The extension is bare: accidents stay over the column, so the trace
+still reads as a section's rule and not as an object of the margin. A figure
+draws no rule across the text, because two drawings in the same ink on top of
+each other make a knot, not a junction — and that difference gives the hierarchy
+for free: an h2 crosses the page, a figure only touches the edge. The tap is on
+the **figcaption**, not the image: `.fig-num` is already set in the notation
+register, so the wire arrives on a _name_ rather than on a box. It stops 6px
+short of the figcaption's own brass tick — two inks meeting end to end would
+read as one two-coloured line.
+
+The **right bus carries the sommaire** and nothing else. It stays bare of dots:
+giving it the left's junctions would state the same list twice, once in wire and
+once in words.
+
+- **The buses are CSS, not SVG** — unlike the nav bus, which is a measured
+  `.circuit-trace`. Not laziness: draw-on inks at `min(length / 180, 1)`s, so 1s
+  whatever the path. The nav bus is one viewport tall (~900px) and visibly
+  draws; these are one article tall (~10500px) and would cross the 900 visible
+  pixels in 0.086s. A drawing nobody can see is not worth the measuring
+  JavaScript it would cost, and the guard's JS budget sits at 11.5 KiB of 12.
+- **Junction dots and pads are carried by the subscriber, not by the bus**, and
+  that is what made "the junctions are there from load" free. A dot needs no
+  ABSOLUTE ordinate: placed at `left: -56px` on its own h2, it lands on the bus
+  at the right height whatever the layout does. No measurement, no redraw on
+  resize. The trace arrives later, on scroll, and solders onto a dot already
+  there — and it draws **from the bus outward**, because `circuit-draw` inks
+  from the start of the path and the path now starts at the spine.
+- **The floor is a `:has()`.** An article where nothing taps has no circuit,
+  only two lines — and a frame around nothing is a rectangle. Today only
+  `hello-world` falls (zero h2, zero figures). Written in CSS rather than
+  counted at build because the condition IS the presence of the subscribers:
+  nothing to keep in step.
+- **One value for the offset, `--bus-offset`.** It serves the CSS (bus, dots,
+  pads, stub length) and `src/scripts/blog-post.ts`, which READS it to extend
+  the section trace by the same amount. A second `56` would be a second place to
+  fix, and the drift would show as a wire missing its dot by two pixels.
+- **The feature count is taken on the measure, not the total width**
+  (`width - ext`). Without it, a desktop article silently went from two
+  accidents to three the day it gained 56px of bare wire.
+- **Two lead-in ranges, and that is not a refinement**: `8–32` when the trace is
+  extended (56px of bare margin already precedes it), `28–64` when it is not
+  (below `xl`, where the buses do not exist and the trace starts at the text
+  edge). One number cannot be right in both cases — the same mistake as the old
+  `--font-sans` pointing at a monospace: one name for two realities.
 ### Signature: The Flow Field
 
 The Now pages' ground: slow drifting streamlines following a simplex flow
@@ -811,6 +865,11 @@ single static frame under reduced motion.
 - **Don't** size a closing block's measure in `ch` against its own font size.
   `55ch` at 0.8125rem is less than half the article's column; that is how the
   hand-tuned `68ch` got there. Put it inside `.article-measure`.
+- **Don't** plug anything new into the article's left bus. h2 and figures, and
+  that is a rule rather than a snapshot: every new subscriber is one more wire
+  across the margin, and at four or five per screen the margin becomes a ladder.
+  Measured before opening it to figures — never more than three taps in a 900px
+  window, tightest pair 149px — and that headroom is what the rule protects.
 - **Don't** introduce a second accent. The green "done" badge was the site's
   only one, and it was removed for carrying state — brass's job.
 - **Don't** put brass on running text, or true brass (#E4A94D) on Paper —
