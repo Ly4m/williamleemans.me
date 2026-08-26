@@ -198,8 +198,18 @@ function buildTrace(width: number, seed: string): SVGSVGElement {
      the reader notices and the tests do not. The class still carries the ink
      and the pointer-events; only the geometry is pinned here. */
   svg.style.position = "absolute";
-  svg.style.top = "0";
+  // SOUS le titre : le tracé souligne sa section au lieu de l'annoncer.
+  svg.style.bottom = "0";
   svg.style.left = "0";
+  /* Et les accidents basculent vers le BAS. Arcs, tentes et vias sont bâtis
+     au-dessus de la ligne de base (`Y - r`) : c'était juste quand le fil
+     surmontait le titre et montait dans sa marge, ça ne l'est plus quand il le
+     souligne — ils viendraient piquer dans les jambages. Le retournement se
+     fait en une transformation plutôt qu'en inversant chaque `sweep-flag` et
+     chaque signe dans `buildTrace` : la boîte fait 3px de haut, son origine de
+     transformation tombe donc à 1.5px, exactement sur la ligne de base. Le fil
+     ne bouge pas d'un pixel, seuls ses accidents changent de côté. */
+  svg.style.transform = "scaleY(-1)";
 
   paths.forEach((d) => svg.appendChild(makePath(d)));
   rects.forEach(([rx, ry, rw, rh]) =>
@@ -211,8 +221,9 @@ function buildTrace(width: number, seed: string): SVGSVGElement {
 }
 
 /**
- * A section trace across the top of an h2 — the mark that says a new region of
- * the sheet starts here.
+ * A section trace under an h2 — the rule that underlines a new region of the
+ * sheet. It sat ABOVE the heading until 2026-08-25; moved below, it reads as
+ * the title's own underline rather than as a separator floating over it.
  *
  * It replaces a short trace that was injected INSIDE every h2 and h3 and ran
  * off to the right of the words. That stub took its length from whatever the
