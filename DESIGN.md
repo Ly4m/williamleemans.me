@@ -213,6 +213,16 @@ state on lines — pads, spurs, rings, ticks, badges. It never colors running te
 and nothing else (no green, no blue) may carry state; a second accent is the
 defect this rule exists to name.
 
+_One Signal per **axis**, not per screen_ — sharpened 2026-08-28, when the
+sommaire gained a current-section mark. The rule bounds the **palette**, not the
+count of lit pads: brass may burn in two places at once provided they answer
+**different questions**. The rail's plot says where you are in the _site_; the
+sommaire's says where you are in the _article_. Same accent, two axes, no
+competition — and the accessibility tree keeps them apart by name, `page` on the
+rail and `location` on the sommaire. What the rule still forbids is two brass
+marks answering the _same_ question: that is the ambiguity it was written for,
+and it has no exception.
+
 **The Two Inks Rule.** One accent, two values: #E4A94D on Night, #8f6a1a on
 Paper. Light mode never wears true brass — it fails contrast on #fafafa — and
 the two are tokens (`--color-brass`, `--color-brass-ink`), mirrored for
@@ -600,12 +610,41 @@ is the same drawing.
   shrinking — and a three-line label overflows the fixed 42px box into its
   neighbour. Roman at 0.875rem never exceeds two lines. Measured on
   `developpement-assiste-par-ia`, the busiest article.
-- **No brass, no state.** It does not follow the reader and has no current item.
-  Deliberate, not a forgotten scroll-spy: the rail's active plot is already lit
-  on these pages, and two brass "you are here" marks break the single-Signal
-  rule. Position in the article is `#reading-progress`'s job. `padActiveR` and
-  `spur` are filled in only because the shared type demands them; they never
-  resolve.
+- **A current-section state since 2026-08-28, in Signal.** It had none until
+  then, on three stated grounds. One fell outright: `#reading-progress` gives a
+  **proportion** (62%) and cannot give a **name**, so naming the section you are
+  in was work nobody was doing, not a duplicate. One was **paid** — a scroll-spy
+  would open a second observer, so it opens none (see the Don't). And one was
+  **refined rather than kept**: "the rail's brass is already lit" was being read
+  as one-Signal-per-screen, and the rule is one Signal per _axis_ — site versus
+  article, two questions, one accent. See The One Signal Rule.
+  **The mark is therefore the rail's own state vocabulary**, restated rather
+  than borrowed, since `--nav-signal` is scoped to `.nav-plate`:
+  `--sommaire-signal` on `.sommaire-plate`, `--color-brass-ink` whole on Paper,
+  the 65%-toward-the-page mix on Night. The two are copies of one recipe and can
+  drift — keep them in step. Pad and spur turn brass together; **the label stays
+  in text ink**, so the wire says _here_ and the word says _which_.
+  `padActiveR: 3.5` is literally `RAIL`'s value doing `RAIL`'s job, after being
+  copied off it to satisfy the type and drawing nothing for months. The spur is
+  **12px, not `RAIL`'s 18** — at 18 it reached the label exactly
+  (`branchX 22 + 18 = 40 = labelX`), which the rail's never does; shortened it
+  points at the word instead of soldering to it, and length no longer has to
+  carry the hover distinction now that colour does. The label takes the ink but
+  **not** hover's `translateX(2px)`: that displacement is a reaction to the
+  pointer, not a state, and a permanently offset item breaks the column's only
+  vertical edge. Hover is scoped `:not([data-active])` throughout, as
+  `.nav-link` already is — without it, hovering the current section would
+  _shrink_ its spur to 9px.
+- **No visible title, since 2026-08-28.** It carried a `register-ident`
+  "SOMMAIRE" label until then; the plate says what it is without being told —
+  a column of headings tapped onto a wire in the margin is not mistakable for
+  anything else, and the label was the one piece of the component doing no
+  work. **The accessible name stayed**, and that part is not decorative: the
+  page renders two `<nav>` landmarks (the rail and this), so an anonymous one
+  announces as "navigation" exactly like the other with nothing to tell them
+  apart. `aria-label="Sommaire"` replaced `aria-labelledby` — there is no
+  longer an element to point at. Removing an ornament must never leave the
+  page less usable than it was.
 - **Outside `<article>`, before it in the DOM.** Visual order matches focus
   order, and an eight-link navigation does not become part of the post for
   reader modes and extractors. The useful corollary is that it never inherits
@@ -1001,11 +1040,27 @@ single static frame under reduced motion.
   across the margin, and at four or five per screen the margin becomes a ladder.
   Measured before opening it to figures — never more than three taps in a 900px
   window, tightest pair 149px — and that headroom is what the rule protects.
-- **Don't** give the sommaire a current-section state, in brass or otherwise.
-  It is static by decision: the rail's active plot is already lit on those
-  pages, and where the reader is in the article is `#reading-progress`'s job.
-  A scroll-spy would also open a second `IntersectionObserver` over
-  `.prose h2`, which `blog-post.ts` already walks for the section traces.
+- **Don't** give the sommaire's current-section state an observer, or a
+  travelling piece. The state arrived 2026-08-28 (see above) and wears Signal;
+  these two constraints are what keep it affordable.
+  **No `IntersectionObserver`** — the objection that once forbade the whole
+  feature is still true, so `initSommaireSpy()` rides the `scroll` listener
+  `initReadingProgress` was already running and reads cached offsets. The one
+  observer in `blog-post.ts` is a one-shot latch (`unobserve` on first
+  intersection) and could not have been reused anyway. **No travelling piece**
+  like the rail's: that gesture is played once per navigation, whereas a spy
+  re-fires forever, and a pad running up and down the right margin all article
+  long is the ladder the left-bus rule exists to prevent, arriving from the
+  other side.
+- **Don't** measure the heading offsets once and trust them. The initial
+  `measure()` at `astro:page-load` fires before layout settles: on
+  `orchestration-ou-choregraphie` the first two headings were cached 21px low,
+  enough to flip the mark at the wrong moment, and arbitrarily worse on an
+  article with a large image. The guard costs neither a listener nor an
+  observer — `update()` compares `scrollHeight`, which the reading bar reads on
+  every scroll anyway, and re-measures when it moves; `document.fonts.ready`
+  covers the one case that misses, a reflow that shifts headings without
+  changing total height.
 - **Don't** introduce a second accent. The green "done" badge was the site's
   only one, and it was removed for carrying state — brass's job.
 - **Don't** put brass on running text, or true brass (#E4A94D) on Paper —

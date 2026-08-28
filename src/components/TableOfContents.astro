@@ -25,12 +25,33 @@ import { trace, plateVars } from "../lib/circuit-plate";
 
    Trois choses à ne pas « harmoniser » :
 
-   1. AUCUN LAITON, et aucun état. Le sommaire ne suit pas la lecture ; il n'a
-      pas d'item courant. C'est délibéré, pas un scroll-spy oublié — le plot
-      actif du rail est déjà allumé à l'écran sur ces pages, et deux « vous êtes
-      ici » en laiton cassent la Règle du Signal unique. La position dans
-      l'article appartient à `#reading-progress`. `padActiveR` et `spur` sont
-      donc renseignés parce que le type les exige, et ne se résolvent jamais.
+   1. UN ÉTAT, EN LAITON, depuis le 2026-08-28. Le sommaire n'avait pas d'item
+      courant jusque-là, et trois textes le disaient. Des trois raisons, une
+      est TOMBÉE, une est PAYÉE, une est AFFÛTÉE.
+
+      TOMBÉE : « la position dans l'article appartient à `#reading-progress` ».
+      La barre donne une PROPORTION et ne peut pas donner un NOM ; nommer la
+      section où l'on est était donc un travail que personne ne faisait, pas un
+      doublon.
+
+      PAYÉE : un scroll-spy ouvrirait bien un second `IntersectionObserver` sur
+      `.prose h2` — c'est pourquoi il n'y en a pas un seul. `blog-post.ts` se
+      greffe sur l'écouteur `scroll` que la barre de progression faisait déjà
+      tourner.
+
+      AFFÛTÉE : « le plot du rail est déjà allumé » lisait la Règle du Signal
+      unique comme « un seul laiton à l'écran ». C'est un Signal par AXE. Le
+      rail dit où l'on est dans le SITE, le sommaire où l'on est dans
+      l'ARTICLE : deux questions, un seul accent, aucune ambiguïté — et
+      `aria-current` les nomme différemment (`page` contre `location`). Deux
+      marques laiton pour la MÊME question resteraient le défaut que la règle
+      existe pour nommer.
+
+      D'où le vocabulaire d'état DU RAIL, à l'identique : plot laiton, amorce
+      laiton, libellé laissé dans l'encre du texte — le fil dit « ici », le mot
+      dit « lequel ». `padActiveR` se résout donc enfin sur la valeur même de
+      `RAIL`, après avoir été copié de lui pour satisfaire le type et n'avoir
+      jamais rien dessiné ; `spur` se résout raccourci, voir la config.
 
    2. IL EST HORS DE `<article>`, et pas seulement avant lui dans le DOM. Une
       navigation de huit liens à l'intérieur de l'article en devient un morceau
@@ -95,7 +116,14 @@ const SOMMAIRE: TraceCfg = {
   tailroom: 28,
   padR: 2,
   padActiveR: 3.5,
-  spur: 18,
+  /* 12 et non 18 : à 18 l'amorce ATTEIGNAIT le libellé (branchX 22 + 18 = 40 =
+     labelX), ce que celle du rail ne fait pas — elle s'arrête 8px avant son
+     mot. Raccourcie, elle redevient un moignon qui DÉSIGNE le libellé au lieu
+     de s'y souder, et la distinction avec le survol n'a plus à être portée par
+     la longueur : depuis que l'état est en laiton, c'est la couleur qui la
+     porte. 10 rendrait l'écart identique à celui du rail ; 12 garde l'amorce
+     visiblement plus longue qu'au survol (9px). */
+  spur: 12,
   spurHover: 9,
 };
 
@@ -115,17 +143,19 @@ const plaque = trace(SOMMAIRE, entrees.length, false);
 
 {
   visible && (
-    <nav class="sommaire" aria-labelledby="sommaire-titre">
+    <nav class="sommaire" aria-label="Sommaire">
+      {/* LE NOM EST PORTÉ PAR `aria-label`, ET IL LE RESTE. Le titre VISIBLE
+      « Sommaire » a été retiré le 2026-08-28 : la plaque se lit d'elle-même,
+      une colonne de titres branchés sur un fil dans la marge n'a pas besoin
+      qu'on la nomme à l'oeil. Le nom ACCESSIBLE, lui, n'est pas décoratif —
+      la page rend deux <nav> (le rail et celui-ci), et un landmark anonyme
+      s'annonce « navigation » comme l'autre, sans rien pour les départager.
+      Retirer aussi l'étiquette rendrait donc la page moins utilisable au
+      lecteur d'écran qu'elle ne l'était, ce que le retrait d'un ornement ne
+      doit jamais faire. `aria-label` et non plus `aria-labelledby` : il n'y
+      a plus d'élément à désigner. */}
       <div class="sommaire-corps">
         <div class="sommaire-bloc">
-          {/* Un <p> et non un titre : ce bloc précède le <h1> dans le document,
-            et un h2 placé avant lui mentirait sur le plan de la page. Le nom
-            accessible vient d'`aria-labelledby`, qui n'a besoin d'aucun
-            niveau. */}
-          <p id="sommaire-titre" class="register-ident sommaire-titre">
-            Sommaire
-          </p>
-
           <div
             class="sommaire-plate"
             style={`${plateVars(SOMMAIRE)};height:${plaque.plateH}px`}
@@ -158,6 +188,14 @@ const plaque = trace(SOMMAIRE, entrees.length, false);
               ))}
             </svg>
 
+            {/* `href="#slug"` EST UNE POIGNÉE autant qu'un lien : c'est par
+                lui — et par rien d'autre, ces liens n'ayant ni id ni
+                `data-` — que `blog-post.ts` retrouve le titre de chaque
+                entrée pour y poser `data-active`. Le risque n'est pas qu'on
+                l'ajoute, c'est qu'on le RANGE : personne, en réécrivant ce
+                bloc, n'a de raison de soupçonner qu'un attribut porteur y
+                pend. Si la forme du lien change, `initSommaireSpy()` change
+                avec. */}
             {entrees.map((e) => (
               <a href={`#${e.slug}`} class="sommaire-link">
                 <span class="sommaire-label">{e.text}</span>
@@ -222,22 +260,29 @@ const plaque = trace(SOMMAIRE, entrees.length, false);
     margin: auto 0;
   }
 
-  /* 0.75rem : le pas du registre d'identification, celui des items du rail et
-     du lien d'évitement. Ce libellé fait le même travail qu'eux — nommer une
-     plaque — et n'a aucune raison d'inventer un palier. */
-  .sommaire-titre {
-    margin: 0 0 0.5rem;
-    padding-left: var(--label-x, 40px);
-    font-size: 0.75rem;
-    color: var(--color-faded);
-  }
-
+  /* LE LAITON DE L'ÉTAT, à la MÊME recette que celui du rail — `--nav-signal`
+     est portée par `.nav-plate` et ne sort pas de `SideNav.astro`, donc la
+     valeur est redite ici plutôt qu'empruntée. Les deux doivent rester
+     d'accord : en clair `--color-brass-ink` entier, parce que le vrai laiton
+     ne donne que 1.9:1 sur `#fafafa` ; en sombre le laiton plein est la chose
+     la plus bruyante d'une page, ramené vers la couleur de page il tombe à
+     4.3:1 — au-dessus des 3:1 qu'un indicateur d'état demande, sans
+     l'éblouissement. */
   .sommaire-plate {
+    --sommaire-signal: var(--color-brass-ink);
     position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--gap);
     padding-top: var(--headroom);
+  }
+
+  :global(.dark) .sommaire-plate {
+    --sommaire-signal: color-mix(
+      in srgb,
+      var(--color-brass) 65%,
+      var(--color-page)
+    );
   }
 
   .sommaire-trace {
@@ -309,20 +354,33 @@ const plaque = trace(SOMMAIRE, entrees.length, false);
     background: var(--ink-circuit);
     transform: scaleX(0);
     transform-origin: left center;
-    transition: transform 0.25s ease;
+    /* `width` et `background` sont dans la transition parce que L'ÉTAT les
+       change tous les deux (9px -> 18px, encre de décoration -> encre du
+       texte). Sans eux, l'amorce de la section courante sauterait à sa
+       longueur pendant que le reste glisse. */
+    transition:
+      transform 0.25s ease,
+      width 0.25s ease,
+      background 0.25s ease;
   }
 
   /* `hover: hover` : sur un écran tactile l'état resterait collé après le tap
      et deux items paraîtraient allumés. Même raison que dans le rail. */
+  /* `:not([data-active])` PARTOUT, comme `.nav-link` dans le rail : sans ça,
+     survoler la section courante RÉTRÉCIRAIT son amorce — l'état la tire à
+     `--spur` (18px), le survol la pose à `--spur-hover` (9px) — et
+     rabaisserait son plot. L'état gagne ; sur l'item courant, le survol ne
+     fait plus rien du tout, pas même le décalage du libellé. */
   @media (hover: hover) {
-    .sommaire-link:hover .sommaire-label {
+    .sommaire-link:not([data-active]):hover .sommaire-label {
       color: var(--color-charcoal);
       transform: translateX(2px);
     }
 
     /* L'encre de décoration à pleine force, pas l'encre du texte : le fil se
-       réveille sous le doigt, il ne s'allume pas. */
-    .sommaire-link:hover::before {
+       réveille sous le doigt, il ne s'allume pas. C'est le BARREAU DU MILIEU
+       de l'échelle — l'encre du texte, elle, est réservée à l'état. */
+    .sommaire-link:not([data-active]):hover::before {
       width: calc(var(--pad-r) * 2 + 2px);
       height: calc(var(--pad-r) * 2 + 2px);
       margin-top: calc(var(--pad-r) * -1 - 1px);
@@ -330,16 +388,60 @@ const plaque = trace(SOMMAIRE, entrees.length, false);
       background: var(--ink-circuit-strong);
     }
 
-    .sommaire-link:hover::after {
+    .sommaire-link:not([data-active]):hover::after {
       transform: scaleX(1);
     }
+  }
+
+  /* L'ÉTAT : LA SECTION QU'ON EST EN TRAIN DE LIRE.
+
+     Posé par `blog-post.ts`, jamais au build — voir la note 1 en tête de
+     fichier pour le pourquoi, et `initSommaireSpy()` pour le comment.
+
+     PAS DE LAITON, et ce n'est pas une timidité : le plot laiton du rail est
+     allumé sur toute page d'article, et deux « vous êtes ici » en laiton
+     casseraient la Règle du Signal unique. L'état prend donc L'ENCRE DU TEXTE,
+     troisième barreau d'une échelle dont le rail n'a que deux barreaux parce
+     qu'il a le laiton : `--ink-circuit` au repos, `--ink-circuit-strong` au
+     survol, l'encre du texte à l'état. Le fil ET le mot passent ensemble —
+     l'item courant est celui qui est écrit dans l'encre de l'article.
+
+     Le libellé ne prend PAS le `translateX(2px)` du survol : ce décalage est
+     une réaction au pointeur, pas un état, et un item courant décalé en
+     permanence casserait le seul alignement vertical qu'ait cette colonne. */
+  .sommaire-link[data-active] .sommaire-label {
+    color: var(--color-charcoal);
+  }
+
+  .sommaire-link[data-active]::before {
+    width: calc(var(--pad-active-r) * 2);
+    height: calc(var(--pad-active-r) * 2);
+    margin-top: calc(var(--pad-active-r) * -1);
+    margin-left: calc(var(--pad-active-r) * -1);
+    background: var(--sommaire-signal);
+  }
+
+  /* LE FIL PORTE LE SIGNAL, LE MOT PORTE L'ENCRE. Plot et amorce passent au
+     laiton ensemble — c'est le vocabulaire d'état du rail, à l'identique — et
+     le libellé reste dans l'encre du texte. La marque dit donc deux choses
+     d'un coup : le laiton dit « c'est ici », l'encre dit « et c'est ce
+     titre ». `--sommaire-signal` est déjà sensible au thème, donc aucune de
+     ces deux règles ne se dédouble en sombre. */
+  .sommaire-link[data-active]::after {
+    width: var(--spur);
+    background: var(--sommaire-signal);
+    transform: scaleX(1);
+  }
+
+  :global(.dark) .sommaire-link[data-active] .sommaire-label {
+    color: var(--color-primary-100);
   }
 
   .sommaire-link:focus-visible .sommaire-label {
     color: var(--color-charcoal);
   }
 
-  :global(.dark) .sommaire-link:hover .sommaire-label,
+  :global(.dark) .sommaire-link:not([data-active]):hover .sommaire-label,
   :global(.dark) .sommaire-link:focus-visible .sommaire-label {
     color: var(--color-primary-100);
   }

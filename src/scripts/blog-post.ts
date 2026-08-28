@@ -282,6 +282,198 @@ function injectSectionTrace(heading: HTMLElement, animate: boolean) {
   if (animate) animateTraces(svg);
 }
 
+/* ---------------------------------------------------------------------------
+   LE SOMMAIRE SUIT LA LECTURE — et c'est un revirement, daté du 2026-08-28.
+
+   Jusque-là le sommaire était STATIQUE, et trois endroits l'écrivaient :
+   la note 1 de `TableOfContents.astro`, `DESIGN.md` et son « Don't ». Trois
+   raisons y étaient données ; une seule est tombée.
+
+   CE QUI TOMBE : « la position dans l'article appartient à
+   `#reading-progress` ». La barre donne une PROPORTION — 62 % — et ne peut
+   structurellement pas donner un NOM. Le sommaire, lui, nomme. Les deux
+   instruments ne répondaient pas à la même question, et celui qui répondait à
+   « où suis-je » ne répondait qu'en pourcentage.
+
+   CE QUI TIENT, et qui est PAYÉ plutôt qu'écarté :
+
+   1. LA RÈGLE DU SIGNAL UNIQUE — non pas écartée, mais AFFÛTÉE le même jour :
+      un Signal par AXE, pas un par écran. Le plot laiton du rail est bien
+      allumé sur toute page d'article (`SideNav.astro`,
+      `current.startsWith("/blog/")`), et l'état du sommaire est EN LAITON LUI
+      AUSSI. Les deux ne se disputent rien : le rail répond « où suis-je dans
+      le SITE », le sommaire « où suis-je dans l'ARTICLE ». Deux questions,
+      deux réponses, un seul accent — et l'arbre d'accessibilité les sépare
+      pareil, `aria-current="page"` contre `"location"`. Ce que la règle
+      interdit toujours, c'est deux marques laiton répondant à la MÊME
+      question. La formulation complète est dans `DESIGN.md`, « The One Signal
+      Rule ».
+
+   2. « UN SCROLL-SPY OUVRIRAIT UN SECOND `IntersectionObserver` SUR
+      `.prose h2` ». Toujours vrai, et c'est pourquoi il n'y en a pas. Cette
+      fonction n'observe rien : elle se greffe sur l'écouteur `scroll` que
+      `initReadingProgress` fait DÉJÀ tourner sur chaque article, et lit des
+      ordonnées mises en cache. Le seul observateur de ce fichier reste celui
+      des traces de section, qui est un verrou à un coup (`unobserve` dès la
+      première intersection) et ne pouvait donc pas servir d'espion.
+
+   LA LIGNE est à 30 % de la hauteur de fenêtre : au ras du haut, la section
+   PRÉCÉDENTE resterait allumée pendant qu'on lit le nouveau titre. Le PLANCHER
+   BAS n'est pas une coquetterie — sans lui, un dernier h2 suivi d'une queue
+   plus courte que 70 % de la fenêtre ne franchit JAMAIS la ligne et ne
+   s'allume jamais. C'est fonction de la hauteur de l'écran : vrai chez
+   quelqu'un, faux chez vous.
+
+   ZÉRO EN HAUT, MAINTENU EN BAS, et l'asymétrie est voulue. Au-dessus du
+   premier h2 on n'est entré dans aucune section, et allumer la première
+   pendant qu'on lit encore le h1 serait un mensonge dit à chaque chargement.
+   Passé `</article>` — `ArticleSignoff` et `ReadNext` sont DEHORS — on les a
+   toutes lues, et voir la marque s'éteindre juste en finissant se lit comme
+   une panne.
+
+   AUCUNE PIÈCE EN VOYAGE, contrairement au rail. Le trajet du rail est un
+   geste de navigation, joué une fois par clic ; un espion se redéclenche sans
+   fin, et un plot qui parcourt la marge droite pendant tout l'article, c'est
+   l'échelle que la règle du bus de gauche existe pour éviter, arrivée par
+   l'autre côté. Les transitions de 0,25 s déjà posées sur `::before` et
+   `::after` suffisent.
+
+   `aria-current="location"` et non `"page"` : le rail possède `"page"`
+   (`SideNav.astro`). Deux axes, deux mots — et dans l'arbre d'accessibilité
+   les deux marques portent alors des noms différents, ce qui est une seconde
+   réponse, non visuelle, à la règle du Signal unique.
+
+   `href="#slug"` EST UNE POIGNÉE, pas seulement un lien : c'est par lui que ce
+   fichier retrouve le titre de chaque entrée. `TableOfContents.astro` le dit
+   de son côté — le risque n'est pas qu'on l'ajoute, c'est qu'on le range.
+
+   Sous `80rem` le sommaire est en `display:none` mais reste dans le DOM :
+   d'où le `matchMedia`, sinon chaque téléphone paierait un calcul par
+   défilement pour un élément que personne ne voit. Le seuil est celui de
+   `TableOfContents.astro` et de `BUS_MQ` ci-dessus — les trois doivent rester
+   d'accord.
+--------------------------------------------------------------------------- */
+type SommaireSpy = {
+  measure: () => void;
+  update: () => void;
+  teardown: () => void;
+};
+
+let sommaireSpy: SommaireSpy | null = null;
+
+/* 0,3 : la ligne de franchissement, en fraction de la hauteur de fenêtre. */
+const LIGNE = 0.3;
+
+function initSommaireSpy() {
+  const links = [
+    ...document.querySelectorAll<HTMLAnchorElement>('.sommaire a[href^="#"]'),
+  ];
+  if (!links.length) return;
+
+  /* Les ids sont écrits BRUTS dans le HTML (« #le-métier-dans-cinq-ans »),
+     donc `getAttribute` — et surtout pas `link.hash`, qui les rendrait
+     pourcent-encodés et ne retrouverait plus rien. */
+  const cibles: { link: HTMLAnchorElement; titre: HTMLElement }[] = [];
+  for (const link of links) {
+    const titre = document.getElementById(link.getAttribute("href")!.slice(1));
+    if (titre) cibles.push({ link, titre });
+  }
+  if (!cibles.length) return;
+
+  const mq = window.matchMedia(BUS_MQ);
+  let ordonnees: number[] = [];
+  let hauteurDoc = -1;
+  let courant = -1;
+
+  const measure = () => {
+    hauteurDoc = document.documentElement.scrollHeight;
+    ordonnees = cibles.map(
+      ({ titre }) => titre.getBoundingClientRect().top + window.scrollY,
+    );
+  };
+
+  /* On n'écrit QUE sur changement d'indice : un défilement continu devient
+     alors une suite de non-opérations, et le DOM n'est touché qu'aux
+     charnières. C'est ce qui rend inutile un étranglement par rAF. */
+  const poser = (suivant: number) => {
+    if (suivant === courant) return;
+    const sortant = cibles[courant]?.link;
+    if (sortant) {
+      sortant.removeAttribute("data-active");
+      sortant.removeAttribute("aria-current");
+    }
+    const entrant = cibles[suivant]?.link;
+    if (entrant) {
+      entrant.setAttribute("data-active", "");
+      entrant.setAttribute("aria-current", "location");
+    }
+    courant = suivant;
+  };
+
+  const update = () => {
+    if (!mq.matches) {
+      poser(-1);
+      return;
+    }
+    const doc = document.documentElement;
+    /* LA MESURE SE RÉPARE TOUTE SEULE. Mesurer une fois à `astro:page-load` ne
+       suffit pas : la mise en page n'est pas encore posée. Constaté sur
+       `orchestration-ou-choregraphie`, où les DEUX premiers titres étaient
+       cachés 21px trop bas — assez pour que la ligne se franchisse au mauvais
+       moment, et arbitrairement plus sur un article à grande image.
+
+       Le remède ne coûte NI écouteur NI observateur, ce qui est tout l'intérêt
+       : `scrollHeight` est déjà lu à chaque défilement par la barre de
+       progression, juste au-dessus dans le même gestionnaire, donc la
+       comparaison est gratuite. Une page dont la hauteur bouge — polices,
+       images, contenu tardif — se remesure au défilement suivant, quelle que
+       soit la cause. `fonts.ready` couvre le seul cas que ce garde-fou rate :
+       une refonte qui déplace les titres SANS changer la hauteur totale. */
+    if (doc.scrollHeight !== hauteurDoc) measure();
+    if (window.scrollY + window.innerHeight >= doc.scrollHeight - 2) {
+      poser(cibles.length - 1);
+      return;
+    }
+    const ligne = window.scrollY + window.innerHeight * LIGNE;
+    let suivant = -1;
+    for (let i = 0; i < ordonnees.length; i += 1) {
+      if (ordonnees[i] > ligne) break;
+      suivant = i;
+    }
+    poser(suivant);
+  };
+
+  /* Traverser le seuil change à la fois la géométrie (les bus s'allument, donc
+     les traces changent de largeur) et la question elle-même. */
+  const onChange = () => {
+    measure();
+    update();
+  };
+  mq.addEventListener("change", onChange);
+
+  measure();
+  update();
+  document.fonts?.ready.then(() => {
+    measure();
+    update();
+  });
+
+  sommaireSpy = {
+    measure,
+    update,
+    teardown: () => {
+      mq.removeEventListener("change", onChange);
+      sommaireSpy = null;
+    },
+  };
+
+  document.addEventListener(
+    "astro:before-swap",
+    () => sommaireSpy?.teardown(),
+    { once: true },
+  );
+}
+
 function initHeadingTraces() {
   const headings = [
     ...document.querySelectorAll<HTMLElement>(".prose h2"),
@@ -310,6 +502,11 @@ function initHeadingTraces() {
       headings.forEach((h) => {
         if (h.querySelector(".heading-trace")) injectSectionTrace(h, false);
       });
+      /* Le même instant : la colonne a changé de largeur, donc les titres ont
+         changé d'ordonnée. Le sommaire se remesure ici plutôt que sur un
+         second écouteur `resize` — celui-ci est déjà débattu à 150 ms. */
+      sommaireSpy?.measure();
+      sommaireSpy?.update();
     }, 150);
   };
 
@@ -334,6 +531,12 @@ function initReadingProgress() {
     const scrollable =
       document.documentElement.scrollHeight - window.innerHeight;
     bar.style.transform = `scaleX(${scrollable > 0 ? window.scrollY / scrollable : 0})`;
+    /* L'ESPION DU SOMMAIRE ROULE ICI, et c'est tout le marché : cet écouteur
+       `scroll` tournait DÉJÀ sur chaque article, pour la barre. Le sommaire
+       suit donc la lecture sans qu'aucun observateur ni aucun écouteur ne
+       s'ajoute à la page — la seule objection du revirement qui restait
+       vraie est ainsi honorée, et non contournée. */
+    sommaireSpy?.update();
   };
 
   window.addEventListener("scroll", update, { passive: true });
@@ -349,4 +552,7 @@ function initReadingProgress() {
 }
 
 document.addEventListener("astro:page-load", initHeadingTraces);
+/* AVANT `initReadingProgress` : celle-ci appelle son `update()` de façon
+   synchrone à l'init, et cet `update()` pilote désormais l'espion. */
+document.addEventListener("astro:page-load", initSommaireSpy);
 document.addEventListener("astro:page-load", initReadingProgress);
